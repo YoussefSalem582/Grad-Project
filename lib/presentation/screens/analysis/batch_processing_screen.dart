@@ -102,14 +102,7 @@ class _BatchProcessingScreenState extends State<BatchProcessingScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: Container(
-        decoration: const BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            colors: AppColors.primaryGradient,
-            stops: [0.0, 0.5, 1.0],
-          ),
-        ),
+        decoration: const BoxDecoration(gradient: AppColors.primaryGradient),
         child: SafeArea(
           child: Column(
             children: [
@@ -452,7 +445,10 @@ class _BatchProcessingScreenState extends State<BatchProcessingScreen> {
             gradient: LinearGradient(
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
-              colors: [AppColors.success.withValues(alpha: 0.1), AppColors.surface],
+              colors: [
+                AppColors.success.withValues(alpha: 0.1),
+                AppColors.surface,
+              ],
             ),
           ),
           child: Column(
@@ -602,4 +598,3 @@ class _BatchProcessingScreenState extends State<BatchProcessingScreen> {
     );
   }
 }
-

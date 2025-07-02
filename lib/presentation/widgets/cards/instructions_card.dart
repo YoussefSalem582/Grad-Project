@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import '../../../core/core.dart';
 
 class InstructionsCard extends StatelessWidget {
-  const InstructionsCard({Key? key}) : super(key: key);
+  const InstructionsCard({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -41,7 +41,7 @@ class InstructionsCard extends StatelessWidget {
         Container(
           padding: const EdgeInsets.all(12),
           decoration: const BoxDecoration(
-            gradient: LinearGradient(colors: AppColors.primaryGradient),
+            gradient: AppColors.primaryGradient,
             borderRadius: BorderRadius.all(Radius.circular(16)),
           ),
           child: const Icon(Icons.lightbulb, color: Colors.white, size: 24),
@@ -198,4 +198,3 @@ class InstructionsCard extends StatelessWidget {
     );
   }
 }
-

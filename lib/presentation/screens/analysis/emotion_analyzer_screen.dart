@@ -1,21 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../providers/providers.dart';
-
-
-
-
-
-
-
 import '../../widgets/widgets.dart';
-
 import '../../../core/core.dart';
+import '../../../data/models/emotion_result.dart';
 import 'batch_processing_screen.dart';
 import '../core/model_info_screen.dart';
 
 class EmotionAnalyzerScreen extends StatefulWidget {
-  const EmotionAnalyzerScreen({Key? key}) : super(key: key);
+  const EmotionAnalyzerScreen({super.key});
 
   @override
   _EmotionAnalyzerScreenState createState() => _EmotionAnalyzerScreenState();
@@ -31,7 +24,6 @@ class _EmotionAnalyzerScreenState extends State<EmotionAnalyzerScreen>
 
   // NEW: Tab controller for enhanced features
   late TabController _tabController;
-  int _currentTabIndex = 0;
   bool _showEnhancedFeatures = false;
 
   @override
@@ -41,7 +33,7 @@ class _EmotionAnalyzerScreenState extends State<EmotionAnalyzerScreen>
     _tabController = TabController(length: 4, vsync: this);
     _tabController.addListener(() {
       setState(() {
-        _currentTabIndex = _tabController.index;
+        // Tab index changed
       });
     });
   }
@@ -123,7 +115,6 @@ class _EmotionAnalyzerScreenState extends State<EmotionAnalyzerScreen>
 
   // NEW: Show batch processing dialog
   void _showBatchProcessingDialog() {
-    final batchTexts = <String>[];
     final textControllers = List.generate(
       5,
       (index) => TextEditingController(),
@@ -181,24 +172,11 @@ class _EmotionAnalyzerScreenState extends State<EmotionAnalyzerScreen>
     );
   }
 
-  // NEW: Show system health status
-  String _getSystemHealthStatus() {
-    final provider = context.read<EmotionProvider>();
-    return provider.systemHealthStatus;
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: Container(
-        decoration: const BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            colors: AppColors.primaryGradient,
-            stops: [0.0, 0.5, 1.0],
-          ),
-        ),
+        decoration: const BoxDecoration(gradient: AppColors.primaryGradient),
         child: SafeArea(
           child: Column(
             children: [
@@ -822,4 +800,3 @@ class _EmotionAnalyzerScreenState extends State<EmotionAnalyzerScreen>
     );
   }
 }
-

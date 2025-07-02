@@ -12,3 +12,4 @@ export 'network/network_info.dart';
 export 'routing/app_router.dart';
 export 'usecases/usecase.dart';
 export 'utils/emotion_utils.dart';
+export 'utils/responsive_utils.dart';

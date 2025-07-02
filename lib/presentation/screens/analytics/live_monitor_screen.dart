@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'dart:async';
 
-
 import '../../../core/core.dart';
 
 class LiveMonitorScreen extends StatefulWidget {
@@ -85,7 +84,7 @@ class _LiveMonitorScreenState extends State<LiveMonitorScreen> {
     return Container(
       padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
-        gradient: const LinearGradient(colors: AppColors.primaryGradient),
+        gradient: AppColors.primaryGradient,
         boxShadow: [
           BoxShadow(
             color: Colors.black.withValues(alpha: 0.1),
@@ -296,7 +295,7 @@ class _LiveMonitorScreenState extends State<LiveMonitorScreen> {
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        gradient: const LinearGradient(colors: AppColors.errorGradient),
+        gradient: AppColors.errorGradient,
         borderRadius: BorderRadius.circular(12),
         boxShadow: [
           BoxShadow(
@@ -836,4 +835,3 @@ class _LiveMonitorScreenState extends State<LiveMonitorScreen> {
     ).showSnackBar(const SnackBar(content: Text('Data refreshed')));
   }
 }
-

@@ -6,7 +6,7 @@ import '../../../core/core.dart';
 class AnalyzeButton extends StatelessWidget {
   final VoidCallback onPressed;
 
-  const AnalyzeButton({Key? key, required this.onPressed}) : super(key: key);
+  const AnalyzeButton({super.key, required this.onPressed});
 
   @override
   Widget build(BuildContext context) {
@@ -15,7 +15,7 @@ class AnalyzeButton extends StatelessWidget {
         return Container(
           height: 60,
           decoration: BoxDecoration(
-            gradient: const LinearGradient(colors: AppColors.primaryGradient),
+            gradient: AppColors.primaryGradient,
             borderRadius: BorderRadius.circular(20),
             boxShadow: [
               BoxShadow(
@@ -81,4 +81,3 @@ class AnalyzeButton extends StatelessWidget {
     );
   }
 }
-

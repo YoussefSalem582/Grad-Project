@@ -6,10 +6,10 @@ class EmotionInputField extends StatelessWidget {
   final VoidCallback? onSubmitted;
 
   const EmotionInputField({
-    Key? key,
+    super.key,
     required this.controller,
     this.onSubmitted,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import '../../../core/core.dart';
 import '../../../data/data.dart';
 import '../admin/admin_navigation_screen.dart';
 import '../employee/employee_navigation_screen.dart';
@@ -11,32 +10,29 @@ class RoleSelectionScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       body: Container(
-        decoration: BoxDecoration(
+        decoration: const BoxDecoration(
           gradient: LinearGradient(
+            colors: [Color(0xFF667EEA), Color(0xFF764BA2)],
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
-            colors: [
-              AppColors.primary.withValues(alpha: 0.1),
-              AppColors.secondary.withValues(alpha: 0.05),
-            ],
           ),
         ),
         child: SafeArea(
-          child: SingleChildScrollView(
+          child: Padding(
             padding: const EdgeInsets.all(24.0),
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                // App Logo/Icon
+                // App Logo
                 Container(
                   width: 120,
                   height: 120,
                   decoration: BoxDecoration(
-                    gradient: AppColors.buttonGradient,
+                    color: Colors.white.withValues(alpha: 0.2),
                     borderRadius: BorderRadius.circular(30),
                   ),
                   child: const Icon(
-                    Icons.analytics,
+                    Icons.analytics_rounded,
                     size: 60,
                     color: Colors.white,
                   ),
@@ -44,50 +40,43 @@ class RoleSelectionScreen extends StatelessWidget {
                 const SizedBox(height: 32),
 
                 // App Title
-                Text(
-                  AppStrings.appTitle,
-                  style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+                const Text(
+                  'CustomerSense Pro',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 32,
                     fontWeight: FontWeight.bold,
-                    color: AppColors.textPrimary,
                   ),
                   textAlign: TextAlign.center,
                 ),
-                const SizedBox(height: 12),
+                const SizedBox(height: 16),
 
-                Text(
-                  'Choose your access level',
-                  style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                    color: AppColors.textSecondary,
-                  ),
+                const Text(
+                  'Choose your access level to continue',
+                  style: TextStyle(color: Colors.white70, fontSize: 16),
                   textAlign: TextAlign.center,
                 ),
                 const SizedBox(height: 48),
 
-                // Role Cards
+                // Admin Card
                 _buildRoleCard(
                   context,
-                  UserRole.admin,
-                  Icons.admin_panel_settings,
-                  'Complete system management with full analytics access',
-                  AppColors.primary,
+                  'Administrator',
+                  'Complete system management and analytics oversight',
+                  Icons.admin_panel_settings_rounded,
+                  Colors.blue,
+                  () => _navigateToRole(context, UserRole.admin),
                 ),
-                const SizedBox(height: 20),
+                const SizedBox(height: 24),
 
+                // Employee Card
                 _buildRoleCard(
                   context,
-                  UserRole.employee,
-                  Icons.person,
+                  'Employee',
                   'Personal dashboard with customer interaction tools',
-                  AppColors.secondary,
-                ),
-
-                const SizedBox(height: 48),
-
-                Text(
-                  'Select your role to continue',
-                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                    color: AppColors.textSecondary,
-                  ),
+                  Icons.person_rounded,
+                  Colors.green,
+                  () => _navigateToRole(context, UserRole.employee),
                 ),
               ],
             ),
@@ -99,67 +88,88 @@ class RoleSelectionScreen extends StatelessWidget {
 
   Widget _buildRoleCard(
     BuildContext context,
-    UserRole role,
-    IconData icon,
+    String title,
     String description,
-    Color primaryColor,
+    IconData icon,
+    Color color,
+    VoidCallback onTap,
   ) {
-    return Card(
-      elevation: 8,
-      shadowColor: primaryColor.withValues(alpha: 0.3),
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-      child: InkWell(
-        borderRadius: BorderRadius.circular(16),
-        onTap: () => _navigateToRole(context, role),
-        child: Container(
-          width: double.infinity,
-          padding: const EdgeInsets.all(24),
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(16),
-            border: Border.all(color: primaryColor.withValues(alpha: 0.2), width: 2),
-          ),
-          child: Column(
-            children: [
-              Container(
-                width: 80,
-                height: 80,
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    colors: [primaryColor, primaryColor.withValues(alpha: 0.7)],
+    return AnimatedContainer(
+      duration: const Duration(milliseconds: 200),
+      child: Card(
+        elevation: 8,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        child: InkWell(
+          onTap: onTap,
+          borderRadius: BorderRadius.circular(16),
+          splashColor: color.withValues(alpha: 0.3),
+          highlightColor: color.withValues(alpha: 0.1),
+          child: Container(
+            padding: const EdgeInsets.all(20),
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(16),
+              gradient: LinearGradient(
+                colors: [color.withValues(alpha: 0.1), Colors.white],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+              ),
+            ),
+            child: Row(
+              children: [
+                Container(
+                  width: 60,
+                  height: 60,
+                  decoration: BoxDecoration(
+                    color: color,
+                    borderRadius: BorderRadius.circular(16),
+                    boxShadow: [
+                      BoxShadow(
+                        color: color.withValues(alpha: 0.3),
+                        blurRadius: 8,
+                        offset: const Offset(0, 4),
+                      ),
+                    ],
                   ),
-                  borderRadius: BorderRadius.circular(20),
+                  child: Icon(icon, size: 28, color: Colors.white),
                 ),
-                child: Icon(icon, size: 40, color: Colors.white),
-              ),
-              const SizedBox(height: 16),
-
-              Text(
-                role.displayName,
-                style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                  fontWeight: FontWeight.bold,
-                  color: AppColors.textPrimary,
+                const SizedBox(width: 16),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        title,
+                        style: const TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.black87,
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      Text(
+                        description,
+                        style: const TextStyle(
+                          fontSize: 14,
+                          color: Colors.black54,
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
-              ),
-              const SizedBox(height: 8),
-
-              Text(
-                role.description,
-                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                  color: AppColors.textSecondary,
+                Container(
+                  padding: const EdgeInsets.all(8),
+                  decoration: BoxDecoration(
+                    color: color.withValues(alpha: 0.1),
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: const Icon(
+                    Icons.arrow_forward_ios,
+                    color: Colors.black54,
+                    size: 16,
+                  ),
                 ),
-                textAlign: TextAlign.center,
-              ),
-              const SizedBox(height: 12),
-
-              Text(
-                description,
-                style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                  color: AppColors.textSecondary,
-                  fontStyle: FontStyle.italic,
-                ),
-                textAlign: TextAlign.center,
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),
@@ -167,14 +177,82 @@ class RoleSelectionScreen extends StatelessWidget {
   }
 
   void _navigateToRole(BuildContext context, UserRole role) {
-    Navigator.pushReplacement(
-      context,
-      MaterialPageRoute(
-        builder: (context) => role == UserRole.admin
-            ? const AdminNavigationScreen()
-            : const EmployeeNavigationScreen(),
-      ),
+    // Show loading indicator
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext context) {
+        return const Center(
+          child: CircularProgressIndicator(
+            valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+          ),
+        );
+      },
     );
+
+    // Navigate after a brief delay for better UX
+    Future.delayed(const Duration(milliseconds: 500), () {
+      // Check if the widget is still mounted
+      if (!context.mounted) return;
+
+      Navigator.of(context).pop(); // Close loading dialog
+
+      switch (role) {
+        case UserRole.admin:
+          if (!context.mounted) return;
+          Navigator.pushReplacement(
+            context,
+            PageRouteBuilder(
+              pageBuilder: (context, animation, secondaryAnimation) =>
+                  const AdminNavigationScreen(),
+              transitionDuration: const Duration(milliseconds: 300),
+              transitionsBuilder:
+                  (context, animation, secondaryAnimation, child) {
+                    return SlideTransition(
+                      position:
+                          Tween<Offset>(
+                            begin: const Offset(1.0, 0.0),
+                            end: Offset.zero,
+                          ).animate(
+                            CurvedAnimation(
+                              parent: animation,
+                              curve: Curves.easeInOut,
+                            ),
+                          ),
+                      child: child,
+                    );
+                  },
+            ),
+          );
+          break;
+        case UserRole.employee:
+          if (!context.mounted) return;
+          Navigator.pushReplacement(
+            context,
+            PageRouteBuilder(
+              pageBuilder: (context, animation, secondaryAnimation) =>
+                  const EmployeeNavigationScreen(),
+              transitionDuration: const Duration(milliseconds: 300),
+              transitionsBuilder:
+                  (context, animation, secondaryAnimation, child) {
+                    return SlideTransition(
+                      position:
+                          Tween<Offset>(
+                            begin: const Offset(1.0, 0.0),
+                            end: Offset.zero,
+                          ).animate(
+                            CurvedAnimation(
+                              parent: animation,
+                              curve: Curves.easeInOut,
+                            ),
+                          ),
+                      child: child,
+                    );
+                  },
+            ),
+          );
+          break;
+      }
+    });
   }
 }
-

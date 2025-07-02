@@ -4,7 +4,7 @@ import '../../providers/providers.dart';
 import '../../../core/core.dart';
 
 class ConnectionStatusCard extends StatelessWidget {
-  const ConnectionStatusCard({Key? key}) : super(key: key);
+  const ConnectionStatusCard({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -13,11 +13,9 @@ class ConnectionStatusCard extends StatelessWidget {
         return Container(
           padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(
-            gradient: LinearGradient(
-              colors: provider.isConnected
-                  ? AppColors.successGradient
-                  : AppColors.errorGradient,
-            ),
+            gradient: provider.isConnected
+                ? AppColors.successGradient
+                : AppColors.errorGradient,
             borderRadius: BorderRadius.circular(20),
             boxShadow: [
               BoxShadow(
@@ -81,4 +79,3 @@ class ConnectionStatusCard extends StatelessWidget {
     );
   }
 }
-

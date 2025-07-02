@@ -138,7 +138,7 @@ class DemoExamplesCard extends StatelessWidget {
         const SizedBox(height: 12),
         ...demoResult!.examples.take(6).map((example) {
           return _buildExampleItem(example);
-        }).toList(),
+        }),
         if (demoResult!.examples.length > 6)
           Padding(
             padding: const EdgeInsets.only(top: 8),
@@ -162,7 +162,9 @@ class DemoExamplesCard extends StatelessWidget {
         color: AppColors.surface.withValues(alpha: 0.3),
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
-          color: EmotionUtils.getEmotionColor(example.emotion).withValues(alpha: 0.3),
+          color: EmotionUtils.getEmotionColor(
+            example.emotion,
+          ).withValues(alpha: 0.3),
         ),
       ),
       child: Material(
@@ -341,4 +343,3 @@ class DemoExamplesCard extends StatelessWidget {
     }
   }
 }
-

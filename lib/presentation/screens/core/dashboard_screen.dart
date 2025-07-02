@@ -421,7 +421,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        gradient: const LinearGradient(colors: AppColors.warningGradient),
+        gradient: AppColors.warningGradient,
         borderRadius: BorderRadius.circular(12),
         boxShadow: [
           BoxShadow(
@@ -572,4 +572,3 @@ class _DashboardScreenState extends State<DashboardScreen> {
     // Navigate to team performance tab
   }
 }
-

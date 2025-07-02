@@ -100,14 +100,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: Container(
-        decoration: const BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            colors: AppColors.primaryGradient,
-            stops: [0.0, 0.5, 1.0],
-          ),
-        ),
+        decoration: const BoxDecoration(gradient: AppColors.primaryGradient),
         child: SafeArea(
           child: Column(
             children: [
@@ -200,11 +193,15 @@ class _HistoryScreenState extends State<HistoryScreen> {
                   : null,
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(15),
-                borderSide: BorderSide(color: Colors.white.withValues(alpha: 0.3)),
+                borderSide: BorderSide(
+                  color: Colors.white.withValues(alpha: 0.3),
+                ),
               ),
               enabledBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(15),
-                borderSide: BorderSide(color: Colors.white.withValues(alpha: 0.3)),
+                borderSide: BorderSide(
+                  color: Colors.white.withValues(alpha: 0.3),
+                ),
               ),
               focusedBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(15),
@@ -337,7 +334,9 @@ class _HistoryScreenState extends State<HistoryScreen> {
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
               colors: [
-                EmotionUtils.getEmotionColor(item.emotion).withValues(alpha: 0.1),
+                EmotionUtils.getEmotionColor(
+                  item.emotion,
+                ).withValues(alpha: 0.1),
                 AppColors.surface,
               ],
             ),
@@ -608,4 +607,3 @@ class HistoryItem {
     required this.timestamp,
   });
 }
-

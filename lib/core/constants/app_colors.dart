@@ -1,149 +1,177 @@
 import 'package:flutter/material.dart';
 
 class AppColors {
-  // Primary brand colors
-  static const Color primary = Color(0xFF3B82F6); // Blue
-  static const Color secondary = Color(0xFF10B981); // Green
-  static const Color primaryLight = Color(0xFF60A5FA);
+  // Primary Brand Colors - Modern Blue Palette
+  static const Color primary = Color(0xFF2563EB); // Vibrant blue
+  static const Color primaryLight = Color(0xFF3B82F6);
   static const Color primaryDark = Color(0xFF1E40AF);
+  static const Color primarySurface = Color(0xFFEFF6FF);
 
-  // Text colors
-  static const Color textPrimary = Color(0xFF1E293B);
-  static const Color textSecondary = Color(0xFF64748B);
-  static const Color textLight = Color(0xFF94A3B8);
+  // Secondary Colors - Professional Teal
+  static const Color secondary = Color(0xFF06B6D4);
+  static const Color secondaryLight = Color(0xFF22D3EE);
+  static const Color secondaryDark = Color(0xFF0891B2);
+  static const Color secondarySurface = Color(0xFFECFDF5);
 
-  // Background colors
-  static const Color background = Color(0xFFF8FAFC);
-  static const Color surface = Color(0xFFFFFFFF);
-  static const Color surfaceVariant = Color(0xFFF1F5F9);
+  // Accent Colors - Energetic Purple
+  static const Color accent = Color(0xFF8B5CF6);
+  static const Color accentLight = Color(0xFFA78BFA);
+  static const Color accentDark = Color(0xFF7C3AED);
+  static const Color accentSurface = Color(0xFFF3F4F6);
 
-  // Status colors
+  // Semantic Colors - Enhanced
   static const Color success = Color(0xFF10B981);
-  static const Color warning = Color(0xFFF59E0B);
-  static const Color error = Color(0xFFEF4444);
-  static const Color info = Color(0xFF3B82F6);
-  static const Color divider = Color(0xFFE5E7EB);
+  static const Color successLight = Color(0xFF34D399);
+  static const Color successDark = Color(0xFF059669);
+  static const Color successSurface = Color(0xFFECFDF5);
 
-  // Gradient
-  static const LinearGradient buttonGradient = LinearGradient(
-    colors: [primary, primaryLight],
+  static const Color warning = Color(0xFFF59E0B);
+  static const Color warningLight = Color(0xFFFBBF24);
+  static const Color warningSurface = Color(0xFFFFFBEB);
+
+  static const Color error = Color(0xFFEF4444);
+  static const Color errorLight = Color(0xFFF87171);
+  static const Color errorSurface = Color(0xFFFEF2F2);
+
+  static const Color info = Color(0xFF3B82F6);
+  static const Color infoSurface = Color(0xFFEFF6FF);
+
+  // Neutral Colors - Modern Gray Scale
+  static const Color background = Color(0xFFFAFBFC);
+  static const Color surface = Color(0xFFFFFFFF);
+  static const Color surfaceVariant = Color(0xFFF8FAFC);
+  static const Color surfaceContainer = Color(0xFFF1F5F9);
+
+  // Text Colors - Enhanced Hierarchy
+  static const Color textPrimary = Color(0xFF0F172A);
+  static const Color textSecondary = Color(0xFF475569);
+  static const Color textTertiary = Color(0xFF64748B);
+  static const Color textLight = Color(0xFF94A3B8);
+  static const Color textDisabled = Color(0xFFCBD5E1);
+
+  // Border Colors
+  static const Color border = Color(0xFFE2E8F0);
+  static const Color borderLight = Color(0xFFF1F5F9);
+  static const Color borderFocus = Color(0xFF3B82F6);
+
+  // Dark Mode Colors
+  static const Color darkBackground = Color(0xFF0F172A);
+  static const Color darkSurface = Color(0xFF1E293B);
+  static const Color darkSurfaceVariant = Color(0xFF334155);
+  static const Color darkTextPrimary = Color(0xFFF8FAFC);
+  static const Color darkTextSecondary = Color(0xFFCBD5E1);
+
+  // Gradients
+  static const LinearGradient primaryGradient = LinearGradient(
     begin: Alignment.topLeft,
     end: Alignment.bottomRight,
+    colors: [Color(0xFF3B82F6), Color(0xFF2563EB)],
   );
 
-  // Legacy colors for backward compatibility
-  static const Color accent = primary;
-  static const Color buttonPrimary = primary;
-  static const Color buttonSecondary = secondary;
-  static const List<Color> accentGradient = primaryGradient;
+  static const LinearGradient secondaryGradient = LinearGradient(
+    begin: Alignment.topLeft,
+    end: Alignment.bottomRight,
+    colors: [Color(0xFF22D3EE), Color(0xFF06B6D4)],
+  );
 
-  // Enterprise Colors
-  static const Color accentColor = Color(0xFF3B82F6); // Blue-500
+  static const LinearGradient accentGradient = LinearGradient(
+    begin: Alignment.topLeft,
+    end: Alignment.bottomRight,
+    colors: [Color(0xFFA78BFA), Color(0xFF8B5CF6)],
+  );
 
-  // Customer Service Specific Colors
-  static const Color positive = Color(
-    0xFF10B981,
-  ); // Green for positive sentiment
-  static const Color negative = Color(0xFFEF4444); // Red for negative sentiment
-  static const Color neutral = Color(0xFF6B7280); // Gray for neutral sentiment
-  static const Color urgent = Color(0xFFEF4444); // Bright red for urgent issues
+  static const LinearGradient buttonGradient = LinearGradient(
+    begin: Alignment.topLeft,
+    end: Alignment.bottomRight,
+    colors: [Color(0xFF3B82F6), Color(0xFF2563EB)],
+  );
 
-  // Team Colors
-  static const Color customerServiceTeam = Color(0xFF3B82F6); // Blue
-  static const Color salesTeam = Color(0xFF10B981); // Green
-  static const Color supportTeam = Color(0xFF8B5CF6); // Purple
-  static const Color marketingTeam = Color(0xFFEF4444); // Red
-  static const Color managementTeam = Color(0xFFF59E0B); // Amber
+  static const LinearGradient backgroundGradient = LinearGradient(
+    begin: Alignment.topCenter,
+    end: Alignment.bottomCenter,
+    colors: [Color(0xFFFAFBFC), Color(0xFFF8FAFC)],
+  );
 
-  // Gradients as List<Color>
-  static const List<Color> primaryGradient = [
+  static const LinearGradient errorGradient = LinearGradient(
+    begin: Alignment.topLeft,
+    end: Alignment.bottomRight,
+    colors: [Color(0xFFEF4444), Color(0xFFDC2626)],
+  );
+
+  static const LinearGradient successGradient = LinearGradient(
+    begin: Alignment.topLeft,
+    end: Alignment.bottomRight,
+    colors: [Color(0xFF10B981), Color(0xFF059669)],
+  );
+
+  static const LinearGradient warningGradient = LinearGradient(
+    begin: Alignment.topLeft,
+    end: Alignment.bottomRight,
+    colors: [Color(0xFFF59E0B), Color(0xFFD97706)],
+  );
+
+  // Glass Effect Colors
+  static const Color glass = Color(0x40FFFFFF);
+  static const Color glassLight = Color(0x20FFFFFF);
+  static const Color glassDark = Color(0x10000000);
+
+  // Shadow Colors
+  static const Color shadowLight = Color(0x08000000);
+  static const Color shadowMedium = Color(0x12000000);
+  static const Color shadowDark = Color(0x20000000);
+
+  // Emotion Colors for Analytics
+  static const Color emotionJoy = Color(0xFFFEF08A);
+  static const Color emotionSadness = Color(0xFF93C5FD);
+  static const Color emotionAnger = Color(0xFFFCA5A5);
+  static const Color emotionFear = Color(0xFFD8B4FE);
+  static const Color emotionSurprise = Color(0xFFA7F3D0);
+  static const Color emotionDisgust = Color(0xFFFDE047);
+  static const Color emotionNeutral = Color(0xFFE5E7EB);
+
+  // Chart Colors
+  static const List<Color> chartColors = [
     Color(0xFF3B82F6),
-    Color(0xFF60A5FA),
-  ];
-  static const List<Color> successGradient = [
+    Color(0xFF8B5CF6),
+    Color(0xFF06B6D4),
     Color(0xFF10B981),
-    Color(0xFF34D399),
-  ];
-  static const List<Color> warningGradient = [
     Color(0xFFF59E0B),
-    Color(0xFFFBBF24),
-  ];
-  static const List<Color> errorGradient = [
     Color(0xFFEF4444),
-    Color(0xFFF87171),
+    Color(0xFFEC4899),
+    Color(0xFF84CC16),
   ];
 
-  // Background Colors - Clean enterprise look
-  static const Color backgroundColor = Color(0xFFF8FAFC); // Slate-50
-  static const Color surfaceColor = Colors.white;
-  static const Color cardBackgroundColor = Colors.white;
-  static const Color dashboardBackgroundColor = Color(0xFFF1F5F9); // Slate-100
+  // Legacy/Backward compatibility colors
+  static const Color positive = success;
+  static const Color negative = error;
+  static const Color neutral = textTertiary;
+  static const Color urgent = error;
 
-  // Text Colors - Professional hierarchy
-  static const Color textPrimaryColor = Color(0xFF0F172A); // Slate-900
-  static const Color textSecondaryColor = Color(0xFF475569); // Slate-600
-  static const Color textLightColor = Color(0xFF64748B); // Slate-500
+  // Team colors
+  static const Color salesTeam = Color(0xFF8B5CF6);
+  static const Color customerServiceTeam = Color(0xFF06B6D4);
+  static const Color supportTeam = Color(0xFF10B981);
+  static const Color managementTeam = Color(0xFFEF4444);
+  static const Color divider = Color(0xFFE5E7EB);
 
-  // Enterprise Status Colors
-  static const Color successColor = Color(0xFF059669); // Emerald-600
-  static const Color errorColor = Color(0xFFDC2626); // Red-600
-  static const Color warningColor = Color(0xFFD97706); // Amber-600
-  static const Color infoColor = Color(0xFF2563EB); // Blue-600
+  // Utility Methods
+  static Color withOpacity(Color color, double opacity) {
+    return color.withValues(alpha: opacity);
+  }
 
-  // Customer Service Specific Colors
-  static const Color positiveColor = Color(
-    0xFF059669,
-  ); // Green for positive sentiment
-  static const Color negativeColor = Color(
-    0xFFDC2626,
-  ); // Red for negative sentiment
-  static const Color neutralColor = Color(
-    0xFF6B7280,
-  ); // Gray for neutral sentiment
-  static const Color urgentColor = Color(
-    0xFFEF4444,
-  ); // Bright red for urgent issues
+  static Color lighten(Color color, [double amount = .1]) {
+    assert(amount >= 0 && amount <= 1);
+    final hsl = HSLColor.fromColor(color);
+    final hslLight = hsl.withLightness(
+      (hsl.lightness + amount).clamp(0.0, 1.0),
+    );
+    return hslLight.toColor();
+  }
 
-  // Enhanced Emotion Colors for Professional Use
-  static const Color joyColorColor = Color(0xFFF59E0B); // Amber-500
-  static const Color sadnessColorColor = Color(0xFF3B82F6); // Blue-500
-  static const Color angerColorColor = Color(0xFFEF4444); // Red-500
-  static const Color fearColorColor = Color(0xFF8B5CF6); // Violet-500
-  static const Color surpriseColorColor = Color(0xFF06B6D4); // Cyan-500
-  static const Color disgustColorColor = Color(0xFF84CC16); // Lime-500
-  static const Color neutralColorColor = Color(0xFF6B7280); // Gray-500
-
-  // Enterprise Dashboard Gradients
-  static const List<Color> primaryGradientColor = [
-    Color(0xFF1E293B),
-    Color(0xFF334155),
-    Color(0xFF475569),
-  ];
-
-  static const List<Color> accentGradientColor = [
-    Color(0xFF3B82F6),
-    Color(0xFF1D4ED8),
-  ];
-
-  static const List<Color> successGradientColor = [
-    Color(0xFF059669),
-    Color(0xFF047857),
-  ];
-
-  static const List<Color> warningGradientColor = [
-    Color(0xFFD97706),
-    Color(0xFFB45309),
-  ];
-
-  static const List<Color> errorGradientColor = [
-    Color(0xFFDC2626),
-    Color(0xFFB91C1C),
-  ];
-
-  // Department/Team Colors for Multi-team Analytics
-  static const Color customerServiceTeamColor = Color(0xFF3B82F6); // Blue
-  static const Color salesTeamColor = Color(0xFF059669); // Green
-  static const Color supportTeamColor = Color(0xFF8B5CF6); // Purple
-  static const Color marketingTeamColor = Color(0xFFEF4444); // Red
-  static const Color managementTeamColor = Color(0xFFF59E0B); // Amber
+  static Color darken(Color color, [double amount = .1]) {
+    assert(amount >= 0 && amount <= 1);
+    final hsl = HSLColor.fromColor(color);
+    final hslDark = hsl.withLightness((hsl.lightness - amount).clamp(0.0, 1.0));
+    return hslDark.toColor();
+  }
 }

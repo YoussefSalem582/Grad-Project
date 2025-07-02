@@ -71,8 +71,24 @@ class EmotionProvider extends ChangeNotifier {
 
   // Constructor
   EmotionProvider(this._apiService) {
-    checkConnection();
-    _initializeEnhancedFeatures();
+    // Don't do heavy initialization in constructor to prevent white screen
+    _safeInitialize();
+  }
+
+  // Safe initialization that won't block the UI
+  void _safeInitialize() {
+    // Initialize connection check without blocking
+    Future.microtask(() async {
+      try {
+        await checkConnection();
+        await _initializeEnhancedFeatures();
+      } catch (e) {
+        // Silently handle initialization errors
+        _isConnected = false;
+        _state = EmotionState.initial;
+        notifyListeners();
+      }
+    });
   }
 
   @override
