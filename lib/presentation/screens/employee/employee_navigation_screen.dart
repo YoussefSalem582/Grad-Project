@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../../core/core.dart';
 import '../../widgets/widgets.dart';
+import '../analysis/batch_processing_screen.dart';
 import 'employee_dashboard_screen.dart';
 import 'employee_customer_interactions_screen.dart';
 import 'employee_performance_screen.dart';
@@ -826,15 +827,171 @@ class _EmployeeNavigationScreenState extends State<EmployeeNavigationScreen>
 
   void _batchAnalysis() {
     _toggleAnalysisOverlay();
-    // TODO: Implement batch analysis
+    // Navigate to batch processing screen (will create this)
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => const BatchProcessingScreen()),
+    );
   }
 
   void _showNotifications() {
-    // TODO: Implement notifications
+    // Show notifications dialog
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Row(
+          children: [
+            Icon(Icons.notifications_active, color: AppColors.primary),
+            SizedBox(width: 8),
+            Text('Notifications'),
+          ],
+        ),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            _buildNotificationItem(
+              'New customer message',
+              '2 minutes ago',
+              Icons.message,
+              AppColors.primary,
+            ),
+            _buildNotificationItem(
+              'Analysis complete',
+              '5 minutes ago',
+              Icons.check_circle,
+              AppColors.success,
+            ),
+            _buildNotificationItem(
+              'Task deadline approaching',
+              '10 minutes ago',
+              Icons.schedule,
+              AppColors.warning,
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: Text('Mark All as Read'),
+          ),
+          ElevatedButton(
+            onPressed: () => Navigator.pop(context),
+            child: Text('Close'),
+          ),
+        ],
+      ),
+    );
   }
 
   void _showHelp() {
-    // TODO: Implement help
+    // Show help dialog
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Row(
+          children: [
+            Icon(Icons.help_outline, color: AppColors.primary),
+            SizedBox(width: 8),
+            Text('Help & Support'),
+          ],
+        ),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            _buildHelpItem(
+              'Getting Started',
+              'Learn the basics of using the app',
+            ),
+            _buildHelpItem(
+              'Analysis Tools',
+              'Understanding AI-powered insights',
+            ),
+            _buildHelpItem(
+              'Customer Management',
+              'Managing customer interactions',
+            ),
+            _buildHelpItem(
+              'Performance Tracking',
+              'Monitor your performance metrics',
+            ),
+            SizedBox(height: 16),
+            Text(
+              'Need more help?',
+              style: TextStyle(fontWeight: FontWeight.bold),
+            ),
+            SizedBox(height: 8),
+            Text(
+              'Contact support: support@graphsmile.com\nPhone: +1 (555) 123-4567',
+              style: TextStyle(color: AppColors.textSecondary),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: Text('Contact Support'),
+          ),
+          ElevatedButton(
+            onPressed: () => Navigator.pop(context),
+            child: Text('Close'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildNotificationItem(
+    String title,
+    String time,
+    IconData icon,
+    Color color,
+  ) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 8),
+      child: Row(
+        children: [
+          Container(
+            padding: EdgeInsets.all(8),
+            decoration: BoxDecoration(
+              color: color.withValues(alpha: 0.1),
+              borderRadius: BorderRadius.circular(8),
+            ),
+            child: Icon(icon, color: color, size: 16),
+          ),
+          SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(title, style: TextStyle(fontWeight: FontWeight.w500)),
+                Text(
+                  time,
+                  style: TextStyle(
+                    color: AppColors.textSecondary,
+                    fontSize: 12,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildHelpItem(String title, String description) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 8),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(title, style: TextStyle(fontWeight: FontWeight.w600)),
+          SizedBox(height: 4),
+          Text(description, style: TextStyle(color: AppColors.textSecondary)),
+        ],
+      ),
+    );
   }
 
   void _logout() {

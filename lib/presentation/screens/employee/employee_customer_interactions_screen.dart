@@ -420,7 +420,7 @@ class _EmployeeCustomerInteractionsScreenState
                   ),
                 ),
                 ModernButton(
-                  onPressed: () {},
+                  onPressed: _viewAllChats,
                   style: ModernButtonStyle.outlined,
                   text: 'View All',
                   size: ModernButtonSize.small,
@@ -696,7 +696,7 @@ class _EmployeeCustomerInteractionsScreenState
               ),
               const Spacer(),
               ModernButton(
-                onPressed: () {},
+                onPressed: _createNewTicket,
                 style: ModernButtonStyle.primary,
                 text: 'New Ticket',
                 icon: Icons.add,
@@ -915,7 +915,7 @@ class _EmployeeCustomerInteractionsScreenState
                 ),
                 const Spacer(),
                 ModernButton(
-                  onPressed: () {},
+                  onPressed: _viewTicketDetails,
                   style: ModernButtonStyle.outlined,
                   text: 'View Details',
                   size: ModernButtonSize.small,
@@ -1164,11 +1164,287 @@ class _EmployeeCustomerInteractionsScreenState
   }
 
   void _openChat(String customerName) {
-    // TODO: Navigate to chat screen
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text('Opening chat with $customerName'),
-        backgroundColor: AppColors.primary,
+    // Navigate to chat screen
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Row(
+          children: [
+            Icon(Icons.chat, color: AppColors.primary),
+            SizedBox(width: 8),
+            Text('Chat with $customerName'),
+          ],
+        ),
+        content: Container(
+          width: double.maxFinite,
+          height: 300,
+          child: Column(
+            children: [
+              Expanded(
+                child: Container(
+                  padding: EdgeInsets.all(16),
+                  decoration: BoxDecoration(
+                    color: AppColors.background,
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Column(
+                    children: [
+                      _buildChatMessage(
+                        'Hello! How can I help you today?',
+                        true,
+                      ),
+                      _buildChatMessage(
+                        'Hi, I need help with my order #12345',
+                        false,
+                      ),
+                      _buildChatMessage(
+                        'Of course! Let me check that for you.',
+                        true,
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              SizedBox(height: 16),
+              Row(
+                children: [
+                  Expanded(
+                    child: TextField(
+                      decoration: InputDecoration(
+                        hintText: 'Type your message...',
+                        border: OutlineInputBorder(),
+                        contentPadding: EdgeInsets.symmetric(
+                          horizontal: 12,
+                          vertical: 8,
+                        ),
+                      ),
+                    ),
+                  ),
+                  SizedBox(width: 8),
+                  ElevatedButton(
+                    onPressed: () {
+                      // Add send message logic
+                    },
+                    child: Icon(Icons.send),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: Text('Close'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildChatMessage(String message, bool isFromAgent) {
+    return Align(
+      alignment: isFromAgent ? Alignment.centerLeft : Alignment.centerRight,
+      child: Container(
+        margin: EdgeInsets.only(bottom: 8),
+        padding: EdgeInsets.all(12),
+        decoration: BoxDecoration(
+          color: isFromAgent
+              ? AppColors.primary.withValues(alpha: 0.1)
+              : AppColors.surface,
+          borderRadius: BorderRadius.circular(12),
+        ),
+        child: Text(
+          message,
+          style: TextStyle(color: AppColors.textPrimary, fontSize: 14),
+        ),
+      ),
+    );
+  }
+
+  void _viewAllChats() {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text('All Customer Chats'),
+        content: Container(
+          width: double.maxFinite,
+          height: 400,
+          child: ListView.builder(
+            itemCount: 10,
+            itemBuilder: (context, index) {
+              return ListTile(
+                leading: CircleAvatar(
+                  child: Text('C${index + 1}'),
+                  backgroundColor: AppColors.primary,
+                ),
+                title: Text('Customer ${index + 1}'),
+                subtitle: Text('Last message...'),
+                trailing: Text('${index + 1}h ago'),
+                onTap: () {
+                  Navigator.pop(context);
+                  _openChat('Customer ${index + 1}');
+                },
+              );
+            },
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: Text('Close'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _createNewTicket() {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Row(
+          children: [
+            Icon(Icons.add_circle, color: AppColors.primary),
+            SizedBox(width: 8),
+            Text('New Support Ticket'),
+          ],
+        ),
+        content: Container(
+          width: double.maxFinite,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              TextField(
+                decoration: InputDecoration(
+                  labelText: 'Customer Name',
+                  border: OutlineInputBorder(),
+                ),
+              ),
+              SizedBox(height: 16),
+              TextField(
+                decoration: InputDecoration(
+                  labelText: 'Issue Title',
+                  border: OutlineInputBorder(),
+                ),
+              ),
+              SizedBox(height: 16),
+              TextField(
+                maxLines: 3,
+                decoration: InputDecoration(
+                  labelText: 'Description',
+                  border: OutlineInputBorder(),
+                ),
+              ),
+              SizedBox(height: 16),
+              DropdownButtonFormField<String>(
+                decoration: InputDecoration(
+                  labelText: 'Priority',
+                  border: OutlineInputBorder(),
+                ),
+                items: ['Low', 'Medium', 'High'].map((priority) {
+                  return DropdownMenuItem(
+                    value: priority,
+                    child: Text(priority),
+                  );
+                }).toList(),
+                onChanged: (value) {},
+              ),
+            ],
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: Text('Cancel'),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              Navigator.pop(context);
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text('Ticket created successfully!'),
+                  backgroundColor: AppColors.success,
+                ),
+              );
+            },
+            child: Text('Create Ticket'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _viewTicketDetails() {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text('Ticket Details'),
+        content: Container(
+          width: double.maxFinite,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              _buildDetailRow('Ticket ID', '#TK-001'),
+              _buildDetailRow('Customer', 'Sarah Johnson'),
+              _buildDetailRow('Priority', 'High'),
+              _buildDetailRow('Status', 'Open'),
+              _buildDetailRow('Created', '2 hours ago'),
+              _buildDetailRow('Assignee', 'You'),
+              SizedBox(height: 16),
+              Text(
+                'Description:',
+                style: TextStyle(fontWeight: FontWeight.bold),
+              ),
+              SizedBox(height: 8),
+              Text(
+                'Customer reports defective product received. Product arrived damaged and needs immediate replacement.',
+              ),
+            ],
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: Text('Close'),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              Navigator.pop(context);
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text('Ticket updated!'),
+                  backgroundColor: AppColors.success,
+                ),
+              );
+            },
+            child: Text('Update Status'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildDetailRow(String label, String value) {
+    return Padding(
+      padding: EdgeInsets.symmetric(vertical: 4),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          SizedBox(
+            width: 80,
+            child: Text(
+              '$label:',
+              style: TextStyle(
+                fontWeight: FontWeight.w500,
+                color: AppColors.textSecondary,
+              ),
+            ),
+          ),
+          Expanded(
+            child: Text(value, style: TextStyle(color: AppColors.textPrimary)),
+          ),
+        ],
       ),
     );
   }

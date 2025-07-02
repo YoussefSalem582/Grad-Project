@@ -1,6 +1,12 @@
 import 'package:flutter/material.dart';
 import '../../../core/core.dart';
+import '../../../data/data.dart';
+import '../../../domain/domain.dart';
+import '../../providers/providers.dart';
 import '../../widgets/widgets.dart';
+import 'employee_customer_interactions_screen.dart';
+import 'employee_performance_screen.dart';
+import 'employee_text_analysis_screen.dart';
 
 class EmployeeDashboardScreen extends StatefulWidget {
   const EmployeeDashboardScreen({super.key});
@@ -728,7 +734,7 @@ class _EmployeeDashboardScreenState extends State<EmployeeDashboardScreen>
                   children: [
                     Expanded(
                       child: ModernButton(
-                        onPressed: () {},
+                        onPressed: _applySuggestion,
                         style: ModernButtonStyle.primary,
                         text: 'Apply Suggestion',
                         icon: Icons.auto_fix_high,
@@ -736,7 +742,7 @@ class _EmployeeDashboardScreenState extends State<EmployeeDashboardScreen>
                     ),
                     SizedBox(width: customSpacing.sm),
                     ModernButton(
-                      onPressed: () {},
+                      onPressed: _dismissSuggestion,
                       style: ModernButtonStyle.ghost,
                       text: '',
                       icon: Icons.close,
@@ -977,24 +983,28 @@ class _EmployeeDashboardScreenState extends State<EmployeeDashboardScreen>
                 Icons.play_arrow,
                 AppColors.primary,
                 customSpacing,
+                () => _navigateToAnalysis(),
               ),
               _buildQuickActionCard(
                 'View Reports',
                 Icons.assessment,
                 AppColors.secondary,
                 customSpacing,
+                () => _navigateToReports(),
               ),
               _buildQuickActionCard(
                 'Customer Chat',
                 Icons.chat,
                 AppColors.success,
                 customSpacing,
+                () => _navigateToCustomerChat(),
               ),
               _buildQuickActionCard(
                 'Settings',
                 Icons.settings,
                 AppColors.textSecondary,
                 customSpacing,
+                () => _navigateToSettings(),
               ),
             ],
           ),
@@ -1008,9 +1018,10 @@ class _EmployeeDashboardScreenState extends State<EmployeeDashboardScreen>
     IconData icon,
     Color color,
     CustomSpacing customSpacing,
+    VoidCallback onTap,
   ) {
     return GestureDetector(
-      onTap: () {},
+      onTap: onTap,
       child: Container(
         padding: EdgeInsets.all(customSpacing.md),
         decoration: BoxDecoration(
@@ -1086,7 +1097,7 @@ class _EmployeeDashboardScreenState extends State<EmployeeDashboardScreen>
             children: [
               Expanded(
                 child: ModernButton(
-                  onPressed: () {},
+                  onPressed: _viewDetailedReport,
                   style: ModernButtonStyle.primary,
                   text: 'View Detailed Report',
                   icon: Icons.arrow_forward,
@@ -1253,6 +1264,141 @@ class _EmployeeDashboardScreenState extends State<EmployeeDashboardScreen>
           ],
         ),
       ],
+    );
+  }
+
+  // Navigation Methods
+  void _navigateToAnalysis() {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => const EmployeeTextAnalysisScreen(),
+      ),
+    );
+  }
+
+  void _navigateToReports() {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => const EmployeePerformanceScreen(),
+      ),
+    );
+  }
+
+  void _navigateToCustomerChat() {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => const EmployeeCustomerInteractionsScreen(),
+      ),
+    );
+  }
+
+  void _navigateToSettings() {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Row(
+          children: [
+            Icon(Icons.settings, color: AppColors.primary),
+            SizedBox(width: 8),
+            Text('Settings'),
+          ],
+        ),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            ListTile(
+              leading: Icon(Icons.notifications, color: AppColors.primary),
+              title: Text('Notifications'),
+              subtitle: Text('Manage notification preferences'),
+              onTap: () {
+                Navigator.pop(context);
+                // Add notification settings logic
+              },
+            ),
+            ListTile(
+              leading: Icon(Icons.palette, color: AppColors.secondary),
+              title: Text('Theme'),
+              subtitle: Text('Customize app appearance'),
+              onTap: () {
+                Navigator.pop(context);
+                // Add theme settings logic
+              },
+            ),
+            ListTile(
+              leading: Icon(Icons.language, color: AppColors.success),
+              title: Text('Language'),
+              subtitle: Text('Change app language'),
+              onTap: () {
+                Navigator.pop(context);
+                // Add language settings logic
+              },
+            ),
+            ListTile(
+              leading: Icon(Icons.security, color: AppColors.warning),
+              title: Text('Privacy'),
+              subtitle: Text('Privacy and security settings'),
+              onTap: () {
+                Navigator.pop(context);
+                // Add privacy settings logic
+              },
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: Text('Close'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _applySuggestion() {
+    // Show success message
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Row(
+          children: [
+            Icon(Icons.check_circle, color: Colors.white),
+            SizedBox(width: 8),
+            Text('AI suggestion applied successfully!'),
+          ],
+        ),
+        backgroundColor: AppColors.success,
+        behavior: SnackBarBehavior.floating,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+      ),
+    );
+  }
+
+  void _dismissSuggestion() {
+    // Show dismiss message
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Row(
+          children: [
+            Icon(Icons.info, color: Colors.white),
+            SizedBox(width: 8),
+            Text('Suggestion dismissed'),
+          ],
+        ),
+        backgroundColor: AppColors.textSecondary,
+        behavior: SnackBarBehavior.floating,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+      ),
+    );
+  }
+
+  void _viewDetailedReport() {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => const EmployeePerformanceScreen(),
+      ),
     );
   }
 }
