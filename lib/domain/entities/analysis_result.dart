@@ -3,39 +3,42 @@ import 'package:equatable/equatable.dart';
 /// Domain entity representing an analysis result
 class AnalysisResult extends Equatable {
   final String id;
+  final DateTime timestamp;
   final String content;
-  final AnalysisType type;
-  final SentimentScore sentiment;
-  final double confidence;
-  final List<String> keywords;
-  final List<EmotionScore> emotions;
-  final DateTime createdAt;
-  final String? platform;
+  final Emotion primaryEmotion;
+  final double sentiment;
+  final Map<Emotion, double> emotionScores;
+  final String? audioUrl;
+  final String? videoUrl;
+  final String? socialMediaUrl;
 
   const AnalysisResult({
     required this.id,
+    required this.timestamp,
     required this.content,
-    required this.type,
+    required this.primaryEmotion,
     required this.sentiment,
-    required this.confidence,
-    required this.keywords,
-    required this.emotions,
-    required this.createdAt,
-    this.platform,
+    required this.emotionScores,
+    this.audioUrl,
+    this.videoUrl,
+    this.socialMediaUrl,
   });
 
   @override
   List<Object?> get props => [
     id,
+    timestamp,
     content,
-    type,
+    primaryEmotion,
     sentiment,
-    confidence,
-    keywords,
-    emotions,
-    createdAt,
-    platform,
+    emotionScores,
+    audioUrl,
+    videoUrl,
+    socialMediaUrl,
   ];
+
+  @override
+  bool get stringify => true;
 }
 
 enum AnalysisType { text, voice, social }
@@ -53,7 +56,7 @@ class SentimentScore extends Equatable {
 enum SentimentType { positive, negative, neutral }
 
 class EmotionScore extends Equatable {
-  final EmotionType emotion;
+  final Emotion emotion;
   final double score;
 
   const EmotionScore({required this.emotion, required this.score});
@@ -62,13 +65,4 @@ class EmotionScore extends Equatable {
   List<Object> get props => [emotion, score];
 }
 
-enum EmotionType {
-  happy,
-  sad,
-  angry,
-  surprised,
-  fearful,
-  disgusted,
-  calm,
-  excited,
-}
+enum Emotion { happy, sad, angry, surprised, fearful, neutral }

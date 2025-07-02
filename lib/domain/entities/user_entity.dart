@@ -1,41 +1,41 @@
-import '../domain.dart';
+import 'package:equatable/equatable.dart';
 
 /// Domain entity representing a user
-class UserEntity {
+class UserEntity extends Equatable {
   final String id;
-  final String name;
   final String email;
+  final String name;
   final UserRole role;
+  final String? profileImage;
+  final DateTime? lastLogin;
+  final Map<String, dynamic>? preferences;
 
   const UserEntity({
     required this.id,
-    required this.name,
     required this.email,
+    required this.name,
     required this.role,
+    this.profileImage,
+    this.lastLogin,
+    this.preferences,
   });
 
   @override
-  bool operator ==(Object other) {
-    if (identical(this, other)) return true;
-    return other is UserEntity &&
-        other.id == id &&
-        other.name == name &&
-        other.email == email &&
-        other.role == role;
-  }
+  List<Object?> get props => [
+    id,
+    email,
+    name,
+    role,
+    profileImage,
+    lastLogin,
+    preferences,
+  ];
 
   @override
-  int get hashCode {
-    return id.hashCode ^ name.hashCode ^ email.hashCode ^ role.hashCode;
-  }
-
-  @override
-  String toString() {
-    return 'UserEntity(id: $id, name: $name, email: $email, role: $role)';
-  }
+  bool get stringify => true;
 }
 
-enum UserRole { employee }
+enum UserRole { admin, employee, manager }
 
 class UserPreferences {
   final bool darkMode;

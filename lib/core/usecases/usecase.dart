@@ -1,3 +1,4 @@
+import 'package:dartz/dartz.dart' as dartz;
 import '../errors/failures.dart';
 
 /// Type alias for Either pattern (success or failure)
@@ -15,15 +16,19 @@ extension EitherExtension<L, R> on Either<L, R> {
 }
 
 /// Helper functions to create Either instances
-Either<L, R> Left<L, R>(L value) => (left: value, right: null);
-Either<L, R> Right<L, R>(R value) => (left: null, right: value);
+Either<L, R> left<L, R>(L value) => (left: value, right: null);
+Either<L, R> right<L, R>(R value) => (left: null, right: value);
 
 /// Base interface for all use cases
 abstract class UseCase<Type, Params> {
-  Future<Either<Failure, Type>> call(Params params);
+  Future<dartz.Either<Failure, Type>> call(Params params);
 }
 
 /// Use case without parameters
 abstract class NoParamsUseCase<Type> {
-  Future<Either<Failure, Type>> call();
+  Future<dartz.Either<Failure, Type>> call();
+}
+
+class NoParams {
+  const NoParams();
 }

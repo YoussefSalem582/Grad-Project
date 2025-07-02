@@ -37,9 +37,7 @@ class AnalysisProvider extends ChangeNotifier {
     _setLoading(true);
     _clearError();
 
-    final result = await analyzeTextUseCase.call(
-      AnalyzeTextParams(content: content),
-    );
+    final result = await analyzeTextUseCase.call(AnalyzeTextParams(content));
 
     result.fold(
       (failure) => _setError(failure.message),
@@ -55,7 +53,7 @@ class AnalysisProvider extends ChangeNotifier {
     _clearError();
 
     final result = await analyzeVoiceUseCase.call(
-      AnalyzeVoiceParams(audioPath: audioPath),
+      AnalyzeVoiceParams(audioPath),
     );
 
     result.fold(
@@ -71,9 +69,7 @@ class AnalysisProvider extends ChangeNotifier {
     _setLoading(true);
     _clearError();
 
-    final result = await analyzeSocialUseCase.call(
-      AnalyzeSocialParams(url: url),
-    );
+    final result = await analyzeSocialUseCase.call(AnalyzeSocialParams(url));
 
     result.fold(
       (failure) => _setError(failure.message),
@@ -84,13 +80,11 @@ class AnalysisProvider extends ChangeNotifier {
   }
 
   /// Get analysis history
-  Future<void> getHistory({AnalysisType? type, int? limit}) async {
+  Future<void> getHistory() async {
     _setLoading(true);
     _clearError();
 
-    final result = await getAnalysisHistoryUseCase.call(
-      GetAnalysisHistoryParams(type: type, limit: limit),
-    );
+    final result = await getAnalysisHistoryUseCase.call();
 
     result.fold(
       (failure) => _setError(failure.message),

@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../core/core.dart';
-import '../../providers/providers.dart';
+import '../../../domain/entities/analysis_result.dart';
+import '../../blocs/emotion/emotion_cubit.dart';
+import '../../blocs/emotion/emotion_state.dart';
 import '../../widgets/widgets.dart';
+import '../../widgets/cards/modern_card.dart';
 
 class DashboardScreen extends StatefulWidget {
   const DashboardScreen({super.key});
@@ -16,7 +19,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      context.read<EmotionProvider>().refreshAllData();
+      // Load initial data
+      context.read<EmotionCubit>().loadAnalysisHistory();
     });
   }
 
@@ -55,65 +59,41 @@ class _DashboardScreenState extends State<DashboardScreen> {
   }
 
   Widget _buildDashboardHeader() {
-    return Container(
+    return Padding(
       padding: const EdgeInsets.all(24),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+      child: Row(
         children: [
-          Row(
-            children: [
-              Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 12,
-                  vertical: 6,
-                ),
-                decoration: BoxDecoration(
-                  color: Colors.white.withValues(alpha: 0.2),
-                  borderRadius: BorderRadius.circular(20),
-                ),
-                child: const Text(
-                  'Enterprise',
-                  style: TextStyle(
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  AppStrings.appName,
+                  style: Theme.of(context).textTheme.headlineSmall?.copyWith(
                     color: Colors.white,
-                    fontSize: 12,
-                    fontWeight: FontWeight.w600,
+                    fontWeight: FontWeight.bold,
                   ),
                 ),
-              ),
-              const Spacer(),
-              IconButton(
-                onPressed: () =>
-                    context.read<EmotionProvider>().refreshAllData(),
-                icon: const Icon(Icons.refresh_rounded, color: Colors.white),
-                tooltip: 'Refresh Dashboard',
-              ),
-              IconButton(
-                onPressed: () => _showNotifications(context),
-                icon: const Icon(
-                  Icons.notifications_outlined,
-                  color: Colors.white,
+                const SizedBox(height: 4),
+                Text(
+                  'Real-time emotion analytics',
+                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                    color: Colors.white.withValues(alpha: 0.8),
+                  ),
                 ),
-                tooltip: 'Notifications',
-              ),
-            ],
-          ),
-          const SizedBox(height: 16),
-          const Text(
-            AppStrings.dashboardTitle,
-            style: TextStyle(
-              color: Colors.white,
-              fontSize: 28,
-              fontWeight: FontWeight.w700,
-              height: 1.2,
+              ],
             ),
           ),
-          const SizedBox(height: 8),
-          Text(
-            AppStrings.todaysInsights,
-            style: TextStyle(
-              color: Colors.white.withValues(alpha: 0.8),
-              fontSize: 16,
-              fontWeight: FontWeight.w400,
+          IconButton(
+            onPressed: () {
+              // Refresh dashboard data
+              context.read<EmotionCubit>().loadAnalysisHistory();
+            },
+            icon: const Icon(Icons.refresh_rounded, color: Colors.white),
+            tooltip: 'Refresh Dashboard',
+            style: IconButton.styleFrom(
+              backgroundColor: Colors.white.withValues(alpha: 0.2),
+              padding: const EdgeInsets.all(12),
             ),
           ),
         ],
@@ -122,453 +102,376 @@ class _DashboardScreenState extends State<DashboardScreen> {
   }
 
   Widget _buildDashboardContent() {
-    return SingleChildScrollView(
-      padding: const EdgeInsets.fromLTRB(24, 32, 24, 32),
+    return BlocBuilder<EmotionCubit, EmotionState>(
+      builder: (context, state) {
+        return SingleChildScrollView(
+          padding: const EdgeInsets.all(24),
+          child: Column(
+            children: [
+              const ConnectionStatusCard(),
+              const SizedBox(height: 24),
+              _buildQuickActions(),
+              const SizedBox(height: 24),
+              if (state is EmotionLoaded) ...[
+                _buildStatsCard(state),
+                const SizedBox(height: 24),
+                _buildRecentAnalysis(state),
+              ] else if (state is EmotionLoading) ...[
+                _buildLoadingCard(),
+              ] else if (state is EmotionError) ...[
+                _buildErrorCard(state),
+              ] else ...[
+                _buildWelcomeCard(),
+              ],
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _buildQuickActions() {
+    return ModernCard(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _buildQuickStats(),
-          const SizedBox(height: 24),
-          _buildConnectionStatus(),
-          const SizedBox(height: 24),
-          _buildTodaysOverview(),
-          const SizedBox(height: 24),
-          _buildCustomerSentimentCard(),
-          const SizedBox(height: 24),
-          _buildUrgentIssuesCard(),
-          const SizedBox(height: 24),
-          _buildTeamPerformancePreview(),
+          const Text(
+            'Quick Actions',
+            style: TextStyle(
+              fontSize: 18,
+              fontWeight: FontWeight.w600,
+              color: AppColors.textPrimary,
+            ),
+          ),
+          const SizedBox(height: 16),
+          Row(
+            children: [
+              Expanded(
+                child: _buildActionButton(
+                  'Text Analysis',
+                  Icons.text_fields,
+                  () => Navigator.pushNamed(context, '/text-analysis'),
+                ),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: _buildActionButton(
+                  'Voice Analysis',
+                  Icons.mic,
+                  () => Navigator.pushNamed(context, '/voice-analysis'),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 12),
+          Row(
+            children: [
+              Expanded(
+                child: _buildActionButton(
+                  'Video Analysis',
+                  Icons.videocam,
+                  () => Navigator.pushNamed(context, '/video-analysis'),
+                ),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: _buildActionButton(
+                  'Social Media',
+                  Icons.share,
+                  () => Navigator.pushNamed(context, '/social-analysis'),
+                ),
+              ),
+            ],
+          ),
         ],
       ),
     );
   }
 
-  Widget _buildQuickStats() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        const Text(
-          'Quick Stats',
-          style: TextStyle(
-            fontSize: 18,
-            fontWeight: FontWeight.w600,
-            color: AppColors.textPrimary,
-          ),
+  Widget _buildActionButton(String label, IconData icon, VoidCallback onTap) {
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(12),
+      child: Container(
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: AppColors.surface,
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(color: AppColors.border),
         ),
-        const SizedBox(height: 16),
-        Row(
+        child: Column(
           children: [
-            Expanded(
-              child: _buildStatCard(
-                'Active Sessions',
-                '127',
-                Icons.people,
-                AppColors.accent,
+            Icon(icon, color: AppColors.primary, size: 32),
+            const SizedBox(height: 8),
+            Text(
+              label,
+              style: const TextStyle(
+                fontSize: 12,
+                fontWeight: FontWeight.w500,
+                color: AppColors.textSecondary,
               ),
-            ),
-            const SizedBox(width: 12),
-            Expanded(
-              child: _buildStatCard(
-                'Avg. Response',
-                '2.3m',
-                Icons.timer,
-                AppColors.success,
-              ),
+              textAlign: TextAlign.center,
             ),
           ],
         ),
-        const SizedBox(height: 12),
-        Row(
-          children: [
-            Expanded(
-              child: _buildStatCard(
-                'Satisfaction',
-                '94.2%',
-                Icons.sentiment_satisfied,
-                AppColors.positive,
-              ),
-            ),
-            const SizedBox(width: 12),
-            Expanded(
-              child: _buildStatCard(
-                'Urgent Issues',
-                '3',
-                Icons.priority_high,
-                AppColors.urgent,
-              ),
-            ),
-          ],
-        ),
-      ],
+      ),
     );
   }
 
-  Widget _buildStatCard(
-    String title,
+  Widget _buildStatsCard(EmotionLoaded state) {
+    return ModernCard(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text(
+            'Analytics Overview',
+            style: TextStyle(
+              fontSize: 18,
+              fontWeight: FontWeight.w600,
+              color: AppColors.textPrimary,
+            ),
+          ),
+          const SizedBox(height: 16),
+          Row(
+            children: [
+              Expanded(
+                child: _buildStatItem(
+                  'Total Analyses',
+                  state.totalAnalyses.toString(),
+                  Icons.analytics,
+                  AppColors.primary,
+                ),
+              ),
+              const SizedBox(width: 16),
+              Expanded(
+                child: _buildStatItem(
+                  'Avg Sentiment',
+                  '${(state.averageSentiment * 100).toStringAsFixed(1)}%',
+                  Icons.sentiment_satisfied,
+                  AppColors.success,
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildStatItem(
+    String label,
     String value,
     IconData icon,
     Color color,
   ) {
     return Container(
       padding: const EdgeInsets.all(16),
-      decoration: AppTheme.enterpriseCardDecoration(),
+      decoration: BoxDecoration(
+        color: color.withValues(alpha: 0.1),
+        borderRadius: BorderRadius.circular(12),
+      ),
       child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Row(
-            children: [
-              Icon(icon, color: color, size: 20),
-              const SizedBox(width: 8),
-              Expanded(
-                child: Text(
-                  title,
-                  style: const TextStyle(
-                    fontSize: 12,
-                    fontWeight: FontWeight.w500,
-                    color: AppColors.textSecondary,
-                  ),
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                ),
-              ),
-            ],
-          ),
+          Icon(icon, color: color, size: 24),
           const SizedBox(height: 8),
           Text(
             value,
-            style: const TextStyle(
-              fontSize: 20,
-              fontWeight: FontWeight.w700,
-              color: AppColors.textPrimary,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildConnectionStatus() {
-    return Container(
-      decoration: AppTheme.enterpriseCardDecoration(),
-      child: const ConnectionStatusCard(),
-    );
-  }
-
-  Widget _buildTodaysOverview() {
-    return Container(
-      padding: const EdgeInsets.all(20),
-      decoration: AppTheme.enterpriseCardDecoration(),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const Text(
-            "Today's Customer Overview",
             style: TextStyle(
-              fontSize: 16,
-              fontWeight: FontWeight.w600,
-              color: AppColors.textPrimary,
+              fontSize: 20,
+              fontWeight: FontWeight.bold,
+              color: color,
             ),
           ),
-          const SizedBox(height: 16),
-          _buildOverviewMetric('Total Interactions', '1,247', '+12%', true),
-          const SizedBox(height: 12),
-          _buildOverviewMetric('Resolved Issues', '1,089', '+8%', true),
-          const SizedBox(height: 12),
-          _buildOverviewMetric('Escalated Cases', '23', '-15%', false),
-          const SizedBox(height: 12),
-          _buildOverviewMetric('Customer Satisfaction', '94.2%', '+2.1%', true),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildOverviewMetric(
-    String title,
-    String value,
-    String change,
-    bool isPositive,
-  ) {
-    return Row(
-      children: [
-        Expanded(
-          child: Text(
-            title,
+          const SizedBox(height: 4),
+          Text(
+            label,
             style: const TextStyle(
-              fontSize: 14,
+              fontSize: 12,
               color: AppColors.textSecondary,
             ),
-          ),
-        ),
-        Text(
-          value,
-          style: const TextStyle(
-            fontSize: 16,
-            fontWeight: FontWeight.w600,
-            color: AppColors.textPrimary,
-          ),
-        ),
-        const SizedBox(width: 8),
-        Container(
-          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-          decoration: BoxDecoration(
-            color: isPositive
-                ? AppColors.success.withValues(alpha: 0.1)
-                : AppColors.error.withValues(alpha: 0.1),
-            borderRadius: BorderRadius.circular(4),
-          ),
-          child: Text(
-            change,
-            style: TextStyle(
-              fontSize: 12,
-              fontWeight: FontWeight.w600,
-              color: isPositive ? AppColors.success : AppColors.error,
-            ),
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildCustomerSentimentCard() {
-    return Container(
-      padding: const EdgeInsets.all(20),
-      decoration: AppTheme.enterpriseCardDecoration(),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              const Expanded(
-                child: Text(
-                  'Customer Sentiment Analysis',
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w600,
-                    color: AppColors.textPrimary,
-                  ),
-                ),
-              ),
-              TextButton(
-                onPressed: () => _navigateToAnalytics(),
-                child: const Text('View Details'),
-              ),
-            ],
-          ),
-          const SizedBox(height: 16),
-          Row(
-            children: [
-              Expanded(
-                child: _buildSentimentBar('Positive', 0.68, AppColors.positive),
-              ),
-              const SizedBox(width: 16),
-              Expanded(
-                child: _buildSentimentBar('Neutral', 0.24, AppColors.neutral),
-              ),
-              const SizedBox(width: 16),
-              Expanded(
-                child: _buildSentimentBar('Negative', 0.08, AppColors.negative),
-              ),
-            ],
+            textAlign: TextAlign.center,
           ),
         ],
       ),
     );
   }
 
-  Widget _buildSentimentBar(String label, double percentage, Color color) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          label,
-          style: const TextStyle(
-            fontSize: 12,
-            fontWeight: FontWeight.w500,
-            color: AppColors.textSecondary,
-          ),
-        ),
-        const SizedBox(height: 8),
-        Container(
-          height: 8,
-          decoration: BoxDecoration(
-            color: color.withValues(alpha: 0.2),
-            borderRadius: BorderRadius.circular(4),
-          ),
-          child: FractionallySizedBox(
-            widthFactor: percentage,
-            child: Container(
-              decoration: BoxDecoration(
-                color: color,
-                borderRadius: BorderRadius.circular(4),
-              ),
-            ),
-          ),
-        ),
-        const SizedBox(height: 4),
-        Text(
-          '${(percentage * 100).toInt()}%',
-          style: TextStyle(
-            fontSize: 14,
-            fontWeight: FontWeight.w600,
-            color: color,
-          ),
-        ),
-      ],
-    );
-  }
+  Widget _buildRecentAnalysis(EmotionLoaded state) {
+    if (state.analysisResults.isEmpty) {
+      return const SizedBox();
+    }
 
-  Widget _buildUrgentIssuesCard() {
-    return Container(
-      padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        gradient: AppColors.warningGradient,
-        borderRadius: BorderRadius.circular(12),
-        boxShadow: [
-          BoxShadow(
-            color: AppColors.warning.withValues(alpha: 0.3),
-            blurRadius: 8,
-            offset: const Offset(0, 4),
-          ),
-        ],
-      ),
+    final recentResults = state.analysisResults.take(3).toList();
+
+    return ModernCard(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const Icon(Icons.warning_rounded, color: Colors.white),
-              const SizedBox(width: 8),
-              const Expanded(
-                child: Text(
-                  'Urgent Issues Requiring Attention',
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w600,
-                    color: Colors.white,
-                  ),
+              const Text(
+                'Recent Analysis',
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.w600,
+                  color: AppColors.textPrimary,
                 ),
               ),
               TextButton(
-                onPressed: () => _navigateToLiveMonitor(),
-                style: TextButton.styleFrom(foregroundColor: Colors.white),
+                onPressed: () => Navigator.pushNamed(context, '/history'),
                 child: const Text('View All'),
               ),
             ],
           ),
-          const SizedBox(height: 12),
-          const Text(
-            '3 customer issues require immediate escalation',
-            style: TextStyle(fontSize: 14, color: Colors.white),
-          ),
+          const SizedBox(height: 16),
+          ...recentResults.map((result) => _buildAnalysisItem(result)),
         ],
       ),
     );
   }
 
-  Widget _buildTeamPerformancePreview() {
+  Widget _buildAnalysisItem(AnalysisResult result) {
     return Container(
-      padding: const EdgeInsets.all(20),
-      decoration: AppTheme.enterpriseCardDecoration(),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+      margin: const EdgeInsets.only(bottom: 12),
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: AppColors.surface,
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(color: AppColors.border),
+      ),
+      child: Row(
         children: [
-          Row(
-            children: [
-              const Expanded(
-                child: Text(
-                  'Team Performance',
-                  style: TextStyle(
-                    fontSize: 16,
+          Container(
+            width: 40,
+            height: 40,
+            decoration: BoxDecoration(
+              color: AppColors.primary.withValues(alpha: 0.1),
+              borderRadius: BorderRadius.circular(8),
+            ),
+            child: Icon(Icons.psychology, color: AppColors.primary, size: 20),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  result.primaryEmotion.name.toUpperCase(),
+                  style: const TextStyle(
                     fontWeight: FontWeight.w600,
                     color: AppColors.textPrimary,
                   ),
                 ),
-              ),
-              TextButton(
-                onPressed: () => _navigateToTeamPerformance(),
-                child: const Text('View Teams'),
+                Text(
+                  'Sentiment: ${(result.sentiment * 100).toStringAsFixed(0)}%',
+                  style: const TextStyle(
+                    fontSize: 12,
+                    color: AppColors.textSecondary,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          Text(
+            '${(result.sentiment * 100).toStringAsFixed(0)}%',
+            style: TextStyle(
+              fontWeight: FontWeight.bold,
+              color: result.sentiment > 0.5
+                  ? AppColors.success
+                  : AppColors.error,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildWelcomeCard() {
+    return ModernCard(
+      child: Column(
+        children: [
+          Icon(
+            Icons.psychology,
+            size: 64,
+            color: AppColors.primary.withValues(alpha: 0.7),
+          ),
+          const SizedBox(height: 16),
+          const Text(
+            'Welcome to CustomerSense Pro',
+            style: TextStyle(
+              fontSize: 20,
+              fontWeight: FontWeight.bold,
+              color: AppColors.textPrimary,
+            ),
+            textAlign: TextAlign.center,
+          ),
+          const SizedBox(height: 8),
+          const Text(
+            'Start by analyzing text, voice, or social media content to get emotion insights.',
+            style: TextStyle(fontSize: 14, color: AppColors.textSecondary),
+            textAlign: TextAlign.center,
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildLoadingCard() {
+    return const ModernCard(
+      child: Center(
+        child: Padding(
+          padding: EdgeInsets.all(32),
+          child: Column(
+            children: [
+              CircularProgressIndicator(),
+              SizedBox(height: 16),
+              Text(
+                'Loading dashboard data...',
+                style: TextStyle(color: AppColors.textSecondary),
               ),
             ],
           ),
-          const SizedBox(height: 16),
-          _buildTeamMetric(
-            'Customer Service',
-            '96%',
-            AppColors.customerServiceTeam,
-          ),
-          const SizedBox(height: 12),
-          _buildTeamMetric('Technical Support', '91%', AppColors.supportTeam),
-          const SizedBox(height: 12),
-          _buildTeamMetric('Sales Team', '89%', AppColors.salesTeam),
-        ],
+        ),
       ),
     );
   }
 
-  Widget _buildTeamMetric(String teamName, String satisfaction, Color color) {
-    return Row(
-      children: [
-        Container(
-          width: 4,
-          height: 24,
-          decoration: BoxDecoration(
-            color: color,
-            borderRadius: BorderRadius.circular(2),
+  Widget _buildErrorCard(EmotionError state) {
+    return ModernCard(
+      child: Column(
+        children: [
+          Icon(
+            Icons.error_outline,
+            size: 48,
+            color: AppColors.error.withValues(alpha: 0.7),
           ),
-        ),
-        const SizedBox(width: 12),
-        Expanded(
-          child: Text(
-            teamName,
-            style: const TextStyle(
-              fontSize: 14,
-              fontWeight: FontWeight.w500,
-              color: AppColors.textSecondary,
+          const SizedBox(height: 16),
+          const Text(
+            'Unable to load dashboard',
+            style: TextStyle(
+              fontSize: 18,
+              fontWeight: FontWeight.w600,
+              color: AppColors.textPrimary,
             ),
           ),
-        ),
-        Text(
-          satisfaction,
-          style: const TextStyle(
-            fontSize: 16,
-            fontWeight: FontWeight.w600,
-            color: AppColors.textPrimary,
+          const SizedBox(height: 8),
+          Text(
+            state.message,
+            style: const TextStyle(
+              fontSize: 14,
+              color: AppColors.textSecondary,
+            ),
+            textAlign: TextAlign.center,
           ),
-        ),
-      ],
-    );
-  }
-
-  void _showNotifications(BuildContext context) {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Notifications'),
-        content: const Text('No new notifications'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(),
-            child: const Text('Close'),
+          const SizedBox(height: 16),
+          ElevatedButton.icon(
+            onPressed: () => context.read<EmotionCubit>().loadAnalysisHistory(),
+            icon: const Icon(Icons.refresh),
+            label: const Text('Retry'),
           ),
         ],
       ),
     );
-  }
-
-  void _navigateToAnalytics() {
-    // Navigate to analytics tab
-    final navigator = Navigator.of(context);
-    if (navigator.canPop()) {
-      navigator.pop();
-    }
-    // This would normally use proper navigation
-  }
-
-  void _navigateToLiveMonitor() {
-    // Navigate to live monitor tab
-  }
-
-  void _navigateToTeamPerformance() {
-    // Navigate to team performance tab
   }
 }

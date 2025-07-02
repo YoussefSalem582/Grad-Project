@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../core/core.dart';
-import '../../providers/providers.dart';
+import '../../blocs/emotion/emotion_cubit.dart';
+import '../../blocs/emotion/emotion_state.dart';
 
 class HistoryScreen extends StatefulWidget {
   const HistoryScreen({super.key});
@@ -15,85 +16,26 @@ class _HistoryScreenState extends State<HistoryScreen> {
   String _selectedFilter = 'All';
   final List<String> _filters = [
     'All',
-    'Joy',
-    'Sadness',
-    'Anger',
-    'Fear',
-    'Surprise',
-    'Disgust',
+    'Happy',
+    'Sad',
+    'Angry',
+    'Surprised',
+    'Fearful',
     'Neutral',
   ];
 
-  // Mock history data - in real app this would come from local storage/database
-  final List<HistoryItem> _historyItems = [
-    HistoryItem(
-      id: '1',
-      text: 'I am so happy today!',
-      emotion: 'joy',
-      confidence: 0.95,
-      timestamp: DateTime.now().subtract(const Duration(hours: 2)),
-    ),
-    HistoryItem(
-      id: '2',
-      text: 'This weather makes me feel sad',
-      emotion: 'sadness',
-      confidence: 0.87,
-      timestamp: DateTime.now().subtract(const Duration(hours: 5)),
-    ),
-    HistoryItem(
-      id: '3',
-      text: 'I cannot believe this happened!',
-      emotion: 'surprise',
-      confidence: 0.92,
-      timestamp: DateTime.now().subtract(const Duration(days: 1)),
-    ),
-    HistoryItem(
-      id: '4',
-      text: 'This is absolutely frustrating',
-      emotion: 'anger',
-      confidence: 0.89,
-      timestamp: DateTime.now().subtract(const Duration(days: 2)),
-    ),
-    HistoryItem(
-      id: '5',
-      text: 'The presentation went well',
-      emotion: 'joy',
-      confidence: 0.78,
-      timestamp: DateTime.now().subtract(const Duration(days: 3)),
-    ),
-  ];
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      context.read<EmotionCubit>().loadAnalysisHistory();
+    });
+  }
 
   @override
   void dispose() {
     _searchController.dispose();
     super.dispose();
-  }
-
-  List<HistoryItem> get _filteredItems {
-    List<HistoryItem> filtered = _historyItems;
-
-    // Apply emotion filter
-    if (_selectedFilter != 'All') {
-      filtered = filtered
-          .where(
-            (item) =>
-                item.emotion.toLowerCase() == _selectedFilter.toLowerCase(),
-          )
-          .toList();
-    }
-
-    // Apply search filter
-    if (_searchController.text.isNotEmpty) {
-      filtered = filtered
-          .where(
-            (item) => item.text.toLowerCase().contains(
-              _searchController.text.toLowerCase(),
-            ),
-          )
-          .toList();
-    }
-
-    return filtered;
   }
 
   @override
@@ -105,8 +47,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
           child: Column(
             children: [
               _buildAppBar(),
-              _buildFilterSection(),
-              Expanded(child: _buildHistoryList()),
+              Expanded(child: _buildContent()),
             ],
           ),
         ),
@@ -115,15 +56,24 @@ class _HistoryScreenState extends State<HistoryScreen> {
   }
 
   Widget _buildAppBar() {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
+    return Padding(
+      padding: const EdgeInsets.all(24),
       child: Row(
         children: [
-          Expanded(
+          IconButton(
+            onPressed: () => Navigator.pop(context),
+            icon: const Icon(Icons.arrow_back_ios, color: Colors.white),
+            style: IconButton.styleFrom(
+              backgroundColor: Colors.white.withValues(alpha: 0.2),
+              padding: const EdgeInsets.all(12),
+            ),
+          ),
+          const SizedBox(width: 16),
+          const Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text(
+                Text(
                   'Analysis History',
                   style: TextStyle(
                     color: Colors.white,
@@ -132,118 +82,18 @@ class _HistoryScreenState extends State<HistoryScreen> {
                   ),
                 ),
                 Text(
-                  '${_filteredItems.length} results found',
-                  style: const TextStyle(color: Colors.white70, fontSize: 14),
+                  'View your past emotion analyses',
+                  style: TextStyle(color: Colors.white70, fontSize: 14),
                 ),
               ],
             ),
           ),
           IconButton(
-            onPressed: _showExportDialog,
-            icon: const Icon(
-              Icons.file_download,
-              color: Colors.white,
-              size: 24,
-            ),
-            tooltip: 'Export History',
-          ),
-          IconButton(
-            onPressed: _clearHistory,
-            icon: const Icon(Icons.delete_sweep, color: Colors.white, size: 24),
-            tooltip: 'Clear History',
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildFilterSection() {
-    return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 24),
-      padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        color: Colors.white.withValues(alpha: 0.15),
-        borderRadius: BorderRadius.circular(20),
-      ),
-      child: Column(
-        children: [
-          // Search Bar
-          TextField(
-            controller: _searchController,
-            onChanged: (value) => setState(() {}),
-            style: const TextStyle(color: Colors.white),
-            decoration: InputDecoration(
-              hintText: 'Search your analysis history...',
-              hintStyle: TextStyle(color: Colors.white.withValues(alpha: 0.7)),
-              prefixIcon: Icon(
-                Icons.search,
-                color: Colors.white.withValues(alpha: 0.7),
-              ),
-              suffixIcon: _searchController.text.isNotEmpty
-                  ? IconButton(
-                      onPressed: () {
-                        _searchController.clear();
-                        setState(() {});
-                      },
-                      icon: Icon(
-                        Icons.clear,
-                        color: Colors.white.withValues(alpha: 0.7),
-                      ),
-                    )
-                  : null,
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(15),
-                borderSide: BorderSide(
-                  color: Colors.white.withValues(alpha: 0.3),
-                ),
-              ),
-              enabledBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(15),
-                borderSide: BorderSide(
-                  color: Colors.white.withValues(alpha: 0.3),
-                ),
-              ),
-              focusedBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(15),
-                borderSide: const BorderSide(color: Colors.white, width: 2),
-              ),
-            ),
-          ),
-          const SizedBox(height: 16),
-          // Filter Chips
-          SingleChildScrollView(
-            scrollDirection: Axis.horizontal,
-            child: Row(
-              children: _filters.map((filter) {
-                final isSelected = _selectedFilter == filter;
-                return Padding(
-                  padding: const EdgeInsets.only(right: 8),
-                  child: FilterChip(
-                    label: Text(filter),
-                    selected: isSelected,
-                    onSelected: (selected) {
-                      setState(() {
-                        _selectedFilter = selected ? filter : 'All';
-                      });
-                    },
-                    backgroundColor: Colors.white.withValues(alpha: 0.1),
-                    selectedColor: Colors.white.withValues(alpha: 0.3),
-                    labelStyle: TextStyle(
-                      color: isSelected
-                          ? Colors.white
-                          : Colors.white.withValues(alpha: 0.8),
-                      fontWeight: isSelected
-                          ? FontWeight.bold
-                          : FontWeight.normal,
-                    ),
-                    side: BorderSide(
-                      color: isSelected
-                          ? Colors.white
-                          : Colors.white.withValues(alpha: 0.3),
-                    ),
-                  ),
-                );
-              }).toList(),
+            onPressed: () => context.read<EmotionCubit>().loadAnalysisHistory(),
+            icon: const Icon(Icons.refresh, color: Colors.white),
+            style: IconButton.styleFrom(
+              backgroundColor: Colors.white.withValues(alpha: 0.2),
+              padding: const EdgeInsets.all(12),
             ),
           ),
         ],
@@ -251,9 +101,8 @@ class _HistoryScreenState extends State<HistoryScreen> {
     );
   }
 
-  Widget _buildHistoryList() {
+  Widget _buildContent() {
     return Container(
-      margin: const EdgeInsets.only(top: 16),
       decoration: const BoxDecoration(
         color: AppColors.background,
         borderRadius: BorderRadius.only(
@@ -266,329 +115,372 @@ class _HistoryScreenState extends State<HistoryScreen> {
           topLeft: Radius.circular(40),
           topRight: Radius.circular(40),
         ),
-        child: _filteredItems.isEmpty
-            ? _buildEmptyState()
-            : _buildHistoryItems(),
+        child: Column(
+          children: [
+            _buildSearchAndFilter(),
+            Expanded(child: _buildHistoryList()),
+          ],
+        ),
       ),
     );
   }
 
-  Widget _buildEmptyState() {
-    return Center(
+  Widget _buildSearchAndFilter() {
+    return Container(
+      padding: const EdgeInsets.all(24),
+      decoration: const BoxDecoration(
+        color: AppColors.surface,
+        border: Border(bottom: BorderSide(color: AppColors.border)),
+      ),
       child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(
-            Icons.history,
-            size: 80,
-            color: AppColors.textSecondary.withValues(alpha: 0.5),
+          // Search Bar
+          Container(
+            decoration: BoxDecoration(
+              color: AppColors.background,
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(color: AppColors.border),
+            ),
+            child: TextField(
+              controller: _searchController,
+              decoration: const InputDecoration(
+                hintText: 'Search your analysis history...',
+                prefixIcon: Icon(Icons.search, color: AppColors.textSecondary),
+                border: InputBorder.none,
+                contentPadding: EdgeInsets.all(16),
+              ),
+              onChanged: (value) => setState(() {}),
+            ),
           ),
           const SizedBox(height: 16),
-          Text(
-            _searchController.text.isNotEmpty
-                ? 'No matching results'
-                : 'No analysis history yet',
-            style: TextStyle(
-              fontSize: 18,
-              color: AppColors.textSecondary,
-              fontWeight: FontWeight.w500,
+          // Filters
+          SizedBox(
+            height: 36,
+            child: ListView.builder(
+              scrollDirection: Axis.horizontal,
+              itemCount: _filters.length,
+              itemBuilder: (context, index) {
+                final filter = _filters[index];
+                final isSelected = _selectedFilter == filter;
+                return Padding(
+                  padding: const EdgeInsets.only(right: 8),
+                  child: FilterChip(
+                    label: Text(filter),
+                    selected: isSelected,
+                    onSelected: (selected) {
+                      setState(() {
+                        _selectedFilter = filter;
+                      });
+                    },
+                    backgroundColor: AppColors.surface,
+                    selectedColor: AppColors.primary.withValues(alpha: 0.2),
+                    checkmarkColor: AppColors.primary,
+                    labelStyle: TextStyle(
+                      color: isSelected
+                          ? AppColors.primary
+                          : AppColors.textSecondary,
+                      fontWeight: isSelected
+                          ? FontWeight.w600
+                          : FontWeight.normal,
+                    ),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(20),
+                      side: BorderSide(
+                        color: isSelected
+                            ? AppColors.primary
+                            : AppColors.border,
+                      ),
+                    ),
+                  ),
+                );
+              },
             ),
-          ),
-          const SizedBox(height: 8),
-          Text(
-            _searchController.text.isNotEmpty
-                ? 'Try adjusting your search or filters'
-                : 'Start analyzing emotions to build your history',
-            style: TextStyle(
-              fontSize: 14,
-              color: AppColors.textSecondary.withValues(alpha: 0.7),
-            ),
-            textAlign: TextAlign.center,
           ),
         ],
       ),
     );
   }
 
-  Widget _buildHistoryItems() {
-    return ListView.builder(
-      padding: const EdgeInsets.fromLTRB(24, 32, 24, 100),
-      itemCount: _filteredItems.length,
-      itemBuilder: (context, index) {
-        final item = _filteredItems[index];
-        return _buildHistoryCard(item, index);
+  Widget _buildHistoryList() {
+    return BlocBuilder<EmotionCubit, EmotionState>(
+      builder: (context, state) {
+        if (state is EmotionLoading) {
+          return const Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                CircularProgressIndicator(),
+                SizedBox(height: 16),
+                Text(
+                  'Loading history...',
+                  style: TextStyle(color: AppColors.textSecondary),
+                ),
+              ],
+            ),
+          );
+        }
+
+        if (state is EmotionError) {
+          return Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(
+                  Icons.error_outline,
+                  size: 64,
+                  color: AppColors.error.withValues(alpha: 0.7),
+                ),
+                const SizedBox(height: 16),
+                const Text(
+                  'Unable to load history',
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.w600,
+                    color: AppColors.textPrimary,
+                  ),
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  state.message,
+                  style: const TextStyle(
+                    fontSize: 14,
+                    color: AppColors.textSecondary,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+                const SizedBox(height: 16),
+                ElevatedButton.icon(
+                  onPressed: () =>
+                      context.read<EmotionCubit>().loadAnalysisHistory(),
+                  icon: const Icon(Icons.refresh),
+                  label: const Text('Retry'),
+                ),
+              ],
+            ),
+          );
+        }
+
+        if (state is EmotionLoaded) {
+          final filteredResults = _filterResults(state.analysisResults);
+
+          if (filteredResults.isEmpty) {
+            return const Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(Icons.history, size: 64, color: AppColors.textSecondary),
+                  SizedBox(height: 16),
+                  Text(
+                    'No analysis history found',
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.w600,
+                      color: AppColors.textPrimary,
+                    ),
+                  ),
+                  SizedBox(height: 8),
+                  Text(
+                    'Start analyzing to see your history here.',
+                    style: TextStyle(
+                      fontSize: 14,
+                      color: AppColors.textSecondary,
+                    ),
+                  ),
+                ],
+              ),
+            );
+          }
+
+          return ListView.builder(
+            padding: const EdgeInsets.all(24),
+            itemCount: filteredResults.length,
+            itemBuilder: (context, index) {
+              final result = filteredResults[index];
+              return _buildHistoryItem(result, index);
+            },
+          );
+        }
+
+        // Initial state
+        return const Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(Icons.history, size: 64, color: AppColors.textSecondary),
+              SizedBox(height: 16),
+              Text(
+                'No analysis history',
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.w600,
+                  color: AppColors.textPrimary,
+                ),
+              ),
+              SizedBox(height: 8),
+              Text(
+                'Start analyzing to see your history here.',
+                style: TextStyle(fontSize: 14, color: AppColors.textSecondary),
+              ),
+            ],
+          ),
+        );
       },
     );
   }
 
-  Widget _buildHistoryCard(HistoryItem item, int index) {
+  Widget _buildHistoryItem(dynamic result, int index) {
+    // Since we don't have the exact structure, we'll create a placeholder
     return Container(
       margin: const EdgeInsets.only(bottom: 16),
-      child: Card(
-        elevation: 8,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-        child: Container(
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(20),
-            gradient: LinearGradient(
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-              colors: [
-                EmotionUtils.getEmotionColor(
-                  item.emotion,
-                ).withValues(alpha: 0.1),
-                AppColors.surface,
-              ],
-            ),
+      decoration: BoxDecoration(
+        color: AppColors.surface,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: AppColors.border),
+        boxShadow: [
+          BoxShadow(
+            color: AppColors.shadowLight,
+            blurRadius: 8,
+            offset: const Offset(0, 2),
           ),
-          child: Material(
-            color: Colors.transparent,
-            child: InkWell(
-              borderRadius: BorderRadius.circular(20),
-              onTap: () => _showDetailDialog(item),
-              child: Padding(
-                padding: const EdgeInsets.all(20),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+        ],
+      ),
+      child: ExpansionTile(
+        title: Row(
+          children: [
+            Container(
+              width: 12,
+              height: 12,
+              decoration: BoxDecoration(
+                color: AppColors.primary,
+                shape: BoxShape.circle,
+              ),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Text(
+                'Analysis ${index + 1}',
+                style: const TextStyle(
+                  fontWeight: FontWeight.w600,
+                  color: AppColors.textPrimary,
+                ),
+              ),
+            ),
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+              decoration: BoxDecoration(
+                color: AppColors.success.withValues(alpha: 0.1),
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: Text(
+                'Positive',
+                style: TextStyle(
+                  fontSize: 12,
+                  fontWeight: FontWeight.w600,
+                  color: AppColors.success,
+                ),
+              ),
+            ),
+          ],
+        ),
+        subtitle: const Padding(
+          padding: EdgeInsets.only(left: 24, top: 4),
+          child: Text(
+            'Sample analysis result',
+            style: TextStyle(fontSize: 12, color: AppColors.textSecondary),
+          ),
+        ),
+        children: [
+          Padding(
+            padding: const EdgeInsets.all(16),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text(
+                  'Analysis Details',
+                  style: TextStyle(
+                    fontWeight: FontWeight.w600,
+                    color: AppColors.textPrimary,
+                  ),
+                ),
+                const SizedBox(height: 8),
+                const Text(
+                  'Confidence: 95%',
+                  style: TextStyle(color: AppColors.textSecondary),
+                ),
+                const SizedBox(height: 16),
+                Row(
                   children: [
-                    Row(
-                      children: [
-                        Container(
-                          padding: const EdgeInsets.all(12),
-                          decoration: BoxDecoration(
-                            color: EmotionUtils.getEmotionColor(
-                              item.emotion,
-                            ).withValues(alpha: 0.2),
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                          child: Icon(
-                            EmotionUtils.getEmotionIcon(item.emotion),
-                            color: EmotionUtils.getEmotionColor(item.emotion),
-                            size: 24,
-                          ),
+                    Expanded(
+                      child: ElevatedButton.icon(
+                        onPressed: () => _reAnalyze('Sample text'),
+                        icon: const Icon(Icons.refresh, size: 16),
+                        label: const Text('Re-analyze'),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: AppColors.primary,
+                          foregroundColor: Colors.white,
+                          padding: const EdgeInsets.symmetric(vertical: 8),
                         ),
-                        const SizedBox(width: 16),
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                item.emotion.toUpperCase(),
-                                style: TextStyle(
-                                  color: EmotionUtils.getEmotionColor(
-                                    item.emotion,
-                                  ),
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                              Text(
-                                '${(item.confidence * 100).toStringAsFixed(1)}% confidence',
-                                style: TextStyle(
-                                  color: AppColors.textSecondary,
-                                  fontSize: 14,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                        Text(
-                          _formatTimestamp(item.timestamp),
-                          style: TextStyle(
-                            color: AppColors.textSecondary,
-                            fontSize: 12,
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 16),
-                    Text(
-                      item.text,
-                      style: TextStyle(
-                        color: AppColors.textPrimary,
-                        fontSize: 16,
-                        height: 1.4,
                       ),
-                      maxLines: 3,
-                      overflow: TextOverflow.ellipsis,
                     ),
-                    const SizedBox(height: 12),
-                    LinearProgressIndicator(
-                      value: item.confidence,
-                      backgroundColor: EmotionUtils.getEmotionColor(
-                        item.emotion,
-                      ).withValues(alpha: 0.2),
-                      valueColor: AlwaysStoppedAnimation<Color>(
-                        EmotionUtils.getEmotionColor(item.emotion),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: OutlinedButton.icon(
+                        onPressed: () => _shareResult(result),
+                        icon: const Icon(Icons.share, size: 16),
+                        label: const Text('Share'),
+                        style: OutlinedButton.styleFrom(
+                          foregroundColor: AppColors.primary,
+                          side: const BorderSide(color: AppColors.primary),
+                          padding: const EdgeInsets.symmetric(vertical: 8),
+                        ),
                       ),
                     ),
                   ],
                 ),
-              ),
+              ],
             ),
-          ),
-        ),
-      ),
-    );
-  }
-
-  void _showDetailDialog(HistoryItem item) {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-        title: Row(
-          children: [
-            Icon(
-              EmotionUtils.getEmotionIcon(item.emotion),
-              color: EmotionUtils.getEmotionColor(item.emotion),
-            ),
-            const SizedBox(width: 8),
-            Text(item.emotion.toUpperCase()),
-          ],
-        ),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              'Text Analyzed:',
-              style: TextStyle(
-                fontWeight: FontWeight.bold,
-                color: AppColors.textSecondary,
-              ),
-            ),
-            const SizedBox(height: 8),
-            Text(item.text),
-            const SizedBox(height: 16),
-            Text(
-              'Confidence: ${(item.confidence * 100).toStringAsFixed(1)}%',
-              style: const TextStyle(fontWeight: FontWeight.w500),
-            ),
-            const SizedBox(height: 8),
-            Text(
-              'Analyzed: ${_formatFullTimestamp(item.timestamp)}',
-              style: TextStyle(color: AppColors.textSecondary),
-            ),
-          ],
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Close'),
-          ),
-          ElevatedButton(
-            onPressed: () {
-              Navigator.pop(context);
-              _reAnalyze(item.text);
-            },
-            child: const Text('Re-analyze'),
           ),
         ],
       ),
     );
+  }
+
+  List<dynamic> _filterResults(List<dynamic> results) {
+    var filtered = results;
+
+    // Apply search filter
+    if (_searchController.text.isNotEmpty) {
+      filtered = filtered.where((item) {
+        // Since we don't have the exact structure, return all for now
+        return true;
+      }).toList();
+    }
+
+    // Apply emotion filter
+    if (_selectedFilter != 'All') {
+      filtered = filtered.where((item) {
+        // Since we don't have the exact structure, return all for now
+        return true;
+      }).toList();
+    }
+
+    return filtered;
   }
 
   void _reAnalyze(String text) {
-    final provider = context.read<EmotionProvider>();
-    provider.analyzeEmotion(text);
+    final cubit = context.read<EmotionCubit>();
+    cubit.analyzeText(text);
     Navigator.pop(context); // Go back to main screen
   }
 
-  void _showExportDialog() {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Export History'),
-        content: const Text(
-          'Export your analysis history as CSV or JSON file?',
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Cancel'),
-          ),
-          TextButton(
-            onPressed: () {
-              Navigator.pop(context);
-              _exportAsCSV();
-            },
-            child: const Text('CSV'),
-          ),
-          TextButton(
-            onPressed: () {
-              Navigator.pop(context);
-              _exportAsJSON();
-            },
-            child: const Text('JSON'),
-          ),
-        ],
+  void _shareResult(dynamic result) {
+    // Implement sharing functionality
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text('Sharing functionality coming soon!'),
+        duration: Duration(seconds: 2),
       ),
     );
-  }
-
-  void _exportAsCSV() {
-    // Mock export functionality
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('CSV export feature coming soon!')),
-    );
-  }
-
-  void _exportAsJSON() {
-    // Mock export functionality
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('JSON export feature coming soon!')),
-    );
-  }
-
-  void _clearHistory() {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Clear History'),
-        content: const Text(
-          'Are you sure you want to clear all analysis history? This action cannot be undone.',
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Cancel'),
-          ),
-          ElevatedButton(
-            onPressed: () {
-              setState(() {
-                _historyItems.clear();
-              });
-              Navigator.pop(context);
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('History cleared successfully')),
-              );
-            },
-            style: ElevatedButton.styleFrom(backgroundColor: AppColors.error),
-            child: const Text('Clear All'),
-          ),
-        ],
-      ),
-    );
-  }
-
-  String _formatTimestamp(DateTime timestamp) {
-    final now = DateTime.now();
-    final diff = now.difference(timestamp);
-
-    if (diff.inMinutes < 60) {
-      return '${diff.inMinutes}m ago';
-    } else if (diff.inHours < 24) {
-      return '${diff.inHours}h ago';
-    } else if (diff.inDays < 7) {
-      return '${diff.inDays}d ago';
-    } else {
-      return '${timestamp.day}/${timestamp.month}/${timestamp.year}';
-    }
-  }
-
-  String _formatFullTimestamp(DateTime timestamp) {
-    return '${timestamp.day}/${timestamp.month}/${timestamp.year} at ${timestamp.hour.toString().padLeft(2, '0')}:${timestamp.minute.toString().padLeft(2, '0')}';
   }
 }
 

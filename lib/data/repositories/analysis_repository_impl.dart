@@ -1,3 +1,4 @@
+import 'package:dartz/dartz.dart' as dartz;
 import '../../domain/entities/analysis_result.dart';
 import '../../domain/repositories/analysis_repository.dart';
 import '../../core/network/network_info.dart';
@@ -19,94 +20,85 @@ class AnalysisRepositoryImpl implements AnalysisRepository {
   });
 
   @override
-  Future<AnalysisResult> analyzeText(String content) async {
+  Future<dartz.Either<Failure, AnalysisResult>> analyzeText(String text) async {
     if (await networkInfo.isConnected) {
       try {
-        final result = await remoteDataSource.analyzeText(content);
+        final result = await remoteDataSource.analyzeText(text);
         await localDataSource.cacheAnalysis(result);
-        return result.toEntity();
+        return dartz.Right(result.toEntity());
       } catch (e) {
-        throw ServerFailure('Failed to analyze text: ${e.toString()}');
+        return dartz.Left(
+          ServerFailure('Failed to analyze text: ${e.toString()}'),
+        );
       }
     } else {
-      throw NetworkFailure('No internet connection');
+      return dartz.Left(NetworkFailure('No internet connection'));
     }
   }
 
   @override
-  Future<AnalysisResult> analyzeVoice(String audioPath) async {
+  Future<dartz.Either<Failure, AnalysisResult>> analyzeVoice(
+    String audioPath,
+  ) async {
     if (await networkInfo.isConnected) {
       try {
         final result = await remoteDataSource.analyzeVoice(audioPath);
         await localDataSource.cacheAnalysis(result);
-        return result.toEntity();
+        return dartz.Right(result.toEntity());
       } catch (e) {
-        throw ServerFailure('Failed to analyze voice: ${e.toString()}');
+        return dartz.Left(
+          ServerFailure('Failed to analyze voice: ${e.toString()}'),
+        );
       }
     } else {
-      throw NetworkFailure('No internet connection');
+      return dartz.Left(NetworkFailure('No internet connection'));
     }
   }
 
   @override
-  Future<AnalysisResult> analyzeSocial(String url) async {
+  Future<dartz.Either<Failure, AnalysisResult>> analyzeSocial(
+    String socialMediaUrl,
+  ) async {
     if (await networkInfo.isConnected) {
       try {
-        final result = await remoteDataSource.analyzeSocial(url);
+        final result = await remoteDataSource.analyzeSocial(socialMediaUrl);
         await localDataSource.cacheAnalysis(result);
-        return result.toEntity();
+        return dartz.Right(result.toEntity());
       } catch (e) {
-        throw ServerFailure('Failed to analyze social media: ${e.toString()}');
+        return dartz.Left(
+          ServerFailure('Failed to analyze social media: ${e.toString()}'),
+        );
       }
     } else {
-      throw NetworkFailure('No internet connection');
+      return dartz.Left(NetworkFailure('No internet connection'));
     }
   }
 
   @override
-  Future<List<AnalysisResult>> getAnalysisHistory({
-    AnalysisType? type,
-    int? limit,
-  }) async {
+  Future<dartz.Either<Failure, List<AnalysisResult>>>
+  getAnalysisHistory() async {
     try {
-      // Try to get from cache first
-      final cachedResults = await localDataSource.getAnalysisHistory(
-        type: type,
-        limit: limit,
-      );
-
-      if (cachedResults.isNotEmpty) {
-        return cachedResults.map((model) => model.toEntity()).toList();
-      }
-
-      // If cache is empty and we have internet, fetch from remote
-      if (await networkInfo.isConnected) {
-        final remoteResults = await remoteDataSource.getAnalysisHistory(
-          type: type,
-          limit: limit,
-        );
-
-        // Cache the results
-        for (final result in remoteResults) {
-          await localDataSource.cacheAnalysis(result);
-        }
-
-        return remoteResults.map((model) => model.toEntity()).toList();
-      }
-
-      return [];
+      final results = await localDataSource.getAnalysisHistory();
+      return dartz.Right(results.map((model) => model.toEntity()).toList());
     } catch (e) {
-      throw ServerFailure('Failed to get analysis history: ${e.toString()}');
+      return dartz.Left(
+        CacheFailure('Failed to get analysis history: ${e.toString()}'),
+      );
     }
   }
 
   @override
-  Future<void> saveAnalysis(AnalysisResult result) async {
+  Future<dartz.Either<Failure, void>> saveAnalysis(
+    AnalysisResult result,
+  ) async {
     try {
       final model = AnalysisResultModel.fromEntity(result);
       await localDataSource.cacheAnalysis(model);
+      return const dartz.Right(null);
     } catch (e) {
-      throw CacheFailure('Failed to save analysis: ${e.toString()}');
+      return dartz.Left(
+        CacheFailure('Failed to save analysis: ${e.toString()}'),
+      );
     }
   }
 

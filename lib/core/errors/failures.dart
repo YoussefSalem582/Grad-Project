@@ -7,37 +7,40 @@ abstract class Failure extends Equatable {
   const Failure(this.message);
 
   @override
-  List<Object> get props => [message];
+  List<Object?> get props => [message];
+
+  @override
+  String toString() => message;
 }
 
 /// Server-related failures
 class ServerFailure extends Failure {
-  const ServerFailure(super.message);
+  const ServerFailure(String message) : super(message);
 }
 
 /// Cache-related failures
 class CacheFailure extends Failure {
-  const CacheFailure(super.message);
+  const CacheFailure(String message) : super(message);
 }
 
 /// Network-related failures
 class NetworkFailure extends Failure {
-  const NetworkFailure(super.message);
+  const NetworkFailure(String message) : super(message);
 }
 
 /// Validation failures
 class ValidationFailure extends Failure {
-  const ValidationFailure(super.message);
+  const ValidationFailure(String message) : super(message);
 }
 
 /// Authentication failures
-class AuthFailure extends Failure {
-  const AuthFailure(super.message);
+class AuthenticationFailure extends Failure {
+  const AuthenticationFailure(String message) : super(message);
 }
 
 /// Permission failures
 class PermissionFailure extends Failure {
-  const PermissionFailure(super.message);
+  const PermissionFailure(String message) : super(message);
 }
 
 /// File system failures

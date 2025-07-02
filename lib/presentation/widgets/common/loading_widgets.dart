@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../../core/core.dart';
+import '../../../core/constants/app_colors.dart';
 
 class ModernLoadingIndicator extends StatefulWidget {
   final double size;
@@ -397,9 +398,30 @@ class _PulsingDotState extends State<PulsingDot>
   }
 }
 
+class LoadingSpinner extends StatelessWidget {
+  final double size;
+  final Color? color;
+
+  const LoadingSpinner({super.key, this.size = 40.0, this.color});
+
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: SizedBox(
+        width: size,
+        height: size,
+        child: CircularProgressIndicator(
+          color: color ?? AppColors.primary,
+          strokeWidth: 3,
+        ),
+      ),
+    );
+  }
+}
+
 class LoadingOverlay extends StatelessWidget {
-  final bool isLoading;
   final Widget child;
+  final bool isLoading;
   final String? message;
   final Color? backgroundColor;
 
@@ -455,6 +477,84 @@ class LoadingOverlay extends StatelessWidget {
             ),
           ),
       ],
+    );
+  }
+}
+
+class ShimmerLoading extends StatelessWidget {
+  final double width;
+  final double height;
+  final double borderRadius;
+
+  const ShimmerLoading({
+    super.key,
+    required this.width,
+    required this.height,
+    this.borderRadius = 8,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: width,
+      height: height,
+      decoration: BoxDecoration(
+        color: Colors.grey[300],
+        borderRadius: BorderRadius.circular(borderRadius),
+      ),
+      child: const _ShimmerEffect(),
+    );
+  }
+}
+
+class _ShimmerEffect extends StatefulWidget {
+  const _ShimmerEffect();
+
+  @override
+  _ShimmerEffectState createState() => _ShimmerEffectState();
+}
+
+class _ShimmerEffectState extends State<_ShimmerEffect>
+    with SingleTickerProviderStateMixin {
+  late AnimationController _controller;
+  late Animation<double> _animation;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 1500),
+    )..repeat();
+
+    _animation = Tween<double>(begin: -1.0, end: 2.0).animate(
+      CurvedAnimation(parent: _controller, curve: Curves.easeInOutSine),
+    );
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AnimatedBuilder(
+      animation: _animation,
+      builder: (context, child) {
+        return ShaderMask(
+          shaderCallback: (bounds) {
+            return LinearGradient(
+              begin: Alignment.centerLeft,
+              end: Alignment.centerRight,
+              colors: const [Colors.grey, Colors.white, Colors.grey],
+              stops: [0.0, _animation.value, 1.0],
+            ).createShader(bounds);
+          },
+          child: Container(color: Colors.white),
+        );
+      },
     );
   }
 }

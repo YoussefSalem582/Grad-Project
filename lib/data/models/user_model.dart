@@ -4,7 +4,7 @@ import '../../domain/domain.dart';
 class UserModel extends UserEntity {
   final String? avatar;
   final String? createdAt;
-  final UserPreferencesModel? preferences;
+  final UserPreferencesModel? _preferencesModel;
 
   const UserModel({
     required super.id,
@@ -13,8 +13,11 @@ class UserModel extends UserEntity {
     required super.role,
     this.avatar,
     this.createdAt,
-    this.preferences,
-  });
+    UserPreferencesModel? preferences,
+  }) : _preferencesModel = preferences;
+
+  @override
+  Map<String, dynamic>? get preferences => _preferencesModel?.toJson();
 
   factory UserModel.fromJson(Map<String, dynamic> json) {
     return UserModel(
@@ -38,7 +41,7 @@ class UserModel extends UserEntity {
       'role': _userRoleToString(role),
       'avatar': avatar,
       'createdAt': createdAt,
-      'preferences': preferences?.toJson(),
+      'preferences': _preferencesModel?.toJson(),
     };
   }
 
@@ -57,6 +60,10 @@ class UserModel extends UserEntity {
 
   static UserRole _stringToUserRole(String role) {
     switch (role.toLowerCase()) {
+      case 'admin':
+        return UserRole.admin;
+      case 'manager':
+        return UserRole.manager;
       case 'employee':
       default:
         return UserRole.employee;
@@ -65,6 +72,10 @@ class UserModel extends UserEntity {
 
   static String _userRoleToString(UserRole role) {
     switch (role) {
+      case UserRole.admin:
+        return 'admin';
+      case UserRole.manager:
+        return 'manager';
       case UserRole.employee:
         return 'employee';
     }

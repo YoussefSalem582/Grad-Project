@@ -1,7 +1,9 @@
-import '../entities/analysis_result.dart';
-import '../repositories/analysis_repository.dart';
+import 'package:dartz/dartz.dart' as dartz;
+import 'package:equatable/equatable.dart';
 import '../../core/errors/failures.dart';
 import '../../core/usecases/usecase.dart';
+import '../entities/analysis_result.dart';
+import '../repositories/analysis_repository.dart';
 
 /// Use case for voice analysis
 class AnalyzeVoiceUseCase
@@ -11,26 +13,18 @@ class AnalyzeVoiceUseCase
   AnalyzeVoiceUseCase(this.repository);
 
   @override
-  Future<Either<Failure, AnalysisResult>> call(
+  Future<dartz.Either<Failure, AnalysisResult>> call(
     AnalyzeVoiceParams params,
   ) async {
-    try {
-      if (params.audioPath.isEmpty) {
-        return Left(ValidationFailure('Audio path cannot be empty'));
-      }
-
-      final result = await repository.analyzeVoice(params.audioPath);
-      await repository.saveAnalysis(result);
-
-      return Right(result);
-    } catch (e) {
-      return Left(ServerFailure('Failed to analyze voice: ${e.toString()}'));
-    }
+    return await repository.analyzeVoice(params.audioPath);
   }
 }
 
-class AnalyzeVoiceParams {
+class AnalyzeVoiceParams extends Equatable {
   final String audioPath;
 
-  AnalyzeVoiceParams({required this.audioPath});
+  const AnalyzeVoiceParams(this.audioPath);
+
+  @override
+  List<Object?> get props => [audioPath];
 }

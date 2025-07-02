@@ -6,10 +6,7 @@ abstract class AnalysisRemoteDataSource {
   Future<AnalysisResultModel> analyzeText(String content);
   Future<AnalysisResultModel> analyzeVoice(String audioPath);
   Future<AnalysisResultModel> analyzeSocial(String url);
-  Future<List<AnalysisResultModel>> getAnalysisHistory({
-    AnalysisType? type,
-    int? limit,
-  });
+  Future<List<AnalysisResultModel>> getAnalysisHistory();
   Future<void> deleteAnalysis(String id);
   Future<AnalysisResultModel?> getAnalysisById(String id);
 }
@@ -23,16 +20,15 @@ class AnalysisRemoteDataSourceImpl implements AnalysisRemoteDataSource {
 
     return AnalysisResultModel(
       id: DateTime.now().millisecondsSinceEpoch.toString(),
+      timestamp: DateTime.now(),
       content: content,
-      type: 'text',
-      sentiment: SentimentScoreModel(type: 'positive', score: 0.8),
-      confidence: 0.85,
-      keywords: ['customer', 'service', 'quality'],
-      emotions: [
-        EmotionScoreModel(emotion: 'happy', score: 0.7),
-        EmotionScoreModel(emotion: 'calm', score: 0.3),
-      ],
-      createdAt: DateTime.now().toIso8601String(),
+      primaryEmotion: Emotion.happy,
+      sentiment: 0.8,
+      emotionScores: {
+        Emotion.happy: 0.7,
+        Emotion.neutral: 0.2,
+        Emotion.sad: 0.1,
+      },
     );
   }
 
@@ -43,16 +39,12 @@ class AnalysisRemoteDataSourceImpl implements AnalysisRemoteDataSource {
 
     return AnalysisResultModel(
       id: DateTime.now().millisecondsSinceEpoch.toString(),
+      timestamp: DateTime.now(),
       content: 'Voice analysis completed',
-      type: 'voice',
-      sentiment: SentimentScoreModel(type: 'neutral', score: 0.6),
-      confidence: 0.78,
-      keywords: ['voice', 'quality', 'clear'],
-      emotions: [
-        EmotionScoreModel(emotion: 'calm', score: 0.8),
-        EmotionScoreModel(emotion: 'happy', score: 0.2),
-      ],
-      createdAt: DateTime.now().toIso8601String(),
+      primaryEmotion: Emotion.neutral,
+      sentiment: 0.6,
+      emotionScores: {Emotion.neutral: 0.8, Emotion.happy: 0.2},
+      audioUrl: audioPath,
     );
   }
 
@@ -63,25 +55,17 @@ class AnalysisRemoteDataSourceImpl implements AnalysisRemoteDataSource {
 
     return AnalysisResultModel(
       id: DateTime.now().millisecondsSinceEpoch.toString(),
+      timestamp: DateTime.now(),
       content: 'Social media analysis completed',
-      type: 'social',
-      sentiment: SentimentScoreModel(type: 'positive', score: 0.9),
-      confidence: 0.92,
-      keywords: ['social', 'media', 'positive'],
-      emotions: [
-        EmotionScoreModel(emotion: 'excited', score: 0.6),
-        EmotionScoreModel(emotion: 'happy', score: 0.4),
-      ],
-      createdAt: DateTime.now().toIso8601String(),
-      platform: _extractPlatform(url),
+      primaryEmotion: Emotion.happy,
+      sentiment: 0.9,
+      emotionScores: {Emotion.happy: 0.6, Emotion.surprised: 0.4},
+      socialMediaUrl: url,
     );
   }
 
   @override
-  Future<List<AnalysisResultModel>> getAnalysisHistory({
-    AnalysisType? type,
-    int? limit,
-  }) async {
+  Future<List<AnalysisResultModel>> getAnalysisHistory() async {
     // Simulate API call
     await Future.delayed(const Duration(seconds: 1));
     return [];

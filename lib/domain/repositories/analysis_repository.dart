@@ -1,24 +1,25 @@
+import 'package:dartz/dartz.dart' as dartz;
+import '../../core/errors/failures.dart';
 import '../entities/analysis_result.dart';
 
 /// Repository interface for analysis operations
 abstract class AnalysisRepository {
   /// Analyze text content
-  Future<AnalysisResult> analyzeText(String content);
+  Future<dartz.Either<Failure, AnalysisResult>> analyzeText(String text);
 
   /// Analyze voice content
-  Future<AnalysisResult> analyzeVoice(String audioPath);
+  Future<dartz.Either<Failure, AnalysisResult>> analyzeVoice(String audioPath);
 
   /// Analyze social media content
-  Future<AnalysisResult> analyzeSocial(String url);
+  Future<dartz.Either<Failure, AnalysisResult>> analyzeSocial(
+    String socialMediaUrl,
+  );
 
   /// Get analysis history
-  Future<List<AnalysisResult>> getAnalysisHistory({
-    AnalysisType? type,
-    int? limit,
-  });
+  Future<dartz.Either<Failure, List<AnalysisResult>>> getAnalysisHistory();
 
   /// Save analysis result
-  Future<void> saveAnalysis(AnalysisResult result);
+  Future<dartz.Either<Failure, void>> saveAnalysis(AnalysisResult result);
 
   /// Delete analysis
   Future<void> deleteAnalysis(String id);

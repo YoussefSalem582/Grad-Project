@@ -240,10 +240,9 @@ class EmotionProvider extends ChangeNotifier {
   // NEW: Clear cache
   Future<void> clearCache() async {
     try {
-      final success = await _apiService.clearCache();
-      if (success) {
-        await loadCacheStats(); // Refresh cache stats
-      }
+      // Note: clearCache method not implemented in current API service
+      // For now, just refresh cache stats to show current state
+      await loadCacheStats();
     } catch (e) {
       _setError('Failed to clear cache');
     }
@@ -375,7 +374,8 @@ class EmotionProvider extends ChangeNotifier {
   // Enhanced API info
   Future<Map<String, dynamic>?> getApiInfo() async {
     try {
-      _apiInfo = await _apiService.getApiInfo();
+      // Use getConnectionDetails instead of getApiInfo (which doesn't exist)
+      _apiInfo = await _apiService.getConnectionDetails();
       notifyListeners();
       return _apiInfo;
     } catch (e) {

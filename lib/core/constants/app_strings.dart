@@ -1,9 +1,54 @@
 class AppStrings {
+  // App
+  static const appName = 'CustomerSense Pro';
+  static const appDescription =
+      'Real-time Customer Sentiment Analysis for Enterprise Customer Service';
+
+  // Auth
+  static const login = 'Login';
+  static const logout = 'Logout';
+  static const email = 'Email';
+  static const password = 'Password';
+  static const forgotPassword = 'Forgot Password?';
+  static const signUp = 'Sign Up';
+
+  // Analysis
+  static const textAnalysisTitle = 'Text Analysis';
+  static const textAnalysisDescription =
+      'Analyze text content for sentiment and emotions';
+  static const voiceAnalysisTitle = 'Voice Analysis';
+  static const voiceAnalysisDescription =
+      'Analyze voice recordings for emotional patterns';
+  static const socialAnalysisTitle = 'Social Media Analysis';
+  static const socialAnalysisDescription =
+      'Analyze social media interactions and feedback';
+
+  // Dashboard
+  static const dashboard = 'Dashboard';
+  static const overview = 'Overview';
+  static const analytics = 'Analytics';
+  static const reports = 'Reports';
+  static const settings = 'Settings';
+
+  // Common
+  static const loading = 'Loading...';
+  static const error = 'Error';
+  static const success = 'Success';
+  static const retry = 'Retry';
+  static const cancel = 'Cancel';
+  static const save = 'Save';
+  static const delete = 'Delete';
+  static const edit = 'Edit';
+  static const view = 'View';
+  static const search = 'Search';
+  static const filter = 'Filter';
+  static const sort = 'Sort';
+  static const noData = 'No data available';
+  static const noResults = 'No results found';
+
   // App Info - Enterprise Branding
   static const String appTitle = 'CustomerSense Pro';
   static const String appSubtitle = 'Enterprise Customer Emotion Analytics';
-  static const String appDescription =
-      'Real-time Customer Sentiment Analysis for Enterprise Customer Service';
 
   // Dashboard
   static const String dashboardTitle = 'Customer Analytics Dashboard';
@@ -12,12 +57,9 @@ class AppStrings {
   static const String realTimeMonitoring = 'Real-time Customer Monitoring';
 
   // Navigation
-  static const String dashboard = 'Dashboard';
   static const String customerAnalytics = 'Customer Analytics';
   static const String teamPerformance = 'Team Performance';
   static const String realTimeMonitor = 'Live Monitor';
-  static const String reports = 'Reports';
-  static const String settings = 'Settings';
 
   // Connection Status
   static const String connected = 'Connected to CustomerSense AI';

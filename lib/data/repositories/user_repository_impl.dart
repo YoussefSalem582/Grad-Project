@@ -87,7 +87,7 @@ class UserRepositoryImpl implements UserRepository {
         throw NetworkFailure('No internet connection');
       }
     } catch (e) {
-      throw AuthFailure('Failed to login: ${e.toString()}');
+      throw AuthenticationFailure('Failed to login: ${e.toString()}');
     }
   }
 

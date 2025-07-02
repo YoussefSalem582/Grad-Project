@@ -4,10 +4,7 @@ import '../../domain/entities/analysis_result.dart';
 /// Local data source for analysis caching
 abstract class AnalysisLocalDataSource {
   Future<void> cacheAnalysis(AnalysisResultModel analysis);
-  Future<List<AnalysisResultModel>> getAnalysisHistory({
-    AnalysisType? type,
-    int? limit,
-  });
+  Future<List<AnalysisResultModel>> getAnalysisHistory();
   Future<void> deleteAnalysis(String id);
   Future<AnalysisResultModel?> getAnalysisById(String id);
   Future<void> clearCache();
@@ -31,24 +28,8 @@ class AnalysisLocalDataSourceImpl implements AnalysisLocalDataSource {
   }
 
   @override
-  Future<List<AnalysisResultModel>> getAnalysisHistory({
-    AnalysisType? type,
-    int? limit,
-  }) async {
-    var results = _cache;
-
-    // Filter by type if specified
-    if (type != null) {
-      final typeString = _analysisTypeToString(type);
-      results = results.where((item) => item.type == typeString).toList();
-    }
-
-    // Apply limit if specified
-    if (limit != null && limit > 0) {
-      results = results.take(limit).toList();
-    }
-
-    return results;
+  Future<List<AnalysisResultModel>> getAnalysisHistory() async {
+    return List.from(_cache);
   }
 
   @override
