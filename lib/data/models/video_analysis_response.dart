@@ -1,46 +1,54 @@
-import 'emotion_result.dart';
-
 class VideoAnalysisResponse {
   final int framesAnalyzed;
-  final List<FrameAnalysis> frameResults;
   final String dominantEmotion;
   final double averageConfidence;
+  final SummarySnapshot summarySnapshot;
 
   VideoAnalysisResponse({
     required this.framesAnalyzed,
-    required this.frameResults,
     required this.dominantEmotion,
     required this.averageConfidence,
+    required this.summarySnapshot,
   });
 
   factory VideoAnalysisResponse.fromJson(Map<String, dynamic> json) {
     return VideoAnalysisResponse(
       framesAnalyzed: json['frames_analyzed'],
-      frameResults: (json['frame_results'] as List)
-          .map((frame) => FrameAnalysis.fromJson(frame))
-          .toList(),
       dominantEmotion: json['dominant_emotion'],
       averageConfidence: json['average_confidence'].toDouble(),
+      summarySnapshot: SummarySnapshot.fromJson(json['summary_snapshot']),
     );
   }
 }
 
-class FrameAnalysis {
-  final int frameNumber;
-  final EmotionResult emotionResult;
-  final double timestamp;
+class SummarySnapshot {
+  final String emotion;
+  final String sentiment;
+  final double confidence;
+  final String subtitle;
+  final String frameImageBase64;
+  final int totalFramesAnalyzed;
+  final Map<String, int> emotionDistribution;
 
-  FrameAnalysis({
-    required this.frameNumber,
-    required this.emotionResult,
-    required this.timestamp,
+  SummarySnapshot({
+    required this.emotion,
+    required this.sentiment,
+    required this.confidence,
+    required this.subtitle,
+    required this.frameImageBase64,
+    required this.totalFramesAnalyzed,
+    required this.emotionDistribution,
   });
 
-  factory FrameAnalysis.fromJson(Map<String, dynamic> json) {
-    return FrameAnalysis(
-      frameNumber: json['frame_number'],
-      emotionResult: EmotionResult.fromJson(json['emotion_result']),
-      timestamp: json['timestamp'].toDouble(),
+  factory SummarySnapshot.fromJson(Map<String, dynamic> json) {
+    return SummarySnapshot(
+      emotion: json['emotion'],
+      sentiment: json['sentiment'],
+      confidence: json['confidence'].toDouble(),
+      subtitle: json['subtitle'],
+      frameImageBase64: json['frame_image_base64'],
+      totalFramesAnalyzed: json['total_frames_analyzed'],
+      emotionDistribution: Map<String, int>.from(json['emotion_distribution']),
     );
   }
 }

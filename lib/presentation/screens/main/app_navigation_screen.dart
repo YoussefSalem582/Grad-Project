@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../../../core/core.dart';
 import '../analysis/social_analysis_screen.dart';
 import '../analysis/text_analysis_screen.dart';
+import '../analysis/video_analysis_screen.dart';
 import '../analysis/voice_analysis_screen.dart';
 
 class AppNavigationScreen extends StatefulWidget {
@@ -24,6 +25,7 @@ class _AppNavigationScreenState extends State<AppNavigationScreen>
   final List<Widget> _screens = [
     const SocialAnalysisScreen(),
     const TextAnalysisScreen(),
+    const VideoAnalysisScreen(),
     const VoiceAnalysisScreen(),
   ];
 
@@ -43,11 +45,18 @@ class _AppNavigationScreenState extends State<AppNavigationScreen>
       'gradient': [const Color(0xFF10B981), const Color(0xFF06B6D4)],
     },
     {
+      'icon': Icons.video_library_outlined,
+      'activeIcon': Icons.video_library_rounded,
+      'label': 'Video',
+      'color': const Color(0xFF8B5CF6),
+      'gradient': [const Color(0xFF8B5CF6), const Color(0xFF3B82F6)],
+    },
+    {
       'icon': Icons.mic_none_outlined,
       'activeIcon': Icons.mic_rounded,
       'label': 'Voice',
-      'color': const Color(0xFF8B5CF6),
-      'gradient': [const Color(0xFF8B5CF6), const Color(0xFFEC4899)],
+      'color': const Color(0xFFEC4899),
+      'gradient': [const Color(0xFFEC4899), const Color(0xFFEF4444)],
     },
   ];
 
@@ -385,6 +394,8 @@ class _AppNavigationScreenState extends State<AppNavigationScreen>
       case 1:
         return 'Text Analysis';
       case 2:
+        return 'Video Analysis';
+      case 3:
         return 'Voice Analysis';
       default:
         return 'Employee';
@@ -398,6 +409,8 @@ class _AppNavigationScreenState extends State<AppNavigationScreen>
       case 1:
         return 'Text sentiment analysis';
       case 2:
+        return 'Video snapshots analysis';
+      case 3:
         return 'Voice emotion detection';
       default:
         return 'Dashboard';
@@ -411,6 +424,8 @@ class _AppNavigationScreenState extends State<AppNavigationScreen>
       case 1:
         return Icons.auto_awesome_rounded;
       case 2:
+        return Icons.video_library_rounded;
+      case 3:
         return Icons.record_voice_over_rounded;
       default:
         return Icons.add_rounded;
@@ -429,6 +444,9 @@ class _AppNavigationScreenState extends State<AppNavigationScreen>
         _showTextTemplates();
         break;
       case 2:
+        _showVideoOptions();
+        break;
+      case 3:
         _showVoiceOptions();
         break;
     }
@@ -447,6 +465,14 @@ class _AppNavigationScreenState extends State<AppNavigationScreen>
       context: context,
       backgroundColor: Colors.transparent,
       builder: (context) => _buildTextTemplatesSheet(),
+    );
+  }
+
+  void _showVideoOptions() {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.transparent,
+      builder: (context) => _buildVideoOptionsSheet(),
     );
   }
 
@@ -559,6 +585,61 @@ class _AppNavigationScreenState extends State<AppNavigationScreen>
                   'Thank You Template',
                   Icons.favorite_rounded,
                   const Color(0xFF8B5CF6),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildVideoOptionsSheet() {
+    return Container(
+      margin: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(20),
+      ),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Container(
+            margin: const EdgeInsets.all(8),
+            width: 40,
+            height: 4,
+            decoration: BoxDecoration(
+              color: AppColors.border,
+              borderRadius: BorderRadius.circular(2),
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.all(20),
+            child: Column(
+              children: [
+                Text(
+                  'Video Options',
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.w700,
+                    color: AppColors.textPrimary,
+                  ),
+                ),
+                const SizedBox(height: 20),
+                _buildQuickActionItem(
+                  'Analyze YouTube',
+                  Icons.video_library_rounded,
+                  const Color(0xFF8B5CF6),
+                ),
+                _buildQuickActionItem(
+                  'Upload Video',
+                  Icons.file_upload_rounded,
+                  const Color(0xFF3B82F6),
+                ),
+                _buildQuickActionItem(
+                  'Live Stream',
+                  Icons.live_tv_rounded,
+                  const Color(0xFF10B981),
                 ),
               ],
             ),

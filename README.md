@@ -34,6 +34,7 @@
 ###  **Multi-Modal Analysis Tools**
 - **Text Analysis**: Email, chat, and review sentiment analysis
 - **Voice Analysis**: Call center emotion detection
+- **Video Link Analysis**: Emotion extraction from video snapshots with subtitles
 - **Social Media Monitoring**: Real-time brand sentiment tracking
 - **Batch Processing**: Bulk data analysis capabilities
 
@@ -100,7 +101,10 @@ lib/
 ### Analysis Suite
 - **Emotion Detection**: Advanced AI-powered sentiment recognition
 - **Batch Processing**: Efficient handling of large datasets
-- **Video Analysis**: Visual emotion recognition capabilities
+- **Video Link Analysis**: Extract emotions from video snapshots with subtitles
+- **Voice Analysis**: Real-time voice emotion detection
+- **Text Analysis**: Comprehensive text sentiment and emotion analysis
+- **Social Media Analysis**: Platform-specific sentiment monitoring
 - **Multi-language Support**: Global customer base analysis
 
 ---
