@@ -52,9 +52,6 @@ class UserProvider extends ChangeNotifier {
         name: _currentUser!.name,
         email: _currentUser!.email,
         role: _currentUser!.role,
-        avatar: _currentUser!.avatar,
-        createdAt: _currentUser!.createdAt,
-        preferences: preferences,
       );
       notifyListeners();
     }

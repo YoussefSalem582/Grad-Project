@@ -1,4 +1,4 @@
-// Analysis Screens Exports
-export 'emotion_analyzer_screen.dart';
-export 'video_analyzer_screen.dart';
-export 'batch_processing_screen.dart';
+﻿// Analysis Screens Export File
+export 'social_analysis_screen.dart';
+export 'text_analysis_screen.dart';
+export 'voice_analysis_screen.dart';

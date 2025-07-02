@@ -1,40 +1,43 @@
-import 'package:equatable/equatable.dart';
+import '../domain.dart';
 
 /// Domain entity representing a user
-class UserEntity extends Equatable {
+class UserEntity {
   final String id;
   final String name;
   final String email;
   final UserRole role;
-  final String? avatar;
-  final DateTime createdAt;
-  final UserPreferences preferences;
 
   const UserEntity({
     required this.id,
     required this.name,
     required this.email,
     required this.role,
-    this.avatar,
-    required this.createdAt,
-    required this.preferences,
   });
 
   @override
-  List<Object?> get props => [
-    id,
-    name,
-    email,
-    role,
-    avatar,
-    createdAt,
-    preferences,
-  ];
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+    return other is UserEntity &&
+        other.id == id &&
+        other.name == name &&
+        other.email == email &&
+        other.role == role;
+  }
+
+  @override
+  int get hashCode {
+    return id.hashCode ^ name.hashCode ^ email.hashCode ^ role.hashCode;
+  }
+
+  @override
+  String toString() {
+    return 'UserEntity(id: $id, name: $name, email: $email, role: $role)';
+  }
 }
 
-enum UserRole { admin, employee }
+enum UserRole { employee }
 
-class UserPreferences extends Equatable {
+class UserPreferences {
   final bool darkMode;
   final String language;
   final bool notifications;
@@ -46,7 +49,4 @@ class UserPreferences extends Equatable {
     this.notifications = true,
     this.timezone = 'UTC',
   });
-
-  @override
-  List<Object> get props => [darkMode, language, notifications, timezone];
 }

@@ -3,28 +3,14 @@ import '../../presentation/screens/screens.dart';
 
 /// Centralized routing configuration
 class AppRouter {
-  static const String roleSelection = '/';
-  static const String adminDashboard = '/admin';
-  static const String employeeDashboard = '/employee';
+  static const String mainDashboard = '/';
   static const String appStatus = '/status';
 
   static Route<dynamic> generateRoute(RouteSettings settings) {
     switch (settings.name) {
-      case roleSelection:
+      case mainDashboard:
         return MaterialPageRoute(
-          builder: (_) => const RoleSelectionScreen(),
-          settings: settings,
-        );
-
-      case adminDashboard:
-        return MaterialPageRoute(
-          builder: (_) => const AdminNavigationScreen(),
-          settings: settings,
-        );
-
-      case employeeDashboard:
-        return MaterialPageRoute(
-          builder: (_) => const EmployeeNavigationScreen(),
+          builder: (_) => const AppNavigationScreen(),
           settings: settings,
         );
 
@@ -43,16 +29,8 @@ class AppRouter {
   }
 
   /// Navigation helper methods
-  static void toRoleSelection(BuildContext context) {
-    Navigator.pushNamedAndRemoveUntil(context, roleSelection, (route) => false);
-  }
-
-  static void toAdminDashboard(BuildContext context) {
-    Navigator.pushReplacementNamed(context, adminDashboard);
-  }
-
-  static void toEmployeeDashboard(BuildContext context) {
-    Navigator.pushReplacementNamed(context, employeeDashboard);
+  static void toMainDashboard(BuildContext context) {
+    Navigator.pushNamedAndRemoveUntil(context, mainDashboard, (route) => false);
   }
 
   static void toAppStatus(BuildContext context) {

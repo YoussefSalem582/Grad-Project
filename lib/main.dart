@@ -33,7 +33,7 @@ class CustomerSenseApp extends StatelessWidget {
         theme: AppTheme.lightTheme,
         darkTheme: AppTheme.darkTheme,
         themeMode: ThemeMode.system,
-        initialRoute: AppRouter.roleSelection,
+        initialRoute: AppRouter.mainDashboard,
         onGenerateRoute: AppRouter.generateRoute,
         debugShowCheckedModeBanner: false,
         builder: (context, child) {

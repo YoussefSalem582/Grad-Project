@@ -23,7 +23,7 @@ class UserRemoteDataSourceImpl implements UserRemoteDataSource {
       id: 'user_123',
       name: 'John Doe',
       email: 'john.doe@company.com',
-      role: 'employee',
+      role: UserRole.employee,
       avatar: null,
       createdAt: DateTime.now()
           .subtract(const Duration(days: 30))
@@ -53,7 +53,7 @@ class UserRemoteDataSourceImpl implements UserRemoteDataSource {
       id: 'user_123',
       name: 'John Doe',
       email: 'john.doe@company.com',
-      role: 'employee',
+      role: UserRole.employee,
       avatar: null,
       createdAt: DateTime.now()
           .subtract(const Duration(days: 30))
@@ -76,7 +76,7 @@ class UserRemoteDataSourceImpl implements UserRemoteDataSource {
       id: 'user_123',
       name: 'John Doe',
       email: email,
-      role: 'employee',
+      role: UserRole.employee,
       avatar: null,
       createdAt: DateTime.now()
           .subtract(const Duration(days: 30))

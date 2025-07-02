@@ -89,7 +89,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'Admin User',
+                      'Employee User',
                       style: TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.w600,
@@ -97,14 +97,14 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       ),
                     ),
                     Text(
-                      'admin@company.com',
+                      'employee@company.com',
                       style: TextStyle(
                         fontSize: 14,
                         color: AppColors.textSecondary,
                       ),
                     ),
                     Text(
-                      'Enterprise Administrator',
+                      'Customer Service Agent',
                       style: TextStyle(
                         fontSize: 12,
                         color: AppColors.textLight,
@@ -684,4 +684,3 @@ class _SettingsScreenState extends State<SettingsScreen> {
     );
   }
 }
-
