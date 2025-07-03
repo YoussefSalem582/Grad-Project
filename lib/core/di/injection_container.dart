@@ -22,6 +22,7 @@ Future<void> init() async {
       analyzeVoiceUseCase: sl(),
       analyzeSocialUseCase: sl(),
       getAnalysisHistoryUseCase: sl(),
+      emotionApiService: sl(),
     ),
   );
   sl.registerFactory(() => UserCubit());

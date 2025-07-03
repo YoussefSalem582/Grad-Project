@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:provider/provider.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'dart:convert';
 import '../../../core/core.dart';
 import '../../../data/models/video_analysis_response.dart';
-import '../../providers/emotion_provider.dart';
+import '../../blocs/emotion/emotion_cubit.dart';
+import '../../blocs/emotion/emotion_state.dart';
 
 class VideoAnalysisScreen extends StatefulWidget {
   const VideoAnalysisScreen({super.key});
@@ -392,9 +393,9 @@ class _VideoAnalysisScreenState extends State<VideoAnalysisScreen>
   }
 
   Widget _buildVideoAnalysisResults() {
-    return Consumer<EmotionProvider>(
-      builder: (context, provider, child) {
-        final videoResult = provider.lastVideoResult;
+    return BlocBuilder<EmotionCubit, EmotionState>(
+      builder: (context, state) {
+        final videoResult = context.read<EmotionCubit>().lastVideoResult;
 
         if (videoResult == null) {
           return _buildDemoResults();
@@ -1128,8 +1129,8 @@ class _VideoAnalysisScreenState extends State<VideoAnalysisScreen>
     });
 
     try {
-      final provider = Provider.of<EmotionProvider>(context, listen: false);
-      await provider.analyzeVideo(
+      final emotionCubit = context.read<EmotionCubit>();
+      await emotionCubit.analyzeVideo(
         _urlController.text,
         frameInterval: 30,
         maxFrames: 5,
