@@ -15,11 +15,11 @@ void main() async {
   // Initialize dependency injection
   await di.init();
 
-  runApp(const CustomerSenseApp());
+  runApp(const EmosenseApp());
 }
 
-class CustomerSenseApp extends StatelessWidget {
-  const CustomerSenseApp({super.key});
+class EmosenseApp extends StatelessWidget {
+  const EmosenseApp({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -30,7 +30,7 @@ class CustomerSenseApp extends StatelessWidget {
         ),
       ],
       child: MaterialApp(
-        title: 'CustomerSense Pro',
+        title: 'Emosense',
         theme: AppTheme.lightTheme,
         darkTheme: AppTheme.darkTheme,
         themeMode: ThemeMode.system,

@@ -7,12 +7,12 @@
 
 import 'package:flutter_test/flutter_test.dart';
 
-import 'package:graphsmile_mobile/main.dart';
+import 'package:emosense_mobile/main.dart';
 
 void main() {
-  testWidgets('CustomerSense Pro app smoke test', (WidgetTester tester) async {
+  testWidgets('Emosense app smoke test', (WidgetTester tester) async {
     // Build our app and trigger a frame.
-    await tester.pumpWidget(const CustomerSenseApp());
+    await tester.pumpWidget(const EmosenseApp());
 
     // Verify that our app contains the main elements
     expect(find.text('Dashboard'), findsOneWidget);

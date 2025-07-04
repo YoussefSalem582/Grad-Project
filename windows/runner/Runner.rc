@@ -90,12 +90,12 @@ BEGIN
         BLOCK "040904e4"
         BEGIN
             VALUE "CompanyName", "com.example" "\0"
-            VALUE "FileDescription", "graphsmile_mobile" "\0"
+            VALUE "FileDescription", "Emosense" "\0"
             VALUE "FileVersion", VERSION_AS_STRING "\0"
-            VALUE "InternalName", "graphsmile_mobile" "\0"
+            VALUE "InternalName", "emosense_mobile" "\0"
             VALUE "LegalCopyright", "Copyright (C) 2025 com.example. All rights reserved." "\0"
-            VALUE "OriginalFilename", "graphsmile_mobile.exe" "\0"
-            VALUE "ProductName", "graphsmile_mobile" "\0"
+            VALUE "OriginalFilename", "emosense_mobile.exe" "\0"
+            VALUE "ProductName", "Emosense" "\0"
             VALUE "ProductVersion", VERSION_AS_STRING "\0"
         END
     END

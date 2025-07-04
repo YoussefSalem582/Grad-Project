@@ -1,13 +1,13 @@
-﻿# GraphSmile - CustomerSense Pro 
+﻿# Emosense - Advanced Emotion Recognition Platform
 
 [![Flutter](https://img.shields.io/badge/Flutter-3.0+-blue.svg)](https://flutter.dev/)
 [![Dart](https://img.shields.io/badge/Dart-3.0+-blue.svg)](https://dart.dev/)
 [![License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 [![Platform](https://img.shields.io/badge/Platform-Android%20|%20iOS%20|%20Web-lightgrey.svg)](https://flutter.dev/)
 
-##  Enterprise-Grade Customer Service Analytics Platform
+##  Enterprise-Grade Emotion Recognition & Analytics Platform
 
-**GraphSmile** (CustomerSense Pro) is a cutting-edge Flutter application that revolutionizes customer service through advanced emotion analysis and real-time sentiment monitoring. Built with **Clean Architecture** principles, this enterprise-ready solution empowers businesses to understand, analyze, and improve customer interactions across multiple channels.
+**Emosense** is a cutting-edge Flutter application that revolutionizes customer service and human interaction analysis through advanced emotion recognition and real-time sentiment monitoring. Built with **Clean Architecture** principles, this enterprise-ready solution empowers businesses to understand, analyze, and improve human interactions across multiple channels.
 
 ###  Perfect for Companies Like:
 - **Amazon** - Customer service optimization
