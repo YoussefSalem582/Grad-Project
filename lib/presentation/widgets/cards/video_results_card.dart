@@ -46,13 +46,16 @@ class VideoResultsCard extends StatelessWidget {
 
   Widget _buildSummarySnapshot(BuildContext context) {
     final snapshot = result.summarySnapshot;
-    
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text('Analysis Details', style: Theme.of(context).textTheme.titleMedium),
+        Text(
+          'Analysis Details',
+          style: Theme.of(context).textTheme.titleMedium,
+        ),
         const SizedBox(height: 8),
-        
+
         // Emotion and Sentiment Row
         Row(
           children: [
@@ -94,10 +97,14 @@ class VideoResultsCard extends StatelessWidget {
               child: Container(
                 padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
-                  color: _getSentimentColor(snapshot.sentiment).withOpacity(0.1),
+                  color: _getSentimentColor(
+                    snapshot.sentiment,
+                  ).withOpacity(0.1),
                   borderRadius: BorderRadius.circular(8),
                   border: Border.all(
-                    color: _getSentimentColor(snapshot.sentiment).withOpacity(0.3),
+                    color: _getSentimentColor(
+                      snapshot.sentiment,
+                    ).withOpacity(0.3),
                   ),
                 ),
                 child: Column(
@@ -125,9 +132,9 @@ class VideoResultsCard extends StatelessWidget {
             ),
           ],
         ),
-        
+
         const SizedBox(height: 16),
-        
+
         // Summary Text
         Container(
           padding: const EdgeInsets.all(12),
@@ -160,18 +167,22 @@ class VideoResultsCard extends StatelessWidget {
             ],
           ),
         ),
-        
+
         const SizedBox(height: 16),
-        
+
         // Emotion Distribution
         if (snapshot.emotionDistribution.isNotEmpty) ...[
-          Text('Emotion Distribution', style: Theme.of(context).textTheme.titleSmall),
+          Text(
+            'Emotion Distribution',
+            style: Theme.of(context).textTheme.titleSmall,
+          ),
           const SizedBox(height: 8),
           ...snapshot.emotionDistribution.entries.map((entry) {
             final emotion = entry.key;
             final count = entry.value;
-            final percentage = (count / snapshot.totalFramesAnalyzed * 100).round();
-            
+            final percentage = (count / snapshot.totalFramesAnalyzed * 100)
+                .round();
+
             return Padding(
               padding: const EdgeInsets.only(bottom: 8.0),
               child: Row(

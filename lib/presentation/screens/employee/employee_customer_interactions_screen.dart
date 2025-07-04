@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import '../../../core/core.dart';
 import '../../widgets/widgets.dart';
 
@@ -51,7 +52,6 @@ class _EmployeeCustomerInteractionsScreenState
         opacity: _fadeAnimation,
         child: Column(
           children: [
-            _buildModernHeader(theme, customSpacing),
             _buildAdvancedTabBar(theme, customSpacing),
             Expanded(
               child: PageView(
@@ -72,186 +72,14 @@ class _EmployeeCustomerInteractionsScreenState
     );
   }
 
-  Widget _buildModernHeader(ThemeData theme, CustomSpacing customSpacing) {
-    return Container(
-      padding: EdgeInsets.all(customSpacing.lg),
-      decoration: BoxDecoration(
-        gradient: const LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [Color(0xFF00B4DB), Color(0xFF0083B0)],
-        ),
-        boxShadow: [
-          BoxShadow(
-            color: const Color(0xFF00B4DB).withValues(alpha: 0.3),
-            blurRadius: 20,
-            offset: const Offset(0, 10),
-          ),
-        ],
-      ),
-      child: SafeArea(
-        bottom: false,
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              children: [
-                Container(
-                  padding: EdgeInsets.all(customSpacing.sm),
-                  decoration: BoxDecoration(
-                    color: Colors.white.withValues(alpha: 0.2),
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: const Icon(
-                    Icons.support_agent,
-                    color: Colors.white,
-                    size: 24,
-                  ),
-                ),
-                SizedBox(width: customSpacing.md),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'Customer Interactions',
-                        style: theme.textTheme.headlineSmall?.copyWith(
-                          color: Colors.white,
-                          fontWeight: FontWeight.w800,
-                        ),
-                      ),
-                      Text(
-                        'Manage conversations & support tickets',
-                        style: theme.textTheme.bodyMedium?.copyWith(
-                          color: Colors.white.withValues(alpha: 0.9),
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                // Status indicator
-                Container(
-                  padding: EdgeInsets.symmetric(
-                    horizontal: customSpacing.sm,
-                    vertical: customSpacing.xs,
-                  ),
-                  decoration: BoxDecoration(
-                    color: AppColors.success.withValues(alpha: 0.2),
-                    borderRadius: BorderRadius.circular(12),
-                    border: Border.all(
-                      color: AppColors.success.withValues(alpha: 0.3),
-                      width: 1,
-                    ),
-                  ),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Container(
-                        width: 8,
-                        height: 8,
-                        decoration: const BoxDecoration(
-                          color: AppColors.success,
-                          shape: BoxShape.circle,
-                        ),
-                      ),
-                      SizedBox(width: customSpacing.xs),
-                      const Text(
-                        'Available',
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 12,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-            SizedBox(height: customSpacing.lg),
-
-            // Quick stats
-            Row(
-              children: [
-                Expanded(
-                  child: _buildHeaderStat(
-                    'Active Chats',
-                    '8',
-                    Icons.chat_bubble,
-                    customSpacing,
-                  ),
-                ),
-                SizedBox(width: customSpacing.sm),
-                Expanded(
-                  child: _buildHeaderStat(
-                    'Pending',
-                    '12',
-                    Icons.pending,
-                    customSpacing,
-                  ),
-                ),
-                SizedBox(width: customSpacing.sm),
-                Expanded(
-                  child: _buildHeaderStat(
-                    'Resolved',
-                    '45',
-                    Icons.check_circle,
-                    customSpacing,
-                  ),
-                ),
-              ],
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildHeaderStat(
-    String label,
-    String value,
-    IconData icon,
-    CustomSpacing customSpacing,
-  ) {
-    return Container(
-      padding: EdgeInsets.all(customSpacing.sm),
-      decoration: BoxDecoration(
-        color: Colors.white.withValues(alpha: 0.15),
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(
-          color: Colors.white.withValues(alpha: 0.3),
-          width: 1,
-        ),
-      ),
-      child: Column(
-        children: [
-          Icon(icon, color: Colors.white, size: 20),
-          SizedBox(height: customSpacing.xs),
-          Text(
-            value,
-            style: const TextStyle(
-              color: Colors.white,
-              fontSize: 18,
-              fontWeight: FontWeight.w800,
-            ),
-          ),
-          Text(
-            label,
-            style: const TextStyle(
-              color: Colors.white70,
-              fontSize: 12,
-              fontWeight: FontWeight.w500,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
   Widget _buildAdvancedTabBar(ThemeData theme, CustomSpacing customSpacing) {
     return Container(
-      margin: EdgeInsets.all(customSpacing.md),
+      margin: EdgeInsets.only(
+        left: customSpacing.md,
+        right: customSpacing.md,
+        top: customSpacing.lg, // Increased top margin since no local app bar
+        bottom: customSpacing.md,
+      ),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(16),

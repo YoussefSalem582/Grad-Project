@@ -55,44 +55,6 @@ class _EmployeeTasksScreenState extends State<EmployeeTasksScreen> {
               context,
             ).textTheme.bodyMedium?.copyWith(color: AppColors.textSecondary),
           ),
-          const SizedBox(height: 16),
-          Row(
-            children: [
-              _buildTaskSummary('Total', '12', AppColors.primary),
-              const SizedBox(width: 16),
-              _buildTaskSummary('Pending', '7', AppColors.warning),
-              const SizedBox(width: 16),
-              _buildTaskSummary('Completed', '5', AppColors.success),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildTaskSummary(String label, String count, Color color) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-      decoration: BoxDecoration(
-        color: color.withValues(alpha: 0.1),
-        borderRadius: BorderRadius.circular(20),
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Container(
-            width: 8,
-            height: 8,
-            decoration: BoxDecoration(color: color, shape: BoxShape.circle),
-          ),
-          const SizedBox(width: 8),
-          Text(
-            '$count $label',
-            style: Theme.of(context).textTheme.bodySmall?.copyWith(
-              color: color,
-              fontWeight: FontWeight.w600,
-            ),
-          ),
         ],
       ),
     );
@@ -103,7 +65,7 @@ class _EmployeeTasksScreenState extends State<EmployeeTasksScreen> {
 
     return Container(
       height: 60,
-      padding: const EdgeInsets.symmetric(horizontal: 16),
+      padding: const EdgeInsets.fromLTRB(16, 8, 16, 0), // Added top padding
       child: ListView.builder(
         scrollDirection: Axis.horizontal,
         itemCount: filters.length,
@@ -266,7 +228,9 @@ class _EmployeeTasksScreenState extends State<EmployeeTasksScreen> {
                     vertical: 4,
                   ),
                   decoration: BoxDecoration(
-                    color: statusColors[statuses[index]]!.withValues(alpha: 0.1),
+                    color: statusColors[statuses[index]]!.withValues(
+                      alpha: 0.1,
+                    ),
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: Text(
@@ -284,7 +248,9 @@ class _EmployeeTasksScreenState extends State<EmployeeTasksScreen> {
                     vertical: 4,
                   ),
                   decoration: BoxDecoration(
-                    color: priorityColors[priorities[index]]!.withValues(alpha: 0.1),
+                    color: priorityColors[priorities[index]]!.withValues(
+                      alpha: 0.1,
+                    ),
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: Text(
@@ -375,4 +341,3 @@ class _EmployeeTasksScreenState extends State<EmployeeTasksScreen> {
     ).showSnackBar(SnackBar(content: Text('$action action for: $task')));
   }
 }
-

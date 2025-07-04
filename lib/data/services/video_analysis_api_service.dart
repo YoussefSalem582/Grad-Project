@@ -6,10 +6,11 @@ class VideoAnalysisApiService {
   static const String _baseUrl = 'http://localhost:8002';
   static const String _videoAnalysisEndpoint = '/analyze-video';
   static const String _healthEndpoint = '/health';
-  
+
   final http.Client _client;
 
-  VideoAnalysisApiService({http.Client? client}) : _client = client ?? http.Client();
+  VideoAnalysisApiService({http.Client? client})
+    : _client = client ?? http.Client();
 
   /// Analyze video from URL
   Future<VideoAnalysisResponse> analyzeVideo({
@@ -27,9 +28,7 @@ class VideoAnalysisApiService {
       final response = await _client
           .post(
             Uri.parse('$_baseUrl$_videoAnalysisEndpoint'),
-            headers: {
-              'Content-Type': 'application/json',
-            },
+            headers: {'Content-Type': 'application/json'},
             body: json.encode(requestBody),
           )
           .timeout(const Duration(seconds: 30));
@@ -100,7 +99,7 @@ class VideoAnalysisApiService {
     final analysisResults = data['analysis_results'] as List;
 
     // Create summary snapshot from the first frame and summary data
-    final firstFrame = analysisResults.isNotEmpty 
+    final firstFrame = analysisResults.isNotEmpty
         ? analysisResults.first as Map<String, dynamic>
         : null;
 
@@ -112,7 +111,7 @@ class VideoAnalysisApiService {
       frameImageBase64: _generateSummaryImage(),
       totalFramesAnalyzed: summary['total_frames_analyzed'] ?? 0,
       emotionDistribution: Map<String, int>.from(
-        summary['emotion_distribution'] ?? {}
+        summary['emotion_distribution'] ?? {},
       ),
     );
 
@@ -135,8 +134,12 @@ class VideoAnalysisApiService {
     final framesCount = summary['total_frames_analyzed'] ?? 0;
 
     return 'Video analysis of $framesCount frames shows predominantly $dominantEmotion emotion with $sentiment sentiment. '
-           'Analysis confidence: ${(confidence * 100).toInt()}%. '
-           'This indicates a ${sentiment == 'positive' ? 'favorable' : sentiment == 'negative' ? 'concerning' : 'balanced'} emotional tone throughout the content.';
+        'Analysis confidence: ${(confidence * 100).toInt()}%. '
+        'This indicates a ${sentiment == 'positive'
+            ? 'favorable'
+            : sentiment == 'negative'
+            ? 'concerning'
+            : 'balanced'} emotional tone throughout the content.';
   }
 
   /// Generate a placeholder image for summary

@@ -101,12 +101,11 @@ Screens are organized by feature areas for better maintainability:
 - `employee_navigation_screen.dart` - Employee navigation
 - `employee_dashboard_screen.dart` - Employee home
 - `employee_profile_screen.dart` - Profile management
-- `employee_tasks_screen.dart` - Task management
 - `employee_performance_screen.dart` - Performance metrics
 - `employee_customer_interactions_screen.dart` - Customer interactions
 - `employee_text_analysis_screen.dart` - Text analysis tools
 - `employee_voice_analysis_screen.dart` - Voice analysis tools
-- `employee_social_analysis_screen.dart` - Social media analysis
+
 
 #### Analysis Screens (`lib/presentation/screens/analysis/`)
 - `emotion_analyzer_screen.dart` - Core emotion analysis

@@ -22,7 +22,5 @@ Future<void> init() async {
   );
 
   // Cubits
-  sl.registerFactory<VideoAnalysisCubit>(
-    () => VideoAnalysisCubit(sl()),
-  );
+  sl.registerFactory<VideoAnalysisCubit>(() => VideoAnalysisCubit(sl()));
 }

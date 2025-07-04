@@ -27,6 +27,7 @@ class SummarySnapshot {
   final double confidence;
   final String subtitle;
   final String frameImageBase64;
+  final String? assetImagePath; // New field for asset images
   final int totalFramesAnalyzed;
   final Map<String, int> emotionDistribution;
 
@@ -36,6 +37,7 @@ class SummarySnapshot {
     required this.confidence,
     required this.subtitle,
     required this.frameImageBase64,
+    this.assetImagePath, // Optional asset path
     required this.totalFramesAnalyzed,
     required this.emotionDistribution,
   });
@@ -47,6 +49,7 @@ class SummarySnapshot {
       confidence: json['confidence'].toDouble(),
       subtitle: json['subtitle'],
       frameImageBase64: json['frame_image_base64'],
+      assetImagePath: json['asset_image_path'], // Optional field
       totalFramesAnalyzed: json['total_frames_analyzed'],
       emotionDistribution: Map<String, int>.from(json['emotion_distribution']),
     );

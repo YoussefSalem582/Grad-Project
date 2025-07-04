@@ -11,7 +11,7 @@ import 'presentation/cubit/video_analysis/video_analysis_cubit.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  
+
   // Initialize dependency injection
   await di.init();
 
@@ -34,7 +34,7 @@ class CustomerSenseApp extends StatelessWidget {
         theme: AppTheme.lightTheme,
         darkTheme: AppTheme.darkTheme,
         themeMode: ThemeMode.system,
-        initialRoute: AppRouter.roleSelection,
+        initialRoute: AppRouter.login,
         onGenerateRoute: AppRouter.generateRoute,
         debugShowCheckedModeBanner: false,
         builder: (context, child) {

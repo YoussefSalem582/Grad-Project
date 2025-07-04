@@ -6,14 +6,16 @@ import '../../../core/core.dart';
 import '../../../data/models/video_analysis_response.dart';
 import '../../cubit/video_analysis/video_analysis_cubit.dart';
 
-class VideoAnalysisScreen extends StatefulWidget {
-  const VideoAnalysisScreen({super.key});
+class EmployeeVideoAnalysisScreen extends StatefulWidget {
+  const EmployeeVideoAnalysisScreen({super.key});
 
   @override
-  State<VideoAnalysisScreen> createState() => _VideoAnalysisScreenState();
+  State<EmployeeVideoAnalysisScreen> createState() =>
+      _EmployeeVideoAnalysisScreenState();
 }
 
-class _VideoAnalysisScreenState extends State<VideoAnalysisScreen>
+class _EmployeeVideoAnalysisScreenState
+    extends State<EmployeeVideoAnalysisScreen>
     with TickerProviderStateMixin {
   final TextEditingController _urlController = TextEditingController();
   final FocusNode _urlFocusNode = FocusNode();
@@ -80,23 +82,28 @@ class _VideoAnalysisScreenState extends State<VideoAnalysisScreen>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.transparent,
+      backgroundColor: AppColors.background,
+      appBar: AppBar(
+        title: const Text('Video Analysis'),
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        foregroundColor: AppColors.textPrimary,
+      ),
       body: SafeArea(
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(16),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const SizedBox(height: 100),
               _buildAnimatedHeader(),
-              const SizedBox(height: 32),
+              const SizedBox(height: 24),
               _buildVideoUrlInput(),
-              const SizedBox(height: 24),
+              const SizedBox(height: 20),
               _buildAnalyzeButton(),
-              const SizedBox(height: 32),
-              _buildVideoAnalysisResults(),
               const SizedBox(height: 24),
-              _buildQuickActionsGrid(),
+              _buildVideoAnalysisResults(),
+              const SizedBox(height: 20),
+              _buildEmployeeInsights(),
             ],
           ),
         ),
@@ -109,62 +116,62 @@ class _VideoAnalysisScreenState extends State<VideoAnalysisScreen>
       animation: _headerAnimation,
       builder: (context, child) {
         return Transform.translate(
-          offset: Offset(0, 30 * (1 - _headerAnimation.value)),
+          offset: Offset(0, 20 * (1 - _headerAnimation.value)),
           child: Opacity(
             opacity: _headerAnimation.value,
             child: Container(
-              padding: const EdgeInsets.all(24),
+              padding: const EdgeInsets.all(20),
               decoration: BoxDecoration(
                 gradient: const LinearGradient(
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
                   colors: [
-                    Color(0xFF8B5CF6),
-                    Color(0xFF3B82F6),
-                    Color(0xFF06B6D4),
+                    Color(0xFF667EEA),
+                    Color(0xFF764BA2),
+                    Color(0xFF6B73FF),
                   ],
                 ),
-                borderRadius: BorderRadius.circular(20),
+                borderRadius: BorderRadius.circular(16),
                 boxShadow: [
                   BoxShadow(
-                    color: const Color(0xFF8B5CF6).withValues(alpha: 0.3),
-                    blurRadius: 20,
-                    offset: const Offset(0, 10),
+                    color: const Color(0xFF667EEA).withValues(alpha: 0.3),
+                    blurRadius: 15,
+                    offset: const Offset(0, 8),
                   ),
                 ],
               ),
               child: Row(
                 children: [
                   Container(
-                    padding: const EdgeInsets.all(16),
+                    padding: const EdgeInsets.all(12),
                     decoration: BoxDecoration(
                       color: Colors.white.withValues(alpha: 0.2),
-                      borderRadius: BorderRadius.circular(16),
+                      borderRadius: BorderRadius.circular(12),
                     ),
                     child: const Icon(
                       Icons.video_library_rounded,
                       color: Colors.white,
-                      size: 32,
+                      size: 28,
                     ),
                   ),
-                  const SizedBox(width: 20),
+                  const SizedBox(width: 16),
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         const Text(
-                          'Video Link Analysis',
+                          'Customer Video Analysis',
                           style: TextStyle(
-                            fontSize: 22,
-                            fontWeight: FontWeight.w800,
+                            fontSize: 20,
+                            fontWeight: FontWeight.w700,
                             color: Colors.white,
                           ),
                         ),
                         const SizedBox(height: 4),
                         Text(
-                          'Extract key emotions from video',
+                          'Analyze customer emotions in videos',
                           style: TextStyle(
-                            fontSize: 14,
+                            fontSize: 13,
                             fontWeight: FontWeight.w500,
                             color: Colors.white.withValues(alpha: 0.9),
                           ),
@@ -185,15 +192,15 @@ class _VideoAnalysisScreenState extends State<VideoAnalysisScreen>
     return ScaleTransition(
       scale: _cardAnimation,
       child: Container(
-        padding: const EdgeInsets.all(20),
+        padding: const EdgeInsets.all(18),
         decoration: BoxDecoration(
           color: Colors.white,
-          borderRadius: BorderRadius.circular(20),
-          border: Border.all(color: AppColors.border.withValues(alpha: 0.5)),
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(color: AppColors.border.withValues(alpha: 0.3)),
           boxShadow: [
             BoxShadow(
-              color: AppColors.shadowLight,
-              blurRadius: 10,
+              color: Colors.black.withValues(alpha: 0.08),
+              blurRadius: 12,
               offset: const Offset(0, 4),
             ),
           ],
@@ -206,38 +213,38 @@ class _VideoAnalysisScreenState extends State<VideoAnalysisScreen>
                 Container(
                   padding: const EdgeInsets.all(8),
                   decoration: BoxDecoration(
-                    color: const Color(0xFF8B5CF6).withValues(alpha: 0.1),
-                    borderRadius: BorderRadius.circular(12),
+                    color: const Color(0xFF667EEA).withValues(alpha: 0.1),
+                    borderRadius: BorderRadius.circular(10),
                   ),
                   child: const Icon(
                     Icons.link_rounded,
-                    color: Color(0xFF8B5CF6),
-                    size: 20,
+                    color: Color(0xFF667EEA),
+                    size: 18,
                   ),
                 ),
                 const SizedBox(width: 12),
                 const Text(
-                  'Enter Video URL',
+                  'Video URL',
                   style: TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.w700,
+                    fontSize: 16,
+                    fontWeight: FontWeight.w600,
                     color: AppColors.textPrimary,
                   ),
                 ),
               ],
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: 14),
             AnimatedContainer(
               duration: const Duration(milliseconds: 300),
-              padding: const EdgeInsets.all(16),
+              padding: const EdgeInsets.all(14),
               decoration: BoxDecoration(
                 color: _urlFocusNode.hasFocus
-                    ? const Color(0xFF8B5CF6).withValues(alpha: 0.05)
+                    ? const Color(0xFF667EEA).withValues(alpha: 0.05)
                     : AppColors.surface,
                 borderRadius: BorderRadius.circular(12),
                 border: Border.all(
                   color: _urlFocusNode.hasFocus
-                      ? const Color(0xFF8B5CF6)
+                      ? const Color(0xFF667EEA)
                       : AppColors.border.withValues(alpha: 0.5),
                   width: _urlFocusNode.hasFocus ? 2 : 1,
                 ),
@@ -246,16 +253,18 @@ class _VideoAnalysisScreenState extends State<VideoAnalysisScreen>
                 controller: _urlController,
                 focusNode: _urlFocusNode,
                 decoration: InputDecoration(
-                  hintText: 'https://youtube.com/watch?v=... or any video URL',
+                  hintText: 'Enter video URL (YouTube, Vimeo, etc.)',
                   hintStyle: TextStyle(
                     color: AppColors.textSecondary.withValues(alpha: 0.7),
+                    fontSize: 14,
                   ),
                   border: InputBorder.none,
                   prefixIcon: Icon(
                     Icons.video_collection_rounded,
                     color: _urlFocusNode.hasFocus
-                        ? const Color(0xFF8B5CF6)
+                        ? const Color(0xFF667EEA)
                         : AppColors.textSecondary,
+                    size: 20,
                   ),
                   suffixIcon: _urlController.text.isNotEmpty
                       ? GestureDetector(
@@ -273,7 +282,7 @@ class _VideoAnalysisScreenState extends State<VideoAnalysisScreen>
                 onChanged: (value) => setState(() {}),
               ),
             ),
-            const SizedBox(height: 12),
+            const SizedBox(height: 10),
             Row(
               children: [
                 Icon(
@@ -283,7 +292,7 @@ class _VideoAnalysisScreenState extends State<VideoAnalysisScreen>
                 ),
                 const SizedBox(width: 8),
                 Text(
-                  'Supports YouTube, Vimeo, and other video platforms',
+                  'Customer interview videos and feedback sessions',
                   style: TextStyle(
                     fontSize: 12,
                     color: AppColors.textSecondary,
@@ -308,19 +317,19 @@ class _VideoAnalysisScreenState extends State<VideoAnalysisScreen>
 
           return Container(
             width: double.infinity,
-            height: 56,
+            height: 52,
             decoration: BoxDecoration(
               gradient: canAnalyze && !isLoading
                   ? const LinearGradient(
-                      colors: [Color(0xFF8B5CF6), Color(0xFF3B82F6)],
+                      colors: [Color(0xFF667EEA), Color(0xFF764BA2)],
                     )
                   : null,
               color: canAnalyze && !isLoading ? null : AppColors.border,
-              borderRadius: BorderRadius.circular(16),
+              borderRadius: BorderRadius.circular(14),
               boxShadow: canAnalyze && !isLoading
                   ? [
                       BoxShadow(
-                        color: const Color(0xFF8B5CF6).withValues(alpha: 0.4),
+                        color: const Color(0xFF667EEA).withValues(alpha: 0.4),
                         blurRadius: 12,
                         offset: const Offset(0, 6),
                       ),
@@ -330,7 +339,7 @@ class _VideoAnalysisScreenState extends State<VideoAnalysisScreen>
             child: Material(
               color: Colors.transparent,
               child: InkWell(
-                borderRadius: BorderRadius.circular(16),
+                borderRadius: BorderRadius.circular(14),
                 onTap: canAnalyze && !isLoading ? _analyzeVideo : null,
                 child: Center(
                   child: isLoading
@@ -338,8 +347,8 @@ class _VideoAnalysisScreenState extends State<VideoAnalysisScreen>
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
                             const SizedBox(
-                              width: 20,
-                              height: 20,
+                              width: 18,
+                              height: 18,
                               child: CircularProgressIndicator(
                                 valueColor: AlwaysStoppedAnimation<Color>(
                                   Colors.white,
@@ -349,9 +358,9 @@ class _VideoAnalysisScreenState extends State<VideoAnalysisScreen>
                             ),
                             const SizedBox(width: 12),
                             const Text(
-                              'Analyzing Video...',
+                              'Analyzing Customer Video...',
                               style: TextStyle(
-                                fontSize: 16,
+                                fontSize: 15,
                                 fontWeight: FontWeight.w600,
                                 color: Colors.white,
                               ),
@@ -366,13 +375,13 @@ class _VideoAnalysisScreenState extends State<VideoAnalysisScreen>
                               color: canAnalyze
                                   ? Colors.white
                                   : AppColors.textSecondary,
-                              size: 20,
+                              size: 18,
                             ),
                             const SizedBox(width: 8),
                             Text(
-                              'Analyze Video',
+                              'Analyze Customer Video',
                               style: TextStyle(
-                                fontSize: 16,
+                                fontSize: 15,
                                 fontWeight: FontWeight.w600,
                                 color: canAnalyze
                                     ? Colors.white
@@ -398,7 +407,11 @@ class _VideoAnalysisScreenState extends State<VideoAnalysisScreen>
           HapticFeedback.heavyImpact();
         } else if (state is VideoAnalysisError) {
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text(state.message), backgroundColor: Colors.red),
+            SnackBar(
+              content: Text(state.message),
+              backgroundColor: Colors.red,
+              behavior: SnackBarBehavior.floating,
+            ),
           );
         }
       },
@@ -427,18 +440,18 @@ class _VideoAnalysisScreenState extends State<VideoAnalysisScreen>
           child: Transform.translate(
             offset: Offset(0, 20 * (1 - _resultsController.value)),
             child: Container(
-              padding: const EdgeInsets.all(24),
+              padding: const EdgeInsets.all(20),
               decoration: BoxDecoration(
                 color: Colors.white,
-                borderRadius: BorderRadius.circular(20),
+                borderRadius: BorderRadius.circular(16),
                 border: Border.all(
-                  color: AppColors.border.withValues(alpha: 0.5),
+                  color: AppColors.border.withValues(alpha: 0.3),
                 ),
                 boxShadow: [
                   BoxShadow(
-                    color: AppColors.shadowLight,
-                    blurRadius: 15,
-                    offset: const Offset(0, 8),
+                    color: Colors.black.withValues(alpha: 0.08),
+                    blurRadius: 12,
+                    offset: const Offset(0, 4),
                   ),
                 ],
               ),
@@ -450,30 +463,30 @@ class _VideoAnalysisScreenState extends State<VideoAnalysisScreen>
                       Container(
                         padding: const EdgeInsets.all(8),
                         decoration: BoxDecoration(
-                          color: const Color(0xFF8B5CF6).withValues(alpha: 0.1),
-                          borderRadius: BorderRadius.circular(12),
+                          color: const Color(0xFF667EEA).withValues(alpha: 0.1),
+                          borderRadius: BorderRadius.circular(10),
                         ),
                         child: const Icon(
                           Icons.video_library_rounded,
-                          color: Color(0xFF8B5CF6),
-                          size: 20,
+                          color: Color(0xFF667EEA),
+                          size: 18,
                         ),
                       ),
                       const SizedBox(width: 12),
                       const Text(
-                        'Video Analysis Summary',
+                        'Customer Video Analysis',
                         style: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.w700,
+                          fontSize: 16,
+                          fontWeight: FontWeight.w600,
                           color: AppColors.textPrimary,
                         ),
                       ),
                     ],
                   ),
-                  const SizedBox(height: 24),
-                  _buildSummaryStats(result),
-                  const SizedBox(height: 24),
-                  _buildSummarySnapshot(result.summarySnapshot),
+                  const SizedBox(height: 20),
+                  _buildCustomerMetrics(result),
+                  const SizedBox(height: 20),
+                  _buildCustomerSnapshot(result.summarySnapshot),
                 ],
               ),
             ),
@@ -483,14 +496,14 @@ class _VideoAnalysisScreenState extends State<VideoAnalysisScreen>
     );
   }
 
-  Widget _buildSummaryStats(VideoAnalysisResponse videoResult) {
+  Widget _buildCustomerMetrics(VideoAnalysisResponse result) {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         gradient: LinearGradient(
           colors: [
-            const Color(0xFF8B5CF6).withValues(alpha: 0.1),
-            const Color(0xFF3B82F6).withValues(alpha: 0.1),
+            const Color(0xFF667EEA).withValues(alpha: 0.08),
+            const Color(0xFF764BA2).withValues(alpha: 0.08),
           ],
         ),
         borderRadius: BorderRadius.circular(12),
@@ -498,22 +511,22 @@ class _VideoAnalysisScreenState extends State<VideoAnalysisScreen>
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceAround,
         children: [
-          _buildStatItem(
+          _buildMetricItem(
             'Frames',
-            '${videoResult.framesAnalyzed}',
+            '${result.framesAnalyzed}',
             Icons.image_rounded,
-            const Color(0xFF8B5CF6),
+            const Color(0xFF667EEA),
           ),
-          _buildStatItem(
-            'Dominant',
-            videoResult.dominantEmotion,
+          _buildMetricItem(
+            'Emotion',
+            result.dominantEmotion,
             Icons.sentiment_satisfied_rounded,
-            const Color(0xFF3B82F6),
+            const Color(0xFF764BA2),
           ),
-          _buildStatItem(
+          _buildMetricItem(
             'Confidence',
-            '${(videoResult.averageConfidence * 100).toInt()}%',
-            Icons.check_circle_rounded,
+            '${(result.averageConfidence * 100).toInt()}%',
+            Icons.verified_rounded,
             const Color(0xFF10B981),
           ),
         ],
@@ -521,7 +534,7 @@ class _VideoAnalysisScreenState extends State<VideoAnalysisScreen>
     );
   }
 
-  Widget _buildStatItem(
+  Widget _buildMetricItem(
     String label,
     String value,
     IconData icon,
@@ -529,20 +542,20 @@ class _VideoAnalysisScreenState extends State<VideoAnalysisScreen>
   ) {
     return Column(
       children: [
-        Icon(icon, color: color, size: 24),
-        const SizedBox(height: 8),
+        Icon(icon, color: color, size: 22),
+        const SizedBox(height: 6),
         Text(
           value,
           style: TextStyle(
-            fontSize: 16,
-            fontWeight: FontWeight.w800,
+            fontSize: 15,
+            fontWeight: FontWeight.w700,
             color: color,
           ),
         ),
         Text(
           label,
           style: const TextStyle(
-            fontSize: 12,
+            fontSize: 11,
             fontWeight: FontWeight.w500,
             color: AppColors.textSecondary,
           ),
@@ -551,7 +564,7 @@ class _VideoAnalysisScreenState extends State<VideoAnalysisScreen>
     );
   }
 
-  Widget _buildSummarySnapshot(SummarySnapshot snapshot) {
+  Widget _buildCustomerSnapshot(SummarySnapshot snapshot) {
     final emotionColor = _getEmotionColor(snapshot.emotion);
     final sentimentColor = _getSentimentColor(snapshot.sentiment);
 
@@ -561,31 +574,27 @@ class _VideoAnalysisScreenState extends State<VideoAnalysisScreen>
         Row(
           children: [
             Container(
-              padding: const EdgeInsets.all(8),
+              padding: const EdgeInsets.all(6),
               decoration: BoxDecoration(
                 color: emotionColor.withValues(alpha: 0.1),
-                borderRadius: BorderRadius.circular(12),
+                borderRadius: BorderRadius.circular(8),
               ),
-              child: Icon(
-                Icons.camera_alt_rounded,
-                color: emotionColor,
-                size: 18,
-              ),
+              child: Icon(Icons.person_rounded, color: emotionColor, size: 16),
             ),
-            const SizedBox(width: 12),
+            const SizedBox(width: 10),
             const Text(
-              'Video Snapshot & Analysis',
+              'Customer Emotional State',
               style: TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.w700,
+                fontSize: 14,
+                fontWeight: FontWeight.w600,
                 color: AppColors.textPrimary,
               ),
             ),
           ],
         ),
-        const SizedBox(height: 16),
+        const SizedBox(height: 14),
 
-        // Main snapshot container with enhanced styling
+        // Customer emotion analysis card
         Container(
           decoration: BoxDecoration(
             gradient: LinearGradient(
@@ -596,161 +605,119 @@ class _VideoAnalysisScreenState extends State<VideoAnalysisScreen>
                 sentimentColor.withValues(alpha: 0.05),
               ],
             ),
-            borderRadius: BorderRadius.circular(16),
-            border: Border.all(
-              color: emotionColor.withValues(alpha: 0.2),
-              width: 2,
-            ),
-            boxShadow: [
-              BoxShadow(
-                color: emotionColor.withValues(alpha: 0.1),
-                blurRadius: 12,
-                offset: const Offset(0, 4),
-              ),
-            ],
+            borderRadius: BorderRadius.circular(14),
+            border: Border.all(color: emotionColor.withValues(alpha: 0.2)),
           ),
           child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Enhanced video snapshot
+              // Video snapshot with customer focus
               Container(
-                margin: const EdgeInsets.all(16),
+                margin: const EdgeInsets.all(14),
                 decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(12),
+                  borderRadius: BorderRadius.circular(10),
                   boxShadow: [
                     BoxShadow(
                       color: Colors.black.withValues(alpha: 0.1),
-                      blurRadius: 8,
+                      blurRadius: 6,
                       offset: const Offset(0, 2),
                     ),
                   ],
                 ),
-                child: LayoutBuilder(
-                  builder: (context, constraints) {
-                    final availableWidth = constraints.maxWidth;
-                    final imageWidth = availableWidth;
-                    final imageHeight = imageWidth * 0.6; // 16:10 aspect ratio
-
-                    return Stack(
-                      children: [
-                        Container(
-                          width: imageWidth,
-                          height: imageHeight,
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(12),
-                            border: Border.all(color: Colors.white, width: 3),
-                          ),
-                          child: ClipRRect(
-                            borderRadius: BorderRadius.circular(9),
-                            child: _buildFrameImage(
-                              snapshot.frameImageBase64,
-                              snapshot.assetImagePath,
-                            ),
-                          ),
+                child: Stack(
+                  children: [
+                    Container(
+                      width: double.infinity,
+                      height: 200,
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(10),
+                        border: Border.all(color: Colors.white, width: 2),
+                      ),
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(8),
+                        child: _buildFrameImage(
+                          snapshot.frameImageBase64,
+                          snapshot.assetImagePath,
                         ),
-                        // Video play overlay
-                        Positioned(
-                          top: 12,
-                          left: 12,
-                          child: Container(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 8,
-                              vertical: 4,
-                            ),
-                            decoration: BoxDecoration(
-                              color: Colors.black.withValues(alpha: 0.7),
-                              borderRadius: BorderRadius.circular(6),
-                            ),
-                            child: Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                const Icon(
-                                  Icons.videocam_rounded,
-                                  color: Colors.white,
-                                  size: 12,
-                                ),
-                                const SizedBox(width: 4),
-                                const Text(
-                                  'SNAPSHOT',
-                                  style: TextStyle(
-                                    fontSize: 10,
-                                    fontWeight: FontWeight.w600,
-                                    color: Colors.white,
-                                    letterSpacing: 0.5,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
+                      ),
+                    ),
+                    // Customer insights overlay
+                    Positioned(
+                      top: 10,
+                      left: 10,
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 8,
+                          vertical: 4,
                         ),
-                        // Confidence badge
-                        Positioned(
-                          top: 12,
-                          right: 12,
-                          child: Container(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 10,
-                              vertical: 6,
+                        decoration: BoxDecoration(
+                          color: Colors.black.withValues(alpha: 0.7),
+                          borderRadius: BorderRadius.circular(6),
+                        ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            const Icon(
+                              Icons.person_rounded,
+                              color: Colors.white,
+                              size: 12,
                             ),
-                            decoration: BoxDecoration(
-                              gradient: LinearGradient(
-                                colors: [
-                                  sentimentColor,
-                                  sentimentColor.withValues(alpha: 0.8),
-                                ],
+                            const SizedBox(width: 4),
+                            const Text(
+                              'CUSTOMER',
+                              style: TextStyle(
+                                fontSize: 10,
+                                fontWeight: FontWeight.w600,
+                                color: Colors.white,
+                                letterSpacing: 0.5,
                               ),
-                              borderRadius: BorderRadius.circular(8),
-                              boxShadow: [
-                                BoxShadow(
-                                  color: sentimentColor.withValues(alpha: 0.3),
-                                  blurRadius: 4,
-                                  offset: const Offset(0, 2),
-                                ),
-                              ],
                             ),
-                            child: Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                const Icon(
-                                  Icons.verified_rounded,
-                                  color: Colors.white,
-                                  size: 12,
-                                ),
-                                const SizedBox(width: 4),
-                                Text(
-                                  '${(snapshot.confidence * 100).toInt()}%',
-                                  style: const TextStyle(
-                                    fontSize: 11,
-                                    fontWeight: FontWeight.w700,
-                                    color: Colors.white,
-                                  ),
-                                ),
-                              ],
-                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                    // Confidence indicator
+                    Positioned(
+                      top: 10,
+                      right: 10,
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 8,
+                          vertical: 4,
+                        ),
+                        decoration: BoxDecoration(
+                          gradient: LinearGradient(
+                            colors: [
+                              sentimentColor,
+                              sentimentColor.withValues(alpha: 0.8),
+                            ],
+                          ),
+                          borderRadius: BorderRadius.circular(6),
+                        ),
+                        child: Text(
+                          '${(snapshot.confidence * 100).toInt()}%',
+                          style: const TextStyle(
+                            fontSize: 11,
+                            fontWeight: FontWeight.w700,
+                            color: Colors.white,
                           ),
                         ),
-                      ],
-                    );
-                  },
+                      ),
+                    ),
+                  ],
                 ),
               ),
 
-              // Enhanced emotion and sentiment tags
+              // Customer emotion and sentiment
               Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16),
+                padding: const EdgeInsets.symmetric(horizontal: 14),
                 child: Row(
                   children: [
                     Expanded(
                       child: Container(
                         padding: const EdgeInsets.all(12),
                         decoration: BoxDecoration(
-                          gradient: LinearGradient(
-                            colors: [
-                              emotionColor.withValues(alpha: 0.1),
-                              emotionColor.withValues(alpha: 0.05),
-                            ],
-                          ),
-                          borderRadius: BorderRadius.circular(12),
+                          color: emotionColor.withValues(alpha: 0.1),
+                          borderRadius: BorderRadius.circular(10),
                           border: Border.all(
                             color: emotionColor.withValues(alpha: 0.3),
                           ),
@@ -760,14 +727,14 @@ class _VideoAnalysisScreenState extends State<VideoAnalysisScreen>
                             Icon(
                               Icons.sentiment_satisfied_rounded,
                               color: emotionColor,
-                              size: 24,
+                              size: 20,
                             ),
-                            const SizedBox(height: 6),
+                            const SizedBox(height: 4),
                             Text(
                               snapshot.emotion.toUpperCase(),
                               style: TextStyle(
-                                fontSize: 13,
-                                fontWeight: FontWeight.w800,
+                                fontSize: 12,
+                                fontWeight: FontWeight.w700,
                                 color: emotionColor,
                                 letterSpacing: 0.5,
                               ),
@@ -775,7 +742,7 @@ class _VideoAnalysisScreenState extends State<VideoAnalysisScreen>
                             Text(
                               'Emotion',
                               style: TextStyle(
-                                fontSize: 11,
+                                fontSize: 10,
                                 fontWeight: FontWeight.w500,
                                 color: AppColors.textSecondary,
                               ),
@@ -784,18 +751,13 @@ class _VideoAnalysisScreenState extends State<VideoAnalysisScreen>
                         ),
                       ),
                     ),
-                    const SizedBox(width: 12),
+                    const SizedBox(width: 10),
                     Expanded(
                       child: Container(
                         padding: const EdgeInsets.all(12),
                         decoration: BoxDecoration(
-                          gradient: LinearGradient(
-                            colors: [
-                              sentimentColor.withValues(alpha: 0.1),
-                              sentimentColor.withValues(alpha: 0.05),
-                            ],
-                          ),
-                          borderRadius: BorderRadius.circular(12),
+                          color: sentimentColor.withValues(alpha: 0.1),
+                          borderRadius: BorderRadius.circular(10),
                           border: Border.all(
                             color: sentimentColor.withValues(alpha: 0.3),
                           ),
@@ -805,14 +767,14 @@ class _VideoAnalysisScreenState extends State<VideoAnalysisScreen>
                             Icon(
                               Icons.trending_up_rounded,
                               color: sentimentColor,
-                              size: 24,
+                              size: 20,
                             ),
-                            const SizedBox(height: 6),
+                            const SizedBox(height: 4),
                             Text(
                               snapshot.sentiment.toUpperCase(),
                               style: TextStyle(
-                                fontSize: 13,
-                                fontWeight: FontWeight.w800,
+                                fontSize: 12,
+                                fontWeight: FontWeight.w700,
                                 color: sentimentColor,
                                 letterSpacing: 0.5,
                               ),
@@ -820,7 +782,7 @@ class _VideoAnalysisScreenState extends State<VideoAnalysisScreen>
                             Text(
                               'Sentiment',
                               style: TextStyle(
-                                fontSize: 11,
+                                fontSize: 10,
                                 fontWeight: FontWeight.w500,
                                 color: AppColors.textSecondary,
                               ),
@@ -833,25 +795,18 @@ class _VideoAnalysisScreenState extends State<VideoAnalysisScreen>
                 ),
               ),
 
-              const SizedBox(height: 16),
+              const SizedBox(height: 14),
 
-              // Enhanced summary text with better styling
+              // Customer insights summary
               Container(
-                margin: const EdgeInsets.symmetric(horizontal: 16),
-                padding: const EdgeInsets.all(16),
+                margin: const EdgeInsets.fromLTRB(14, 0, 14, 14),
+                padding: const EdgeInsets.all(14),
                 decoration: BoxDecoration(
                   color: Colors.white,
-                  borderRadius: BorderRadius.circular(12),
+                  borderRadius: BorderRadius.circular(10),
                   border: Border.all(
                     color: AppColors.border.withValues(alpha: 0.3),
                   ),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withValues(alpha: 0.04),
-                      blurRadius: 4,
-                      offset: const Offset(0, 2),
-                    ),
-                  ],
                 ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -859,97 +814,41 @@ class _VideoAnalysisScreenState extends State<VideoAnalysisScreen>
                     Row(
                       children: [
                         Container(
-                          padding: const EdgeInsets.all(6),
+                          padding: const EdgeInsets.all(4),
                           decoration: BoxDecoration(
                             color: const Color(
-                              0xFF8B5CF6,
+                              0xFF667EEA,
                             ).withValues(alpha: 0.1),
-                            borderRadius: BorderRadius.circular(8),
+                            borderRadius: BorderRadius.circular(6),
                           ),
                           child: Icon(
-                            Icons.auto_awesome_rounded,
-                            color: const Color(0xFF8B5CF6),
-                            size: 16,
+                            Icons.psychology_rounded,
+                            color: const Color(0xFF667EEA),
+                            size: 14,
                           ),
                         ),
                         const SizedBox(width: 8),
                         Text(
-                          'AI Summary',
+                          'Customer Insights',
                           style: TextStyle(
-                            fontSize: 14,
-                            fontWeight: FontWeight.w700,
+                            fontSize: 13,
+                            fontWeight: FontWeight.w600,
                             color: AppColors.textPrimary,
                           ),
                         ),
                       ],
                     ),
-                    const SizedBox(height: 12),
+                    const SizedBox(height: 10),
                     Text(
                       snapshot.subtitle,
                       style: const TextStyle(
-                        fontSize: 15,
+                        fontSize: 13,
                         fontWeight: FontWeight.w500,
                         color: AppColors.textPrimary,
-                        height: 1.5,
+                        height: 1.4,
                         letterSpacing: 0.2,
                       ),
                     ),
-                  ],
-                ),
-              ),
-
-              const SizedBox(height: 20),
-
-              // Enhanced emotion distribution chart
-              Container(
-                margin: const EdgeInsets.fromLTRB(16, 0, 16, 16),
-                padding: const EdgeInsets.all(16),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(12),
-                  border: Border.all(
-                    color: AppColors.border.withValues(alpha: 0.3),
-                  ),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withValues(alpha: 0.04),
-                      blurRadius: 4,
-                      offset: const Offset(0, 2),
-                    ),
-                  ],
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      children: [
-                        Container(
-                          padding: const EdgeInsets.all(6),
-                          decoration: BoxDecoration(
-                            color: const Color(
-                              0xFF3B82F6,
-                            ).withValues(alpha: 0.1),
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                          child: Icon(
-                            Icons.analytics_rounded,
-                            color: const Color(0xFF3B82F6),
-                            size: 16,
-                          ),
-                        ),
-                        const SizedBox(width: 8),
-                        Text(
-                          'Emotion Distribution',
-                          style: TextStyle(
-                            fontSize: 14,
-                            fontWeight: FontWeight.w700,
-                            color: AppColors.textPrimary,
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 12),
-                    _buildEmotionDistribution(snapshot.emotionDistribution),
                   ],
                 ),
               ),
@@ -960,211 +859,132 @@ class _VideoAnalysisScreenState extends State<VideoAnalysisScreen>
     );
   }
 
-  Widget _buildEmotionDistribution(Map<String, int> distribution) {
-    final sortedEmotions = distribution.entries.toList()
-      ..sort((a, b) => b.value.compareTo(a.value));
-
-    final totalFrames = distribution.values.fold<int>(
-      0,
-      (sum, count) => sum + count,
-    );
-
-    return Column(
-      children: sortedEmotions.map((entry) {
-        final emotion = entry.key;
-        final count = entry.value;
-        final percentage = (count / totalFrames * 100).toInt();
-        final color = _getEmotionColor(emotion);
+  Widget _buildEmployeeInsights() {
+    return BlocBuilder<VideoAnalysisCubit, VideoAnalysisState>(
+      builder: (context, state) {
+        if (state is! VideoAnalysisSuccess && state is! VideoAnalysisDemo) {
+          return const SizedBox.shrink();
+        }
 
         return Container(
-          margin: const EdgeInsets.only(bottom: 12),
-          padding: const EdgeInsets.all(12),
+          padding: const EdgeInsets.all(18),
           decoration: BoxDecoration(
-            color: color.withValues(alpha: 0.05),
-            borderRadius: BorderRadius.circular(10),
-            border: Border.all(color: color.withValues(alpha: 0.15)),
-          ),
-          child: Row(
-            children: [
-              // Emotion icon and label
-              Container(
-                width: 24,
-                height: 24,
-                decoration: BoxDecoration(
-                  color: color.withValues(alpha: 0.2),
-                  borderRadius: BorderRadius.circular(6),
-                ),
-                child: Icon(
-                  Icons.sentiment_satisfied_rounded,
-                  color: color,
-                  size: 14,
-                ),
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(color: AppColors.border.withValues(alpha: 0.3)),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withValues(alpha: 0.06),
+                blurRadius: 8,
+                offset: const Offset(0, 2),
               ),
-              const SizedBox(width: 12),
-              SizedBox(
-                width: 80,
-                child: Text(
-                  emotion,
+            ],
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(8),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFF10B981).withValues(alpha: 0.1),
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    child: const Icon(
+                      Icons.lightbulb_rounded,
+                      color: Color(0xFF10B981),
+                      size: 18,
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  const Text(
+                    'Employee Action Items',
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w600,
+                      color: AppColors.textPrimary,
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 16),
+              _buildActionItem(
+                'Follow up on customer concerns',
+                'Schedule a call to address any issues raised',
+                Icons.phone_rounded,
+                const Color(0xFF667EEA),
+              ),
+              const SizedBox(height: 12),
+              _buildActionItem(
+                'Document customer feedback',
+                'Add insights to customer profile and CRM',
+                Icons.edit_note_rounded,
+                const Color(0xFF764BA2),
+              ),
+              const SizedBox(height: 12),
+              _buildActionItem(
+                'Share with team',
+                'Discuss findings in next team meeting',
+                Icons.people_rounded,
+                const Color(0xFF10B981),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _buildActionItem(
+    String title,
+    String description,
+    IconData icon,
+    Color color,
+  ) {
+    return Container(
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        color: color.withValues(alpha: 0.05),
+        borderRadius: BorderRadius.circular(10),
+        border: Border.all(color: color.withValues(alpha: 0.2)),
+      ),
+      child: Row(
+        children: [
+          Container(
+            padding: const EdgeInsets.all(8),
+            decoration: BoxDecoration(
+              color: color.withValues(alpha: 0.2),
+              borderRadius: BorderRadius.circular(8),
+            ),
+            child: Icon(icon, color: color, size: 16),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  title,
                   style: TextStyle(
                     fontSize: 13,
                     fontWeight: FontWeight.w600,
                     color: color,
                   ),
-                  overflow: TextOverflow.ellipsis,
                 ),
-              ),
-              const SizedBox(width: 12),
-
-              // Progress bar
-              Expanded(
-                child: Container(
-                  height: 8,
-                  decoration: BoxDecoration(
-                    color: AppColors.border.withValues(alpha: 0.3),
-                    borderRadius: BorderRadius.circular(4),
-                  ),
-                  child: Stack(
-                    children: [
-                      FractionallySizedBox(
-                        widthFactor: count / totalFrames,
-                        child: Container(
-                          decoration: BoxDecoration(
-                            gradient: LinearGradient(
-                              colors: [color, color.withValues(alpha: 0.8)],
-                            ),
-                            borderRadius: BorderRadius.circular(4),
-                            boxShadow: [
-                              BoxShadow(
-                                color: color.withValues(alpha: 0.3),
-                                blurRadius: 2,
-                                offset: const Offset(0, 1),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-
-              const SizedBox(width: 12),
-
-              // Percentage badge
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                decoration: BoxDecoration(
-                  color: color,
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: Text(
-                  '$percentage%',
+                const SizedBox(height: 2),
+                Text(
+                  description,
                   style: const TextStyle(
-                    fontSize: 11,
-                    fontWeight: FontWeight.w700,
-                    color: Colors.white,
+                    fontSize: 12,
+                    fontWeight: FontWeight.w500,
+                    color: AppColors.textSecondary,
                   ),
                 ),
-              ),
-            ],
-          ),
-        );
-      }).toList(),
-    );
-  }
-
-  Widget _buildQuickActionsGrid() {
-    return Container(
-      padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: AppColors.border.withValues(alpha: 0.5)),
-        boxShadow: [
-          BoxShadow(
-            color: AppColors.shadowLight,
-            blurRadius: 10,
-            offset: const Offset(0, 4),
-          ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const Text(
-            'Quick Actions',
-            style: TextStyle(
-              fontSize: 18,
-              fontWeight: FontWeight.w700,
-              color: AppColors.textPrimary,
+              ],
             ),
           ),
-          const SizedBox(height: 16),
-          GridView.count(
-            shrinkWrap: true,
-            physics: const NeverScrollableScrollPhysics(),
-            crossAxisCount: 2,
-            crossAxisSpacing: 12,
-            mainAxisSpacing: 12,
-            childAspectRatio: 2.5,
-            children: [
-              _buildQuickAction(
-                'Export Report',
-                Icons.file_download_rounded,
-                const Color(0xFF8B5CF6),
-              ),
-              _buildQuickAction(
-                'Share Results',
-                Icons.share_rounded,
-                const Color(0xFF3B82F6),
-              ),
-              _buildQuickAction(
-                'Save Analysis',
-                Icons.bookmark_rounded,
-                const Color(0xFF10B981),
-              ),
-              _buildQuickAction(
-                'Settings',
-                Icons.settings_rounded,
-                const Color(0xFFF59E0B),
-              ),
-            ],
-          ),
         ],
-      ),
-    );
-  }
-
-  Widget _buildQuickAction(String title, IconData icon, Color color) {
-    return Material(
-      color: Colors.transparent,
-      child: InkWell(
-        borderRadius: BorderRadius.circular(12),
-        onTap: () => HapticFeedback.lightImpact(),
-        child: Container(
-          padding: const EdgeInsets.all(16),
-          decoration: BoxDecoration(
-            color: color.withValues(alpha: 0.1),
-            borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: color.withValues(alpha: 0.2)),
-          ),
-          child: Row(
-            children: [
-              Icon(icon, color: color, size: 20),
-              const SizedBox(width: 12),
-              Expanded(
-                child: Text(
-                  title,
-                  style: TextStyle(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w600,
-                    color: color,
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ),
       ),
     );
   }
@@ -1187,7 +1007,7 @@ class _VideoAnalysisScreenState extends State<VideoAnalysisScreen>
       case 'angry':
         return const Color(0xFFEF4444);
       default:
-        return const Color(0xFF8B5CF6);
+        return const Color(0xFF667EEA);
     }
   }
 
@@ -1213,7 +1033,7 @@ class _VideoAnalysisScreenState extends State<VideoAnalysisScreen>
           return Container(
             decoration: BoxDecoration(
               color: Colors.grey[300],
-              borderRadius: BorderRadius.circular(6),
+              borderRadius: BorderRadius.circular(8),
             ),
             child: const Icon(
               Icons.broken_image_rounded,
@@ -1230,7 +1050,7 @@ class _VideoAnalysisScreenState extends State<VideoAnalysisScreen>
       return Container(
         decoration: BoxDecoration(
           color: Colors.grey[300],
-          borderRadius: BorderRadius.circular(6),
+          borderRadius: BorderRadius.circular(8),
         ),
         child: const Icon(
           Icons.image_not_supported_rounded,
@@ -1257,7 +1077,7 @@ class _VideoAnalysisScreenState extends State<VideoAnalysisScreen>
           return Container(
             decoration: BoxDecoration(
               color: Colors.grey[300],
-              borderRadius: BorderRadius.circular(6),
+              borderRadius: BorderRadius.circular(8),
             ),
             child: const Icon(
               Icons.broken_image_rounded,
@@ -1271,7 +1091,7 @@ class _VideoAnalysisScreenState extends State<VideoAnalysisScreen>
       return Container(
         decoration: BoxDecoration(
           color: Colors.grey[300],
-          borderRadius: BorderRadius.circular(6),
+          borderRadius: BorderRadius.circular(8),
         ),
         child: const Icon(
           Icons.image_not_supported_rounded,

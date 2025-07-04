@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../../core/core.dart';
+import '../../widgets/widgets.dart';
 import 'employee_text_analysis_screen.dart';
 import 'employee_voice_analysis_screen.dart';
 import 'employee_video_analysis_screen.dart';
@@ -97,7 +98,7 @@ class _EmployeeDashboardScreenState extends State<EmployeeDashboardScreen>
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
-            color: const Color(0xFF667EEA).withValues(alpha: 0.3),
+            color: const Color(0xFF667EEA).withOpacity(0.3),
             blurRadius: 20,
             offset: const Offset(0, 10),
           ),
@@ -111,7 +112,7 @@ class _EmployeeDashboardScreenState extends State<EmployeeDashboardScreen>
               Container(
                 padding: EdgeInsets.all(customSpacing.sm),
                 decoration: BoxDecoration(
-                  color: Colors.white.withValues(alpha: 0.2),
+                  color: Colors.white.withOpacity(0.2),
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: const Icon(
@@ -137,7 +138,7 @@ class _EmployeeDashboardScreenState extends State<EmployeeDashboardScreen>
                     Text(
                       'Customer Experience Specialist',
                       style: TextStyle(
-                        color: Colors.white.withValues(alpha: 0.9),
+                        color: Colors.white.withOpacity(0.9),
                         fontSize: 14,
                       ),
                     ),
@@ -153,17 +154,17 @@ class _EmployeeDashboardScreenState extends State<EmployeeDashboardScreen>
               _buildStatCard(
                 '12',
                 'Today\'s Analysis',
-                Colors.white.withValues(alpha: 0.2),
+                Colors.white.withOpacity(0.2),
               ),
               _buildStatCard(
                 '89%',
                 'Satisfaction',
-                Colors.white.withValues(alpha: 0.2),
+                Colors.white.withOpacity(0.2),
               ),
               _buildStatCard(
                 '2.1m',
                 'Avg Response',
-                Colors.white.withValues(alpha: 0.2),
+                Colors.white.withOpacity(0.2),
               ),
             ],
           ),
@@ -193,7 +194,7 @@ class _EmployeeDashboardScreenState extends State<EmployeeDashboardScreen>
           Text(
             label,
             style: TextStyle(
-              color: Colors.white.withValues(alpha: 0.8),
+              color: Colors.white.withOpacity(0.8),
               fontSize: 12,
             ),
             textAlign: TextAlign.center,
@@ -278,19 +279,13 @@ class _EmployeeDashboardScreenState extends State<EmployeeDashboardScreen>
                 gradient: LinearGradient(
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
-                  colors: [
-                    color.withValues(alpha: 0.1),
-                    color.withValues(alpha: 0.05),
-                  ],
+                  colors: [color.withOpacity(0.1), color.withOpacity(0.05)],
                 ),
                 borderRadius: BorderRadius.circular(16),
-                border: Border.all(
-                  color: color.withValues(alpha: 0.3),
-                  width: 1,
-                ),
+                border: Border.all(color: color.withOpacity(0.3), width: 1),
                 boxShadow: [
                   BoxShadow(
-                    color: color.withValues(alpha: 0.1),
+                    color: color.withOpacity(0.1),
                     blurRadius: 8,
                     offset: const Offset(0, 4),
                   ),
@@ -303,7 +298,7 @@ class _EmployeeDashboardScreenState extends State<EmployeeDashboardScreen>
                     padding: const EdgeInsets.all(12),
                     decoration: BoxDecoration(
                       gradient: LinearGradient(
-                        colors: [color, color.withValues(alpha: 0.8)],
+                        colors: [color, color.withOpacity(0.8)],
                       ),
                       borderRadius: BorderRadius.circular(12),
                     ),
@@ -388,13 +383,11 @@ class _EmployeeDashboardScreenState extends State<EmployeeDashboardScreen>
       child: Container(
         padding: const EdgeInsets.all(20),
         decoration: BoxDecoration(
-          gradient: LinearGradient(
-            colors: [color, color.withValues(alpha: 0.8)],
-          ),
+          gradient: LinearGradient(colors: [color, color.withOpacity(0.8)]),
           borderRadius: BorderRadius.circular(16),
           boxShadow: [
             BoxShadow(
-              color: color.withValues(alpha: 0.3),
+              color: color.withOpacity(0.3),
               blurRadius: 8,
               offset: const Offset(0, 4),
             ),
@@ -483,7 +476,7 @@ class _EmployeeDashboardScreenState extends State<EmployeeDashboardScreen>
           Container(
             padding: const EdgeInsets.all(8),
             decoration: BoxDecoration(
-              color: color.withValues(alpha: 0.1),
+              color: color.withOpacity(0.1),
               borderRadius: BorderRadius.circular(8),
             ),
             child: Icon(icon, color: color, size: 20),

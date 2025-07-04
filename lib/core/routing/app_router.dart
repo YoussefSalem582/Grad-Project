@@ -3,13 +3,27 @@ import '../../presentation/screens/screens.dart';
 
 /// Centralized routing configuration
 class AppRouter {
-  static const String roleSelection = '/';
+  static const String login = '/';
+  static const String signup = '/signup';
+  static const String roleSelection = '/role-selection';
   static const String adminDashboard = '/admin';
   static const String employeeDashboard = '/employee';
   static const String appStatus = '/status';
 
   static Route<dynamic> generateRoute(RouteSettings settings) {
     switch (settings.name) {
+      case login:
+        return MaterialPageRoute(
+          builder: (_) => const LoginScreen(),
+          settings: settings,
+        );
+
+      case signup:
+        return MaterialPageRoute(
+          builder: (_) => const SignUpScreen(),
+          settings: settings,
+        );
+
       case roleSelection:
         return MaterialPageRoute(
           builder: (_) => const RoleSelectionScreen(),
@@ -43,6 +57,10 @@ class AppRouter {
   }
 
   /// Navigation helper methods
+  static void toLogin(BuildContext context) {
+    Navigator.pushNamedAndRemoveUntil(context, login, (route) => false);
+  }
+
   static void toRoleSelection(BuildContext context) {
     Navigator.pushNamedAndRemoveUntil(context, roleSelection, (route) => false);
   }
