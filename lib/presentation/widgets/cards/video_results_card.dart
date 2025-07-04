@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import '../../../data/data.dart';
-import '../../../core/core.dart';
 
 class VideoResultsCard extends StatelessWidget {
   final VideoAnalysisResponse result;
@@ -22,7 +21,7 @@ class VideoResultsCard extends StatelessWidget {
             const SizedBox(height: 16),
             _buildSummarySection(context),
             const Divider(),
-            _buildFramesList(context),
+            _buildSummarySnapshot(context),
           ],
         ),
       ),
@@ -45,38 +44,188 @@ class VideoResultsCard extends StatelessWidget {
     );
   }
 
-  Widget _buildFramesList(BuildContext context) {
+  Widget _buildSummarySnapshot(BuildContext context) {
+    final snapshot = result.summarySnapshot;
+    
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text('Frame Details', style: Theme.of(context).textTheme.titleMedium),
+        Text('Analysis Details', style: Theme.of(context).textTheme.titleMedium),
         const SizedBox(height: 8),
-        SizedBox(
-          height: 200,
-          child: ListView.builder(
-            itemCount: result.frameResults.length,
-            itemBuilder: (context, index) {
-              final frame = result.frameResults[index];
-              return ListTile(
-                title: Text('Frame ${frame.frameNumber}'),
-                subtitle: Text(
-                  'Emotion: ${frame.emotionResult.emotion}\n'
-                  'Confidence: ${(frame.emotionResult.confidence * 100).toStringAsFixed(1)}%\n'
-                  'Timestamp: ${frame.timestamp.toStringAsFixed(2)}s',
-                ),
-                leading: CircleAvatar(
-                  backgroundColor: EmotionUtils.getEmotionColor(
-                    frame.emotionResult.emotion,
-                  ),
-                  child: Text(
-                    frame.emotionResult.emotion[0].toUpperCase(),
-                    style: const TextStyle(color: Colors.white),
+        
+        // Emotion and Sentiment Row
+        Row(
+          children: [
+            Expanded(
+              child: Container(
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: _getEmotionColor(snapshot.emotion).withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(8),
+                  border: Border.all(
+                    color: _getEmotionColor(snapshot.emotion).withOpacity(0.3),
                   ),
                 ),
-              );
-            },
+                child: Column(
+                  children: [
+                    Icon(
+                      Icons.sentiment_satisfied_rounded,
+                      color: _getEmotionColor(snapshot.emotion),
+                      size: 32,
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      snapshot.emotion,
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        color: _getEmotionColor(snapshot.emotion),
+                      ),
+                    ),
+                    Text(
+                      'Emotion',
+                      style: Theme.of(context).textTheme.bodySmall,
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Container(
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: _getSentimentColor(snapshot.sentiment).withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(8),
+                  border: Border.all(
+                    color: _getSentimentColor(snapshot.sentiment).withOpacity(0.3),
+                  ),
+                ),
+                child: Column(
+                  children: [
+                    Icon(
+                      Icons.trending_up_rounded,
+                      color: _getSentimentColor(snapshot.sentiment),
+                      size: 32,
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      snapshot.sentiment.toUpperCase(),
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        color: _getSentimentColor(snapshot.sentiment),
+                      ),
+                    ),
+                    Text(
+                      'Sentiment',
+                      style: Theme.of(context).textTheme.bodySmall,
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ],
+        ),
+        
+        const SizedBox(height: 16),
+        
+        // Summary Text
+        Container(
+          padding: const EdgeInsets.all(12),
+          decoration: BoxDecoration(
+            color: Colors.grey.withOpacity(0.1),
+            borderRadius: BorderRadius.circular(8),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  Icon(
+                    Icons.description_rounded,
+                    size: 16,
+                    color: Theme.of(context).textTheme.bodyMedium?.color,
+                  ),
+                  const SizedBox(width: 8),
+                  Text(
+                    'Analysis Summary',
+                    style: Theme.of(context).textTheme.titleSmall,
+                  ),
+                ],
+              ),
+              const SizedBox(height: 8),
+              Text(
+                snapshot.subtitle,
+                style: Theme.of(context).textTheme.bodyMedium,
+              ),
+            ],
           ),
         ),
+        
+        const SizedBox(height: 16),
+        
+        // Emotion Distribution
+        if (snapshot.emotionDistribution.isNotEmpty) ...[
+          Text('Emotion Distribution', style: Theme.of(context).textTheme.titleSmall),
+          const SizedBox(height: 8),
+          ...snapshot.emotionDistribution.entries.map((entry) {
+            final emotion = entry.key;
+            final count = entry.value;
+            final percentage = (count / snapshot.totalFramesAnalyzed * 100).round();
+            
+            return Padding(
+              padding: const EdgeInsets.only(bottom: 8.0),
+              child: Row(
+                children: [
+                  SizedBox(
+                    width: 80,
+                    child: Text(
+                      emotion,
+                      style: TextStyle(
+                        fontSize: 12,
+                        fontWeight: FontWeight.w500,
+                        color: _getEmotionColor(emotion),
+                      ),
+                    ),
+                  ),
+                  Expanded(
+                    child: Stack(
+                      children: [
+                        Container(
+                          height: 8,
+                          decoration: BoxDecoration(
+                            color: Colors.grey.withOpacity(0.3),
+                            borderRadius: BorderRadius.circular(4),
+                          ),
+                        ),
+                        FractionallySizedBox(
+                          widthFactor: count / snapshot.totalFramesAnalyzed,
+                          child: Container(
+                            height: 8,
+                            decoration: BoxDecoration(
+                              color: _getEmotionColor(emotion),
+                              borderRadius: BorderRadius.circular(4),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  SizedBox(
+                    width: 40,
+                    child: Text(
+                      '$percentage%',
+                      textAlign: TextAlign.right,
+                      style: const TextStyle(
+                        fontSize: 12,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            );
+          }).toList(),
+        ],
       ],
     );
   }
@@ -92,5 +241,39 @@ class VideoResultsCard extends StatelessWidget {
         ],
       ),
     );
+  }
+
+  Color _getEmotionColor(String emotion) {
+    switch (emotion.toLowerCase()) {
+      case 'happy':
+      case 'joy':
+        return const Color(0xFF10B981);
+      case 'excited':
+      case 'enthusiastic':
+        return const Color(0xFFF59E0B);
+      case 'confident':
+        return const Color(0xFF3B82F6);
+      case 'serious':
+      case 'neutral':
+        return const Color(0xFF6B7280);
+      case 'sad':
+        return const Color(0xFF8B5CF6);
+      case 'angry':
+        return const Color(0xFFEF4444);
+      default:
+        return const Color(0xFF8B5CF6);
+    }
+  }
+
+  Color _getSentimentColor(String sentiment) {
+    switch (sentiment.toLowerCase()) {
+      case 'positive':
+        return const Color(0xFF10B981);
+      case 'negative':
+        return const Color(0xFFEF4444);
+      case 'neutral':
+      default:
+        return const Color(0xFF6B7280);
+    }
   }
 }

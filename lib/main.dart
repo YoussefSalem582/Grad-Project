@@ -1,17 +1,19 @@
 ﻿import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 // Core
 import 'core/constants/app_theme.dart';
 import 'core/routing/app_router.dart';
+import 'core/di/dependency_injection.dart' as di;
 
 // Presentation
-import 'presentation/providers/emotion_provider.dart';
-import 'presentation/providers/user_provider.dart';
-import 'data/services/emotion_api_service.dart';
+import 'presentation/cubit/video_analysis/video_analysis_cubit.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  
+  // Initialize dependency injection
+  await di.init();
 
   runApp(const CustomerSenseApp());
 }
@@ -21,12 +23,11 @@ class CustomerSenseApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MultiProvider(
+    return MultiBlocProvider(
       providers: [
-        ChangeNotifierProvider<EmotionProvider>(
-          create: (_) => EmotionProvider(EmotionApiService()),
+        BlocProvider<VideoAnalysisCubit>(
+          create: (_) => di.sl<VideoAnalysisCubit>(),
         ),
-        ChangeNotifierProvider<UserProvider>(create: (_) => UserProvider()),
       ],
       child: MaterialApp(
         title: 'CustomerSense Pro',

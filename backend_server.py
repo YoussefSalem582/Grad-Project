@@ -119,7 +119,7 @@ def batch_predict():
 
 @app.route('/analyze-video', methods=['POST'])
 def analyze_video():
-    """Video emotion analysis"""
+    """Video emotion analysis with summary snapshot"""
     try:
         data = request.get_json()
         if not data or 'video_url' not in data:
@@ -127,7 +127,7 @@ def analyze_video():
         
         video_url = data['video_url']
         frame_interval = data.get('frame_interval', 30)
-        max_frames = data.get('max_frames', 100)
+        max_frames = data.get('max_frames', 5)
         
         # Simulate processing time
         time.sleep(2)
@@ -157,24 +157,54 @@ def analyze_video():
         overall_sentiment = max(sentiments_count.items(), key=lambda x: x[1])[0]
         avg_confidence = total_confidence / len(analysis_results)
         
-        return jsonify({
-            'video_url': video_url,
-            'frame_interval': frame_interval,
-            'max_frames': max_frames,
-            'analysis_results': analysis_results,
-            'summary': {
-                'total_frames_analyzed': num_frames,
-                'dominant_emotion': dominant_emotion,
-                'overall_sentiment': overall_sentiment,
+        # Generate summary text
+        summary_text = generate_summary_text(dominant_emotion, overall_sentiment, avg_confidence, num_frames)
+        
+        # Generate summary image (placeholder base64)
+        summary_image = generate_summary_frame_image(dominant_emotion, avg_confidence)
+        
+        # Create new response format with summary snapshot
+        response = {
+            'frames_analyzed': num_frames,
+            'dominant_emotion': dominant_emotion,
+            'average_confidence': round(avg_confidence, 3),
+            'summary_snapshot': {
+                'emotion': dominant_emotion,
+                'sentiment': overall_sentiment,
                 'confidence': round(avg_confidence, 3),
+                'subtitle': summary_text,
+                'frame_image_base64': summary_image,
+                'total_frames_analyzed': num_frames,
                 'emotion_distribution': emotions_count
             },
             'processing_time_ms': random.randint(2000, 5000),
             'timestamp': datetime.datetime.now().isoformat()
-        })
+        }
+        
+        return jsonify(response)
     
     except Exception as e:
         return jsonify({'error': f'Video analysis failed: {str(e)}'}), 500
+
+def generate_summary_text(emotion, sentiment, confidence, frames_count):
+    """Generate a descriptive summary of the video analysis"""
+    confidence_pct = int(confidence * 100)
+    
+    sentiment_desc = {
+        'positive': 'favorable',
+        'negative': 'concerning', 
+        'neutral': 'balanced'
+    }.get(sentiment, 'balanced')
+    
+    return (f"Video analysis of {frames_count} frames shows predominantly {emotion} emotion "
+            f"with {sentiment} sentiment. Analysis confidence: {confidence_pct}%. "
+            f"This indicates a {sentiment_desc} emotional tone throughout the content.")
+
+def generate_summary_frame_image(emotion, confidence):
+    """Generate a placeholder base64 image for the summary frame"""
+    # Return a 1x1 transparent pixel as placeholder
+    # In a real implementation, this would generate or select a representative frame
+    return 'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg=='
 
 @app.route('/metrics', methods=['GET'])
 def metrics():
