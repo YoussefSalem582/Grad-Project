@@ -18,17 +18,16 @@ class _SignUpScreenState extends State<SignUpScreen>
   final _confirmPasswordController = TextEditingController();
   final _employeeIdController = TextEditingController();
   final _departmentController = TextEditingController();
-  
+  final _scrollController = ScrollController();
+
   bool _isPasswordVisible = false;
   bool _isConfirmPasswordVisible = false;
   bool _isLoading = false;
   bool _agreeToTerms = false;
   String _selectedRole = 'Employee'; // Default role
-  
-  late AnimationController _logoController;
+
   late AnimationController _formController;
   late AnimationController _backgroundController;
-  late Animation<double> _logoAnimation;
   late Animation<double> _formAnimation;
   late Animation<double> _backgroundAnimation;
 
@@ -40,10 +39,6 @@ class _SignUpScreenState extends State<SignUpScreen>
   }
 
   void _initializeAnimations() {
-    _logoController = AnimationController(
-      duration: const Duration(milliseconds: 1500),
-      vsync: this,
-    );
     _formController = AnimationController(
       duration: const Duration(milliseconds: 1200),
       vsync: this,
@@ -53,33 +48,16 @@ class _SignUpScreenState extends State<SignUpScreen>
       vsync: this,
     );
 
-    _logoAnimation = Tween<double>(
-      begin: 0.0,
-      end: 1.0,
-    ).animate(CurvedAnimation(
-      parent: _logoController,
-      curve: Curves.elasticOut,
-    ));
+    _formAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
+      CurvedAnimation(parent: _formController, curve: Curves.easeOutCubic),
+    );
 
-    _formAnimation = Tween<double>(
-      begin: 0.0,
-      end: 1.0,
-    ).animate(CurvedAnimation(
-      parent: _formController,
-      curve: Curves.easeOutCubic,
-    ));
-
-    _backgroundAnimation = Tween<double>(
-      begin: 0.0,
-      end: 1.0,
-    ).animate(CurvedAnimation(
-      parent: _backgroundController,
-      curve: Curves.linear,
-    ));
+    _backgroundAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
+      CurvedAnimation(parent: _backgroundController, curve: Curves.linear),
+    );
   }
 
   void _startAnimations() {
-    _logoController.forward();
     Future.delayed(const Duration(milliseconds: 300), () {
       _formController.forward();
     });
@@ -88,7 +66,6 @@ class _SignUpScreenState extends State<SignUpScreen>
 
   @override
   void dispose() {
-    _logoController.dispose();
     _formController.dispose();
     _backgroundController.dispose();
     _firstNameController.dispose();
@@ -98,36 +75,78 @@ class _SignUpScreenState extends State<SignUpScreen>
     _confirmPasswordController.dispose();
     _employeeIdController.dispose();
     _departmentController.dispose();
+    _scrollController.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: Stack(
-        children: [
-          _buildAnimatedBackground(),
-          SafeArea(
-            child: SingleChildScrollView(
-              child: Padding(
-                padding: const EdgeInsets.all(24.0),
+    return GestureDetector(
+      onTap: () => FocusScope.of(context).unfocus(),
+      child: Scaffold(
+        resizeToAvoidBottomInset: true,
+        body: Stack(
+          children: [_buildAnimatedBackground(), _buildScrollableContent()],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildScrollableContent() {
+    return SafeArea(
+      child: LayoutBuilder(
+        builder: (context, constraints) {
+          final keyboardHeight = MediaQuery.of(context).viewInsets.bottom;
+          final screenHeight = MediaQuery.of(context).size.height;
+          final isSmallScreen = screenHeight < 700;
+
+          return SingleChildScrollView(
+            controller: _scrollController,
+            physics: const BouncingScrollPhysics(
+              parent: AlwaysScrollableScrollPhysics(),
+            ),
+            padding: EdgeInsets.only(
+              bottom: keyboardHeight > 0 ? keyboardHeight + 20 : 0,
+            ),
+            child: ConstrainedBox(
+              constraints: BoxConstraints(
+                minHeight: constraints.maxHeight - keyboardHeight,
+              ),
+              child: IntrinsicHeight(
                 child: Column(
                   children: [
-                    const SizedBox(height: 20),
-                    _buildLogo(),
-                    const SizedBox(height: 30),
-                    _buildSignUpForm(),
-                    const SizedBox(height: 20),
-                    _buildSignUpButton(),
-                    const SizedBox(height: 20),
-                    _buildLoginLink(),
-                    const SizedBox(height: 20),
+                    Padding(
+                      padding: EdgeInsets.symmetric(
+                        horizontal: isSmallScreen ? 16.0 : 24.0,
+                      ),
+                      child: Column(
+                        children: [
+                          SizedBox(height: isSmallScreen ? 10 : 20),
+                          _buildHeader(),
+                          SizedBox(height: isSmallScreen ? 15 : 20),
+                          _buildWelcomeText(),
+                          SizedBox(height: isSmallScreen ? 15 : 20),
+                          _buildSignUpForm(),
+                          SizedBox(height: isSmallScreen ? 15 : 20),
+                          _buildSignUpButton(),
+                          SizedBox(height: isSmallScreen ? 10 : 15),
+                          _buildTermsSection(),
+                          SizedBox(height: isSmallScreen ? 15 : 20),
+                          _buildDivider(),
+                          SizedBox(height: isSmallScreen ? 15 : 20),
+                          _buildSocialSignUpButtons(),
+                          SizedBox(height: isSmallScreen ? 15 : 20),
+                          _buildLoginLink(),
+                          SizedBox(height: isSmallScreen ? 30 : 40),
+                        ],
+                      ),
+                    ),
                   ],
                 ),
               ),
             ),
-          ),
-        ],
+          );
+        },
       ),
     );
   }
@@ -207,61 +226,105 @@ class _SignUpScreenState extends State<SignUpScreen>
     );
   }
 
-  Widget _buildLogo() {
+  Widget _buildHeader() {
     return AnimatedBuilder(
-      animation: _logoAnimation,
+      animation: _formAnimation,
       builder: (context, child) {
-        return Transform.scale(
-          scale: _logoAnimation.value,
-          child: Column(
-            children: [
-              Container(
-                width: 120,
-                height: 120,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  gradient: LinearGradient(
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                    colors: [
-                      Colors.white.withValues(alpha: 0.3),
-                      Colors.white.withValues(alpha: 0.1),
+        return Transform.translate(
+          offset: Offset(0, 30 * (1 - _formAnimation.value)),
+          child: Opacity(
+            opacity: _formAnimation.value,
+            child: Row(
+              children: [
+                IconButton(
+                  onPressed: () => Navigator.pop(context),
+                  icon: Container(
+                    padding: const EdgeInsets.all(8),
+                    decoration: BoxDecoration(
+                      color: Colors.white.withValues(alpha: 0.2),
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(
+                        color: Colors.white.withValues(alpha: 0.3),
+                        width: 1,
+                      ),
+                    ),
+                    child: const Icon(
+                      Icons.arrow_back_ios_new,
+                      color: Colors.white,
+                      size: 20,
+                    ),
+                  ),
+                ),
+                const Spacer(),
+                Container(
+                  width: 60,
+                  height: 60,
+                  decoration: BoxDecoration(
+                    gradient: const LinearGradient(
+                      colors: [Colors.white, Color(0xFFF8F9FA)],
+                    ),
+                    shape: BoxShape.circle,
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withValues(alpha: 0.1),
+                        blurRadius: 15,
+                        offset: const Offset(0, 8),
+                      ),
                     ],
                   ),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withValues(alpha: 0.2),
-                      blurRadius: 20,
-                      offset: const Offset(0, 10),
-                    ),
-                  ],
+                  child: const Icon(
+                    Icons.person_add,
+                    size: 30,
+                    color: Color(0xFF667EEA),
+                  ),
                 ),
-                child: const Icon(
-                  Icons.person_add,
-                  size: 60,
-                  color: Colors.white,
+                const Spacer(),
+                const SizedBox(width: 48), // Balance the back button
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _buildWelcomeText() {
+    return AnimatedBuilder(
+      animation: _formAnimation,
+      builder: (context, child) {
+        return Transform.translate(
+          offset: Offset(0, 30 * (1 - _formAnimation.value)),
+          child: Opacity(
+            opacity: _formAnimation.value,
+            child: Column(
+              children: [
+                Text(
+                  'Create Account',
+                  style: TextStyle(
+                    fontSize: 28,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white,
+                    shadows: [
+                      Shadow(
+                        color: Colors.black.withValues(alpha: 0.3),
+                        blurRadius: 10,
+                        offset: const Offset(0, 2),
+                      ),
+                    ],
+                  ),
                 ),
-              ),
-              const SizedBox(height: 16),
-              const Text(
-                'Create Account',
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 32,
-                  fontWeight: FontWeight.bold,
-                  letterSpacing: 1.2,
+                const SizedBox(height: 8),
+                Text(
+                  'Join GraphSmile and start your journey with us',
+                  style: TextStyle(
+                    fontSize: 15,
+                    color: Colors.white.withValues(alpha: 0.9),
+                    fontWeight: FontWeight.w400,
+                  ),
+                  textAlign: TextAlign.center,
                 ),
-              ),
-              const SizedBox(height: 8),
-              Text(
-                'Join GraphSmile today',
-                style: TextStyle(
-                  color: Colors.white.withValues(alpha: 0.8),
-                  fontSize: 16,
-                  letterSpacing: 0.5,
-                ),
-              ),
-            ],
+              ],
+            ),
           ),
         );
       },
@@ -298,7 +361,7 @@ class _SignUpScreenState extends State<SignUpScreen>
                 child: Column(
                   children: [
                     _buildRoleSelector(),
-                    const SizedBox(height: 20),
+                    const SizedBox(height: 16),
                     Row(
                       children: [
                         Expanded(child: _buildFirstNameField()),
@@ -318,8 +381,6 @@ class _SignUpScreenState extends State<SignUpScreen>
                     _buildPasswordField(),
                     const SizedBox(height: 16),
                     _buildConfirmPasswordField(),
-                    const SizedBox(height: 20),
-                    _buildTermsCheckbox(),
                   ],
                 ),
               ),
@@ -354,9 +415,7 @@ class _SignUpScreenState extends State<SignUpScreen>
           ),
           child: Row(
             children: [
-              Expanded(
-                child: _buildRoleOption('Employee', Icons.badge),
-              ),
+              Expanded(child: _buildRoleOption('Employee', Icons.badge)),
               Container(
                 width: 1,
                 height: 50,
@@ -384,7 +443,9 @@ class _SignUpScreenState extends State<SignUpScreen>
       child: Container(
         padding: const EdgeInsets.symmetric(vertical: 12),
         decoration: BoxDecoration(
-          color: isSelected ? Colors.white.withValues(alpha: 0.2) : Colors.transparent,
+          color: isSelected
+              ? Colors.white.withValues(alpha: 0.2)
+              : Colors.transparent,
           borderRadius: BorderRadius.circular(12),
         ),
         child: Row(
@@ -392,14 +453,18 @@ class _SignUpScreenState extends State<SignUpScreen>
           children: [
             Icon(
               icon,
-              color: isSelected ? Colors.white : Colors.white.withValues(alpha: 0.7),
+              color: isSelected
+                  ? Colors.white
+                  : Colors.white.withValues(alpha: 0.7),
               size: 20,
             ),
             const SizedBox(width: 8),
             Text(
               role,
               style: TextStyle(
-                color: isSelected ? Colors.white : Colors.white.withValues(alpha: 0.7),
+                color: isSelected
+                    ? Colors.white
+                    : Colors.white.withValues(alpha: 0.7),
                 fontSize: 16,
                 fontWeight: isSelected ? FontWeight.w600 : FontWeight.w400,
               ),
@@ -417,7 +482,10 @@ class _SignUpScreenState extends State<SignUpScreen>
       decoration: InputDecoration(
         labelText: 'First Name',
         labelStyle: TextStyle(color: Colors.white.withValues(alpha: 0.8)),
-        prefixIcon: Icon(Icons.person, color: Colors.white.withValues(alpha: 0.8)),
+        prefixIcon: Icon(
+          Icons.person,
+          color: Colors.white.withValues(alpha: 0.8),
+        ),
         filled: true,
         fillColor: Colors.white.withValues(alpha: 0.1),
         border: OutlineInputBorder(
@@ -452,7 +520,10 @@ class _SignUpScreenState extends State<SignUpScreen>
       decoration: InputDecoration(
         labelText: 'Last Name',
         labelStyle: TextStyle(color: Colors.white.withValues(alpha: 0.8)),
-        prefixIcon: Icon(Icons.person, color: Colors.white.withValues(alpha: 0.8)),
+        prefixIcon: Icon(
+          Icons.person,
+          color: Colors.white.withValues(alpha: 0.8),
+        ),
         filled: true,
         fillColor: Colors.white.withValues(alpha: 0.1),
         border: OutlineInputBorder(
@@ -488,7 +559,10 @@ class _SignUpScreenState extends State<SignUpScreen>
       decoration: InputDecoration(
         labelText: 'Email',
         labelStyle: TextStyle(color: Colors.white.withValues(alpha: 0.8)),
-        prefixIcon: Icon(Icons.email, color: Colors.white.withValues(alpha: 0.8)),
+        prefixIcon: Icon(
+          Icons.email,
+          color: Colors.white.withValues(alpha: 0.8),
+        ),
         filled: true,
         fillColor: Colors.white.withValues(alpha: 0.1),
         border: OutlineInputBorder(
@@ -524,7 +598,10 @@ class _SignUpScreenState extends State<SignUpScreen>
       decoration: InputDecoration(
         labelText: 'Employee ID',
         labelStyle: TextStyle(color: Colors.white.withValues(alpha: 0.8)),
-        prefixIcon: Icon(Icons.badge, color: Colors.white.withValues(alpha: 0.8)),
+        prefixIcon: Icon(
+          Icons.badge,
+          color: Colors.white.withValues(alpha: 0.8),
+        ),
         filled: true,
         fillColor: Colors.white.withValues(alpha: 0.1),
         border: OutlineInputBorder(
@@ -556,7 +633,10 @@ class _SignUpScreenState extends State<SignUpScreen>
       decoration: InputDecoration(
         labelText: 'Department',
         labelStyle: TextStyle(color: Colors.white.withValues(alpha: 0.8)),
-        prefixIcon: Icon(Icons.business, color: Colors.white.withValues(alpha: 0.8)),
+        prefixIcon: Icon(
+          Icons.business,
+          color: Colors.white.withValues(alpha: 0.8),
+        ),
         filled: true,
         fillColor: Colors.white.withValues(alpha: 0.1),
         border: OutlineInputBorder(
@@ -589,7 +669,10 @@ class _SignUpScreenState extends State<SignUpScreen>
       decoration: InputDecoration(
         labelText: 'Password',
         labelStyle: TextStyle(color: Colors.white.withValues(alpha: 0.8)),
-        prefixIcon: Icon(Icons.lock, color: Colors.white.withValues(alpha: 0.8)),
+        prefixIcon: Icon(
+          Icons.lock,
+          color: Colors.white.withValues(alpha: 0.8),
+        ),
         suffixIcon: IconButton(
           icon: Icon(
             _isPasswordVisible ? Icons.visibility_off : Icons.visibility,
@@ -639,7 +722,10 @@ class _SignUpScreenState extends State<SignUpScreen>
       decoration: InputDecoration(
         labelText: 'Confirm Password',
         labelStyle: TextStyle(color: Colors.white.withValues(alpha: 0.8)),
-        prefixIcon: Icon(Icons.lock_outline, color: Colors.white.withValues(alpha: 0.8)),
+        prefixIcon: Icon(
+          Icons.lock_outline,
+          color: Colors.white.withValues(alpha: 0.8),
+        ),
         suffixIcon: IconButton(
           icon: Icon(
             _isConfirmPasswordVisible ? Icons.visibility_off : Icons.visibility,
@@ -678,48 +764,6 @@ class _SignUpScreenState extends State<SignUpScreen>
     );
   }
 
-  Widget _buildTermsCheckbox() {
-    return Row(
-      children: [
-        Checkbox(
-          value: _agreeToTerms,
-          onChanged: (value) {
-            setState(() {
-              _agreeToTerms = value ?? false;
-            });
-          },
-          fillColor: WidgetStateProperty.resolveWith<Color>((states) {
-            if (states.contains(WidgetState.selected)) {
-              return Colors.white;
-            }
-            return Colors.transparent;
-          }),
-          checkColor: const Color(0xFF667EEA),
-          side: BorderSide(
-            color: Colors.white.withValues(alpha: 0.8),
-            width: 2,
-          ),
-        ),
-        Expanded(
-          child: GestureDetector(
-            onTap: () {
-              setState(() {
-                _agreeToTerms = !_agreeToTerms;
-              });
-            },
-            child: Text(
-              'I agree to the Terms of Service and Privacy Policy',
-              style: TextStyle(
-                color: Colors.white.withValues(alpha: 0.9),
-                fontSize: 14,
-              ),
-            ),
-          ),
-        ),
-      ],
-    );
-  }
-
   Widget _buildSignUpButton() {
     return AnimatedBuilder(
       animation: _formAnimation,
@@ -746,7 +790,9 @@ class _SignUpScreenState extends State<SignUpScreen>
                       height: 24,
                       child: CircularProgressIndicator(
                         strokeWidth: 2,
-                        valueColor: AlwaysStoppedAnimation<Color>(Color(0xFF667EEA)),
+                        valueColor: AlwaysStoppedAnimation<Color>(
+                          Color(0xFF667EEA),
+                        ),
                       ),
                     )
                   : const Text(
@@ -800,13 +846,213 @@ class _SignUpScreenState extends State<SignUpScreen>
     );
   }
 
+  Widget _buildTermsSection() {
+    return AnimatedBuilder(
+      animation: _formAnimation,
+      builder: (context, child) {
+        return Opacity(
+          opacity: _formAnimation.value,
+          child: Container(
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              color: Colors.white.withValues(alpha: 0.1),
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(
+                color: Colors.white.withValues(alpha: 0.3),
+                width: 1,
+              ),
+            ),
+            child: Row(
+              children: [
+                Checkbox(
+                  value: _agreeToTerms,
+                  onChanged: (value) {
+                    setState(() {
+                      _agreeToTerms = value ?? false;
+                    });
+                  },
+                  fillColor: WidgetStateProperty.resolveWith<Color>((states) {
+                    if (states.contains(WidgetState.selected)) {
+                      return Colors.white;
+                    }
+                    return Colors.transparent;
+                  }),
+                  checkColor: const Color(0xFF667EEA),
+                  side: BorderSide(
+                    color: Colors.white.withValues(alpha: 0.8),
+                    width: 2,
+                  ),
+                ),
+                Expanded(
+                  child: GestureDetector(
+                    onTap: () {
+                      setState(() {
+                        _agreeToTerms = !_agreeToTerms;
+                      });
+                    },
+                    child: Text.rich(
+                      TextSpan(
+                        text: 'I agree to the ',
+                        style: TextStyle(
+                          color: Colors.white.withValues(alpha: 0.9),
+                          fontSize: 14,
+                        ),
+                        children: [
+                          TextSpan(
+                            text: 'Terms of Service',
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontWeight: FontWeight.w600,
+                              decoration: TextDecoration.underline,
+                              decorationColor: Colors.white,
+                            ),
+                          ),
+                          const TextSpan(text: ' and '),
+                          TextSpan(
+                            text: 'Privacy Policy',
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontWeight: FontWeight.w600,
+                              decoration: TextDecoration.underline,
+                              decorationColor: Colors.white,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _buildDivider() {
+    return AnimatedBuilder(
+      animation: _formAnimation,
+      builder: (context, child) {
+        return Opacity(
+          opacity: _formAnimation.value,
+          child: Row(
+            children: [
+              Expanded(
+                child: Container(
+                  height: 1,
+                  color: Colors.white.withValues(alpha: 0.3),
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                child: Text(
+                  'OR',
+                  style: TextStyle(
+                    color: Colors.white.withValues(alpha: 0.8),
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ),
+              Expanded(
+                child: Container(
+                  height: 1,
+                  color: Colors.white.withValues(alpha: 0.3),
+                ),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _buildSocialSignUpButtons() {
+    return AnimatedBuilder(
+      animation: _formAnimation,
+      builder: (context, child) {
+        return Opacity(
+          opacity: _formAnimation.value,
+          child: Row(
+            children: [
+              Expanded(
+                child: _buildSocialButton(
+                  'Google',
+                  Icons.g_mobiledata,
+                  Colors.white,
+                  const Color(0xFFDB4437),
+                  () => _handleSocialSignUp('google'),
+                ),
+              ),
+              const SizedBox(width: 16),
+              Expanded(
+                child: _buildSocialButton(
+                  'Microsoft',
+                  Icons.business,
+                  Colors.white,
+                  const Color(0xFF00A4EF),
+                  () => _handleSocialSignUp('microsoft'),
+                ),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _buildSocialButton(
+    String text,
+    IconData icon,
+    Color textColor,
+    Color backgroundColor,
+    VoidCallback onPressed,
+  ) {
+    return SizedBox(
+      height: 48,
+      child: ElevatedButton.icon(
+        onPressed: onPressed,
+        icon: Icon(icon, color: textColor, size: 20),
+        label: Text(
+          text,
+          style: TextStyle(color: textColor, fontWeight: FontWeight.w600),
+        ),
+        style: ElevatedButton.styleFrom(
+          backgroundColor: backgroundColor,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+          ),
+          elevation: 4,
+        ),
+      ),
+    );
+  }
+
+  void _handleSocialSignUp(String provider) {
+    // Show loading indicator
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) =>
+          const Center(child: CircularProgressIndicator(color: Colors.white)),
+    );
+
+    // Simulate social signup
+    Future.delayed(const Duration(seconds: 2), () {
+      Navigator.pop(context); // Close loading dialog
+      _showSuccessDialog();
+    });
+  }
+
   void _handleSignUp() async {
     if (!_formKey.currentState!.validate()) {
       return;
     }
 
     if (!_agreeToTerms) {
-      _showErrorDialog('Please agree to the Terms of Service and Privacy Policy');
+      _showErrorDialog(
+        'Please agree to the Terms of Service and Privacy Policy',
+      );
       return;
     }
 
@@ -885,20 +1131,21 @@ class _SignUpScreenState extends State<SignUpScreen>
               ),
             ),
             const SizedBox(height: 8),
-            Text('• Name: ${_firstNameController.text} ${_lastNameController.text}'),
+            Text(
+              '• Name: ${_firstNameController.text} ${_lastNameController.text}',
+            ),
             Text('• Email: ${_emailController.text}'),
             Text('• Role: $_selectedRole'),
-            if (_selectedRole == 'Employee' && _employeeIdController.text.isNotEmpty)
+            if (_selectedRole == 'Employee' &&
+                _employeeIdController.text.isNotEmpty)
               Text('• Employee ID: ${_employeeIdController.text}'),
-            if (_selectedRole == 'Employee' && _departmentController.text.isNotEmpty)
+            if (_selectedRole == 'Employee' &&
+                _departmentController.text.isNotEmpty)
               Text('• Department: ${_departmentController.text}'),
             const SizedBox(height: 16),
             Text(
               'A verification email has been sent to ${_emailController.text}. Please check your inbox and verify your email before signing in.',
-              style: TextStyle(
-                color: Colors.grey[600],
-                fontSize: 14,
-              ),
+              style: TextStyle(color: Colors.grey[600], fontSize: 14),
             ),
           ],
         ),

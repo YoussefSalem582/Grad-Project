@@ -45,11 +45,11 @@ class _SplashScreenState extends State<SplashScreen>
   void _startSplashSequence() async {
     // Start logo animation
     _logoController.forward();
-    
+
     // Wait a bit, then start text animation
     await Future.delayed(const Duration(milliseconds: 800));
     _textController.forward();
-    
+
     // Wait for animations to complete, then navigate to login
     await Future.delayed(const Duration(milliseconds: 2000));
     if (mounted) {
@@ -75,11 +75,7 @@ class _SplashScreenState extends State<SplashScreen>
           gradient: LinearGradient(
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
-            colors: [
-              Color(0xFF667EEA),
-              Color(0xFF764BA2),
-              Color(0xFF48CAE4),
-            ],
+            colors: [Color(0xFF667EEA), Color(0xFF764BA2), Color(0xFF48CAE4)],
           ),
         ),
         child: Center(

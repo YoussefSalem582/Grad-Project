@@ -16,12 +16,13 @@ class _LoginScreenState extends State<LoginScreen>
   final _formKey = GlobalKey<FormState>();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
-  
+  final _scrollController = ScrollController();
+
   bool _isPasswordVisible = false;
   bool _isLoading = false;
   bool _rememberMe = false;
   String _selectedRole = 'Employee'; // Default role
-  
+
   late AnimationController _logoController;
   late AnimationController _formController;
   late AnimationController _backgroundController;
@@ -81,17 +82,19 @@ class _LoginScreenState extends State<LoginScreen>
     _backgroundController.dispose();
     _emailController.dispose();
     _passwordController.dispose();
+    _scrollController.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: Stack(
-        children: [
-          _buildAnimatedBackground(),
-          _buildLoginContent(),
-        ],
+    return GestureDetector(
+      onTap: () => FocusScope.of(context).unfocus(),
+      child: Scaffold(
+        resizeToAvoidBottomInset: true,
+        body: Stack(
+          children: [_buildAnimatedBackground(), _buildLoginContent()],
+        ),
       ),
     );
   }
@@ -173,33 +176,53 @@ class _LoginScreenState extends State<LoginScreen>
 
   Widget _buildLoginContent() {
     return SafeArea(
-      child: SingleChildScrollView(
-        physics: const BouncingScrollPhysics(),
-        child: Container(
-          height: MediaQuery.of(context).size.height - MediaQuery.of(context).padding.top,
-          padding: const EdgeInsets.symmetric(horizontal: 24),
-          child: Column(
-            children: [
-              const SizedBox(height: 40),
-              _buildLogo(),
-              const SizedBox(height: 30),
-              _buildWelcomeText(),
-              const SizedBox(height: 30),
-              _buildLoginForm(),
-              const SizedBox(height: 25),
-              _buildLoginButton(),
-              const SizedBox(height: 15),
-              _buildRememberMeAndForgotPassword(),
-              const SizedBox(height: 30),
-              _buildDivider(),
-              const SizedBox(height: 25),
-              _buildSocialLoginButtons(),
-              const SizedBox(height: 25),
-              _buildSignUpLink(),
-              const SizedBox(height: 40),
-            ],
-          ),
-        ),
+      child: LayoutBuilder(
+        builder: (context, constraints) {
+          final keyboardHeight = MediaQuery.of(context).viewInsets.bottom;
+          final screenHeight = MediaQuery.of(context).size.height;
+          final isSmallScreen = screenHeight < 700;
+
+          return SingleChildScrollView(
+            controller: _scrollController,
+            physics: const BouncingScrollPhysics(
+              parent: AlwaysScrollableScrollPhysics(),
+            ),
+            padding: EdgeInsets.only(
+              bottom: keyboardHeight > 0 ? keyboardHeight + 20 : 0,
+            ),
+            child: ConstrainedBox(
+              constraints: BoxConstraints(
+                minHeight: constraints.maxHeight - keyboardHeight,
+              ),
+              child: Padding(
+                padding: EdgeInsets.symmetric(
+                  horizontal: isSmallScreen ? 16.0 : 24.0,
+                ),
+                child: Column(
+                  children: [
+                    SizedBox(height: isSmallScreen ? 30 : 40),
+                    _buildLogo(),
+                    SizedBox(height: isSmallScreen ? 20 : 30),
+                    _buildWelcomeText(),
+                    SizedBox(height: isSmallScreen ? 20 : 30),
+                    _buildLoginForm(),
+                    SizedBox(height: isSmallScreen ? 20 : 25),
+                    _buildLoginButton(),
+                    SizedBox(height: isSmallScreen ? 10 : 15),
+                    _buildRememberMeAndForgotPassword(),
+                    SizedBox(height: isSmallScreen ? 20 : 30),
+                    _buildDivider(),
+                    SizedBox(height: isSmallScreen ? 20 : 25),
+                    _buildSocialLoginButtons(),
+                    SizedBox(height: isSmallScreen ? 20 : 25),
+                    _buildSignUpLink(),
+                    SizedBox(height: isSmallScreen ? 30 : 40),
+                  ],
+                ),
+              ),
+            ),
+          );
+        },
       ),
     );
   }
@@ -373,9 +396,14 @@ class _LoginScreenState extends State<LoginScreen>
     );
   }
 
-  Widget _buildRoleOption(String role, IconData icon, String description, Color color) {
+  Widget _buildRoleOption(
+    String role,
+    IconData icon,
+    String description,
+    Color color,
+  ) {
     final isSelected = _selectedRole == role;
-    
+
     return GestureDetector(
       onTap: () {
         setState(() {
@@ -388,10 +416,8 @@ class _LoginScreenState extends State<LoginScreen>
         margin: const EdgeInsets.symmetric(horizontal: 12),
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
-          gradient: isSelected 
-              ? LinearGradient(
-                  colors: [color.withValues(alpha: 0.8), color],
-                )
+          gradient: isSelected
+              ? LinearGradient(colors: [color.withValues(alpha: 0.8), color])
               : null,
           color: isSelected ? null : Colors.white,
           borderRadius: BorderRadius.circular(12),
@@ -415,7 +441,7 @@ class _LoginScreenState extends State<LoginScreen>
               duration: const Duration(milliseconds: 200),
               padding: const EdgeInsets.all(8),
               decoration: BoxDecoration(
-                color: isSelected 
+                color: isSelected
                     ? Colors.white.withValues(alpha: 0.2)
                     : color.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(8),
@@ -440,7 +466,7 @@ class _LoginScreenState extends State<LoginScreen>
               description,
               style: TextStyle(
                 fontSize: 11,
-                color: isSelected 
+                color: isSelected
                     ? Colors.white.withValues(alpha: 0.9)
                     : Colors.grey.shade600,
               ),
@@ -547,7 +573,7 @@ class _LoginScreenState extends State<LoginScreen>
                 child: Ink(
                   decoration: BoxDecoration(
                     gradient: LinearGradient(
-                      colors: _selectedRole == 'Admin' 
+                      colors: _selectedRole == 'Admin'
                           ? [const Color(0xFF764BA2), const Color(0xFF667EEA)]
                           : [const Color(0xFF667EEA), const Color(0xFF764BA2)],
                     ),
@@ -575,8 +601,8 @@ class _LoginScreenState extends State<LoginScreen>
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
                               Icon(
-                                _selectedRole == 'Admin' 
-                                    ? Icons.admin_panel_settings 
+                                _selectedRole == 'Admin'
+                                    ? Icons.admin_panel_settings
                                     : Icons.person,
                                 color: Colors.white,
                                 size: 20,
@@ -742,10 +768,7 @@ class _LoginScreenState extends State<LoginScreen>
         icon: Icon(icon, color: textColor, size: 20),
         label: Text(
           text,
-          style: TextStyle(
-            color: textColor,
-            fontWeight: FontWeight.w600,
-          ),
+          style: TextStyle(color: textColor, fontWeight: FontWeight.w600),
         ),
         style: ElevatedButton.styleFrom(
           backgroundColor: backgroundColor,
@@ -811,7 +834,8 @@ class _LoginScreenState extends State<LoginScreen>
 
     // For demo purposes, accept any valid email/password
     // In a real app, you would validate credentials with your backend
-    if (_emailController.text.isNotEmpty && _passwordController.text.isNotEmpty) {
+    if (_emailController.text.isNotEmpty &&
+        _passwordController.text.isNotEmpty) {
       // Navigate based on selected role
       Widget targetScreen;
       if (_selectedRole == 'Admin') {
@@ -839,15 +863,14 @@ class _LoginScreenState extends State<LoginScreen>
     showDialog(
       context: context,
       barrierDismissible: false,
-      builder: (context) => const Center(
-        child: CircularProgressIndicator(color: Colors.white),
-      ),
+      builder: (context) =>
+          const Center(child: CircularProgressIndicator(color: Colors.white)),
     );
 
     // Simulate social login
     Future.delayed(const Duration(seconds: 2), () {
       Navigator.pop(context); // Close loading dialog
-      
+
       // Navigate based on selected role
       Widget targetScreen;
       if (_selectedRole == 'Admin') {
@@ -871,7 +894,9 @@ class _LoginScreenState extends State<LoginScreen>
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const Text('Enter your email address to receive a password reset link.'),
+            const Text(
+              'Enter your email address to receive a password reset link.',
+            ),
             const SizedBox(height: 16),
             TextFormField(
               decoration: const InputDecoration(

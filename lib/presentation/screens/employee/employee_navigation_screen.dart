@@ -964,10 +964,7 @@ class _EmployeeNavigationScreenState extends State<EmployeeNavigationScreen>
             AnimatedSwitcher(
               duration: const Duration(milliseconds: 200),
               transitionBuilder: (child, animation) {
-                return ScaleTransition(
-                  scale: animation,
-                  child: child,
-                );
+                return ScaleTransition(scale: animation, child: child);
               },
               child: Icon(
                 isSelected ? filledIcon : outlinedIcon,
