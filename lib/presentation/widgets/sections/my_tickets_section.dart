@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../core/core.dart';
-import '../employee/employee_widgets.dart';
+import '../employee_screen_widgets/employee/employee_widgets.dart';
 import '../buttons/modern_button.dart';
 import '../dialogs/create_ticket_dialog.dart';
 import '../dialogs/ticket_details_dialog.dart';

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import '../../../core/core.dart';
-import '../widgets.dart';
+import '../../../../core/core.dart';
+import '../../widgets.dart';
 
 class EmployeeTicketCard extends StatelessWidget {
   final String ticketId;

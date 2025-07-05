@@ -3,10 +3,10 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../core/core.dart';
 import '../../cubit/employee_dashboard/employee_dashboard_cubit.dart';
 import '../../widgets/auth/animated_background_widget.dart';
-import '../../widgets/dashboard/welcome_header_widget.dart';
-import '../../widgets/dashboard/quick_stats_grid_widget.dart';
-import '../../widgets/dashboard/analysis_tools_grid_widget.dart';
-import '../../widgets/dashboard/recent_activity_list_widget.dart';
+import '../../widgets/employee_screen_widgets/dashboard/welcome_header_widget.dart';
+import '../../widgets/employee_screen_widgets/dashboard/quick_stats_grid_widget.dart';
+import '../../widgets/employee_screen_widgets/dashboard/analysis_tools_grid_widget.dart';
+import '../../widgets/employee_screen_widgets/dashboard/recent_activity_list_widget.dart';
 import '../screens.dart';
 
 class EmployeeDashboardScreen extends StatefulWidget {

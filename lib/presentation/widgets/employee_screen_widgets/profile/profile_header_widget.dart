@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../../../core/core.dart';
+import '../../../../core/core.dart';
 
 class ProfileHeaderWidget extends StatelessWidget {
   final String name;

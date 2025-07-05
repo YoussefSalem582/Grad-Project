@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import '../../../core/core.dart';
-import '../../cubit/employee_dashboard/employee_dashboard_cubit.dart';
+import '../../../../core/core.dart';
+import '../../../cubit/employee_dashboard/employee_dashboard_cubit.dart';
 
 class QuickStatsGridWidget extends StatelessWidget {
   final EmployeeDashboardData? data;

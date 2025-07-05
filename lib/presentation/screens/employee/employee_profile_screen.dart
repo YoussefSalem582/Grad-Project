@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../../core/core.dart';
 import '../../widgets/auth/animated_background_widget.dart';
-import '../../widgets/profile/profile.dart';
+import '../../widgets/employee_screen_widgets/profile/profile.dart';
 
 class EmployeeProfileScreen extends StatefulWidget {
   const EmployeeProfileScreen({super.key});

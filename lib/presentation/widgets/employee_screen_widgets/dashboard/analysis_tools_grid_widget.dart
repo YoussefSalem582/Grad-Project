@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../../../core/core.dart';
+import '../../../../core/core.dart';
 
 class AnalysisToolsGridWidget extends StatelessWidget {
   final VoidCallback onTextAnalysisTap;

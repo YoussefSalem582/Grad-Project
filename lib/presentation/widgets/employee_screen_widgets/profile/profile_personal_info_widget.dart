@@ -1,18 +1,20 @@
 import 'package:flutter/material.dart';
-import '../../../core/core.dart';
+import '../../../../core/core.dart';
 
-class ProfileWorkInfoWidget extends StatelessWidget {
-  final String startDate;
-  final String location;
-  final String manager;
-  final String team;
+class ProfilePersonalInfoWidget extends StatelessWidget {
+  final String name;
+  final String email;
+  final String phone;
+  final String department;
+  final String employeeId;
 
-  const ProfileWorkInfoWidget({
+  const ProfilePersonalInfoWidget({
     super.key,
-    required this.startDate,
-    required this.location,
-    required this.manager,
-    required this.team,
+    required this.name,
+    required this.email,
+    required this.phone,
+    required this.department,
+    required this.employeeId,
   });
 
   @override
@@ -35,10 +37,10 @@ class ProfileWorkInfoWidget extends StatelessWidget {
           children: [
             Row(
               children: [
-                Icon(Icons.work_outline, color: AppColors.primary),
+                Icon(Icons.person_outline, color: AppColors.primary),
                 const SizedBox(width: 8),
                 Text(
-                  'Work Information',
+                  'Personal Information',
                   style: Theme.of(context).textTheme.titleMedium?.copyWith(
                     fontWeight: FontWeight.w600,
                     color: AppColors.textPrimary,
@@ -47,10 +49,11 @@ class ProfileWorkInfoWidget extends StatelessWidget {
               ],
             ),
             const SizedBox(height: 16),
-            _buildInfoItem('Start Date', startDate),
-            _buildInfoItem('Location', location),
-            _buildInfoItem('Manager', manager),
-            _buildInfoItem('Team', team),
+            _buildInfoItem('Name', name),
+            _buildInfoItem('Email', email),
+            _buildInfoItem('Phone', phone),
+            _buildInfoItem('Department', department),
+            _buildInfoItem('Employee ID', employeeId),
           ],
         ),
       ),

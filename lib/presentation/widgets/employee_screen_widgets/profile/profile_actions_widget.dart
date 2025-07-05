@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../../../core/core.dart';
+import '../../../../core/core.dart';
 
 class ProfileActionsWidget extends StatelessWidget {
   final List<ProfileAction> actions;

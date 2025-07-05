@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../../../core/core.dart';
+import '../../../../core/core.dart';
 
 class EmployeeAnalyticsCard extends StatelessWidget {
   final String title;
