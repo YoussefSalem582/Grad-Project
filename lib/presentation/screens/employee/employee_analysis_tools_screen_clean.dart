@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import '../../../core/core.dart';
 import '../../widgets/auth/animated_background_widget.dart';
+import '../analysis/enhanced_text_analysis_screen.dart';
+import '../analysis/enhanced_voice_analysis_screen.dart';
+import '../analysis/enhanced_video_analysis_screen.dart';
 
 class EmployeeAnalysisToolsScreen extends StatefulWidget {
   const EmployeeAnalysisToolsScreen({super.key});
@@ -115,14 +118,14 @@ class _EmployeeAnalysisToolsScreenState
                   'Analysis Tools',
                   style: theme.textTheme.headlineSmall?.copyWith(
                     fontWeight: FontWeight.w900,
-                    color: Colors.white,
+                    color: AppColors.textPrimary,
                   ),
                 ),
                 SizedBox(height: customSpacing.xs),
                 Text(
                   'AI-powered customer insights and analytics',
                   style: theme.textTheme.bodyMedium?.copyWith(
-                    color: Colors.grey,
+                    color: AppColors.textSecondary,
                   ),
                 ),
                 SizedBox(height: customSpacing.sm),
@@ -168,11 +171,11 @@ class _EmployeeAnalysisToolsScreenState
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          'Analysis Tools',
+          'Available Tools',
           style: TextStyle(
             fontSize: 20,
             fontWeight: FontWeight.w700,
-            color: Colors.white,
+            color: AppColors.textPrimary,
           ),
         ),
         SizedBox(height: customSpacing.md),
@@ -194,7 +197,7 @@ class _EmployeeAnalysisToolsScreenState
                           'Messages, emails & feedback',
                           Icons.text_fields,
                           AppColors.secondary,
-                          () => _navigateToAnalysis(5),
+                          () => _navigateToTextAnalysis(),
                         ),
                       ),
                       SizedBox(width: customSpacing.md),
@@ -204,7 +207,7 @@ class _EmployeeAnalysisToolsScreenState
                           'Calls, recordings & audio',
                           Icons.mic,
                           AppColors.success,
-                          () => _navigateToAnalysis(6),
+                          () => _navigateToVoiceAnalysis(),
                         ),
                       ),
                     ],
@@ -220,7 +223,7 @@ class _EmployeeAnalysisToolsScreenState
                           'Customer videos & interviews',
                           Icons.video_library,
                           const Color(0xFF667EEA),
-                          () => _navigateToAnalysis(7),
+                          () => _navigateToVideoAnalysis(),
                         ),
                       ),
                       Expanded(flex: 1, child: Container()),
@@ -237,7 +240,7 @@ class _EmployeeAnalysisToolsScreenState
                     'Messages, emails & feedback',
                     Icons.text_fields,
                     AppColors.secondary,
-                    () => _navigateToAnalysis(5),
+                    () => _navigateToTextAnalysis(),
                   ),
                   SizedBox(height: customSpacing.md),
                   _buildAnalysisToolCard(
@@ -245,7 +248,7 @@ class _EmployeeAnalysisToolsScreenState
                     'Calls, recordings & audio',
                     Icons.mic,
                     AppColors.success,
-                    () => _navigateToAnalysis(6),
+                    () => _navigateToVoiceAnalysis(),
                   ),
                   SizedBox(height: customSpacing.md),
                   _buildAnalysisToolCard(
@@ -253,7 +256,7 @@ class _EmployeeAnalysisToolsScreenState
                     'Customer videos & interviews',
                     Icons.video_library,
                     const Color(0xFF667EEA),
-                    () => _navigateToAnalysis(7),
+                    () => _navigateToVideoAnalysis(),
                   ),
                 ],
               );
@@ -355,17 +358,12 @@ class _EmployeeAnalysisToolsScreenState
                       ],
                     ),
                   ),
+                  Icon(
+                    Icons.arrow_forward_ios,
+                    color: color.withValues(alpha: 0.6),
+                    size: 16,
+                  ),
                 ],
-              ),
-            ),
-            // Arrow indicator
-            Positioned(
-              top: 16,
-              right: 16,
-              child: Icon(
-                Icons.arrow_forward,
-                color: color.withValues(alpha: 0.6),
-                size: 20,
               ),
             ),
           ],
@@ -374,12 +372,30 @@ class _EmployeeAnalysisToolsScreenState
     );
   }
 
-  void _navigateToAnalysis(int index) {
-    // Navigate back to main navigation with analysis screen
-    Navigator.pop(context);
-    // Use callback to set the analysis screen index
-    if (Navigator.canPop(context)) {
-      Navigator.pop(context, index);
-    }
+  void _navigateToTextAnalysis() {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => const EnhancedTextAnalysisScreen(),
+      ),
+    );
+  }
+
+  void _navigateToVoiceAnalysis() {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => const EnhancedVoiceAnalysisScreen(),
+      ),
+    );
+  }
+
+  void _navigateToVideoAnalysis() {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => const EnhancedVideoAnalysisScreen(),
+      ),
+    );
   }
 }
