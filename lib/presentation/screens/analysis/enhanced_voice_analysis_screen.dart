@@ -1,638 +1,515 @@
-import 'dart:math';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../core/core.dart';
-import '../../widgets/widgets.dart';
-import 'base_analysis_screen.dart';
+import '../../widgets/analysis/analysis.dart';
+import '../../cubit/voice_analysis/voice_analysis_cubit.dart';
 
-class EnhancedVoiceAnalysisScreen extends BaseAnalysisScreen {
+class EnhancedVoiceAnalysisScreen extends StatelessWidget {
   const EnhancedVoiceAnalysisScreen({super.key});
 
   @override
-  State<EnhancedVoiceAnalysisScreen> createState() =>
-      _EnhancedVoiceAnalysisScreenState();
+  Widget build(BuildContext context) {
+    return BlocProvider(
+      create: (context) => VoiceAnalysisCubit(),
+      child: const _EnhancedVoiceAnalysisScreenView(),
+    );
+  }
 }
 
-class _EnhancedVoiceAnalysisScreenState
-    extends BaseAnalysisScreenState<EnhancedVoiceAnalysisScreen> {
-  bool _isRecording = false;
-  bool _isAnalyzing = false;
-  bool _hasRecording = false;
-  String _recordingDuration = '00:00';
-  double _recordingLevel = 0.0;
-  Map<String, dynamic>? _analysisResult;
-
-  late AnimationController _waveController;
-  late AnimationController _levelController;
-  late AnimationController _recordingController;
-  late AnimationController _resultController;
-  late Animation<double> _resultAnimation;
-
-  final List<Map<String, dynamic>> _recentRecordings = [];
-  int _recordingSeconds = 0;
+class _EnhancedVoiceAnalysisScreenView extends StatefulWidget {
+  const _EnhancedVoiceAnalysisScreenView();
 
   @override
-  String get analysisType => 'AI Voice Analysis';
+  State<_EnhancedVoiceAnalysisScreenView> createState() =>
+      _EnhancedVoiceAnalysisScreenViewState();
+}
 
-  @override
-  IconData get analysisIcon => Icons.record_voice_over;
+class _EnhancedVoiceAnalysisScreenViewState
+    extends State<_EnhancedVoiceAnalysisScreenView> {
+  final TextEditingController _filePathController = TextEditingController();
+  final FocusNode _filePathFocusNode = FocusNode();
 
-  @override
-  String get analysisDescription =>
-      'Real-time voice emotion and sentiment analysis';
+  String _selectedAnalysisType = 'Emotion Analysis';
+  bool _isValidFile = false;
 
-  @override
-  List<Color> get gradientColors => [
-    const Color(0xFF11998e),
-    const Color(0xFF38ef7d),
+  final List<String> _analysisTypes = [
+    'Emotion Analysis',
+    'Communication Style',
+    'Confidence Level',
+    'Speech Patterns',
+    'Sentiment Analysis',
   ];
 
-  @override
-  List<Map<String, dynamic>> get headerStats => [
-    {'label': 'Recordings', 'value': '23', 'icon': Icons.mic},
-    {'label': 'Accuracy', 'value': '96%', 'icon': Icons.verified},
-    {'label': 'Avg Length', 'value': '2.1m', 'icon': Icons.timer},
-  ];
+  final List<AudioSample> _sampleAudioFiles = DefaultAudioSamples.all;
 
   @override
   void initState() {
     super.initState();
-    _initializeVoiceAnimations();
-  }
-
-  void _initializeVoiceAnimations() {
-    _waveController = AnimationController(
-      duration: const Duration(milliseconds: 1500),
-      vsync: this,
-    );
-
-    _levelController = AnimationController(
-      duration: const Duration(milliseconds: 100),
-      vsync: this,
-    );
-
-    _recordingController = AnimationController(
-      duration: const Duration(milliseconds: 1000),
-      vsync: this,
-    );
-
-    _resultController = AnimationController(
-      duration: const Duration(milliseconds: 800),
-      vsync: this,
-    );
-
-    _resultAnimation = CurvedAnimation(
-      parent: _resultController,
-      curve: Curves.elasticOut,
-    );
+    _filePathController.addListener(_validateFile);
   }
 
   @override
   void dispose() {
-    _waveController.dispose();
-    _levelController.dispose();
-    _recordingController.dispose();
-    _resultController.dispose();
+    _filePathController.dispose();
+    _filePathFocusNode.dispose();
     super.dispose();
   }
 
-  @override
-  Widget buildAnalysisContent(
-    BuildContext context,
-    ThemeData theme,
-    CustomSpacing spacing,
-  ) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        // Recording Section
-        _buildRecordingSection(theme, spacing),
-        SizedBox(height: spacing.lg),
+  void _validateFile() {
+    final path = _filePathController.text.trim();
+    setState(() {
+      _isValidFile =
+          path.isNotEmpty &&
+          (path.endsWith('.mp3') ||
+              path.endsWith('.wav') ||
+              path.endsWith('.m4a') ||
+              path.startsWith('/audio/'));
+    });
+  }
 
-        // Analysis Result
-        if (_analysisResult != null) ...[
-          _buildAnalysisResult(theme, spacing),
-          SizedBox(height: spacing.lg),
+  void _onAnalysisTypeChanged(String? value) {
+    if (value != null) {
+      setState(() {
+        _selectedAnalysisType = value;
+      });
+    }
+  }
+
+  void _useSampleAudio(String filePath) {
+    _filePathController.text = filePath;
+    _validateFile();
+    _filePathFocusNode.unfocus();
+  }
+
+  void _selectAudioFile() {
+    // In a real implementation, this would open a file picker
+    // For now, show a dialog with file selection options
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Import Audio File'),
+        content: const Text(
+          'In a production app, this would open a file picker to select:\n\n'
+          '• Audio files from device storage\n'
+          '• Recent call recordings\n'
+          '• Cloud storage files\n'
+          '• Voice memos\n\n'
+          'For now, please use the sample files below or enter a file path manually.',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: const Text('Got it'),
+          ),
         ],
+      ),
+    );
+  }
 
-        // Quick Actions
-        _buildQuickActions(theme, spacing),
-      ],
+  Future<void> _analyzeAudio() async {
+    if (!_isValidFile) return;
+
+    context.read<VoiceAnalysisCubit>().analyzeAudio(
+      filePath: _filePathController.text.trim(),
+      analysisType: _selectedAnalysisType,
+    );
+  }
+
+  void _clearAnalysis() {
+    setState(() {
+      _filePathController.clear();
+      _isValidFile = false;
+    });
+    context.read<VoiceAnalysisCubit>().clearAnalysis();
+  }
+
+  void _showAudioLibrary() {
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text('Audio Library feature coming soon!'),
+        behavior: SnackBarBehavior.floating,
+      ),
+    );
+  }
+
+  void _exportResults() {
+    final cubit = context.read<VoiceAnalysisCubit>();
+    final state = cubit.state;
+
+    if (state is! VoiceAnalysisSuccess && state is! VoiceAnalysisDemo) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('No analysis results to export'),
+          backgroundColor: AppColors.warning,
+          behavior: SnackBarBehavior.floating,
+        ),
+      );
+      return;
+    }
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text('Export Results feature coming soon!'),
+        behavior: SnackBarBehavior.floating,
+      ),
+    );
+  }
+
+  void _showAboutDialog() {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('About Voice Analysis'),
+        content: const Text(
+          'This tool analyzes pre-recorded audio files and phone calls to provide insights into:\n\n'
+          '• Emotional tone and sentiment\n'
+          '• Communication effectiveness\n'
+          '• Confidence levels\n'
+          '• Speech patterns and clarity\n\n'
+          'Supported formats: MP3, WAV, M4A\n'
+          'Maximum file size: 50MB\n'
+          'Analysis typically takes 30-60 seconds.',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: const Text('Got it'),
+          ),
+        ],
+      ),
     );
   }
 
   @override
-  Widget? buildAdditionalFeatures(
-    BuildContext context,
-    ThemeData theme,
-    CustomSpacing spacing,
-  ) {
-    return _buildRecentRecordings(theme, spacing);
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final spacing = CustomSpacing();
+
+    return Scaffold(
+      backgroundColor: Colors.grey[300],
+      appBar: AppBar(
+        title: const Text('Voice Analysis'),
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        foregroundColor: AppColors.textPrimary,
+        actions: [
+          IconButton(
+            onPressed: _showAudioLibrary,
+            icon: const Icon(Icons.library_music),
+            tooltip: 'Audio Library',
+          ),
+          IconButton(
+            onPressed: _exportResults,
+            icon: const Icon(Icons.download),
+            tooltip: 'Export Results',
+          ),
+          IconButton(
+            onPressed: _showAboutDialog,
+            icon: const Icon(Icons.info_outline),
+            tooltip: 'About',
+          ),
+        ],
+      ),
+      body: BlocConsumer<VoiceAnalysisCubit, VoiceAnalysisState>(
+        listener: (context, state) {
+          if (state is VoiceAnalysisSuccess) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text('Audio analysis completed successfully!'),
+                backgroundColor: AppColors.success,
+                behavior: SnackBarBehavior.floating,
+              ),
+            );
+          } else if (state is VoiceAnalysisError) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text(state.message),
+                backgroundColor: AppColors.error,
+                behavior: SnackBarBehavior.floating,
+              ),
+            );
+          }
+        },
+        builder: (context, state) {
+          return SingleChildScrollView(
+            padding: EdgeInsets.all(spacing.lg),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // Header Section
+                AnalysisHeaderWidget(
+                  title: 'Voice & Audio Analysis',
+                  description:
+                      'Import and analyze pre-recorded audio files or phone calls',
+                  icon: Icons.mic,
+                  gradientColors: const [
+                    AppColors.primary,
+                    AppColors.secondary,
+                  ],
+                  stats: [
+                    AnalysisHeaderStat(
+                      value: '12',
+                      label: 'Files',
+                      icon: Icons.audio_file,
+                    ),
+                    AnalysisHeaderStat(
+                      value: '8.7',
+                      label: 'Avg Score',
+                      icon: Icons.star,
+                    ),
+                    AnalysisHeaderStat(
+                      value: '2.1s',
+                      label: 'Speed',
+                      icon: Icons.speed,
+                    ),
+                  ],
+                ),
+                SizedBox(height: spacing.xl),
+
+                // Audio Input Section
+                _buildAudioInputSection(theme, spacing, state),
+                SizedBox(height: spacing.xl),
+
+                // Sample Audio Files Section
+                _buildAudioSamplesSection(theme, spacing),
+                SizedBox(height: spacing.xl),
+
+                // Analysis Results Section
+                if (state is VoiceAnalysisSuccess ||
+                    state is VoiceAnalysisDemo) ...[
+                  AnalysisResultWidget(
+                    result: state is VoiceAnalysisSuccess
+                        ? state.result.toMap()
+                        : (state as VoiceAnalysisDemo).demoResult.toMap(),
+                    isLoading: false,
+                    analysisType: 'voice',
+                  ),
+                  SizedBox(height: spacing.xl),
+                ],
+              ],
+            ),
+          );
+        },
+      ),
+      floatingActionButton: FloatingActionButton.extended(
+        onPressed: _selectAudioFile,
+        icon: Icon(Icons.mic),
+        label: Text('Import Audio'),
+        backgroundColor: AppColors.primary,
+        foregroundColor: Colors.white,
+      ),
+    );
   }
 
-  Widget _buildRecordingSection(ThemeData theme, CustomSpacing spacing) {
+  Widget _buildAudioInputSection(
+    ThemeData theme,
+    CustomSpacing spacing,
+    VoiceAnalysisState state,
+  ) {
     return Container(
-      padding: EdgeInsets.all(spacing.xl),
+      padding: EdgeInsets.all(spacing.lg),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.05),
-            blurRadius: 25,
-            offset: const Offset(0, 10),
-          ),
-        ],
-      ),
-      child: Column(
-        children: [
-          // Recording Visualizer
-          _buildRecordingVisualizer(theme, spacing),
-          SizedBox(height: spacing.xl),
-
-          // Recording Duration
-          Text(
-            _recordingDuration,
-            style: theme.textTheme.headlineMedium?.copyWith(
-              fontWeight: FontWeight.w600,
-              color: _isRecording
-                  ? gradientColors.first
-                  : AppColors.textPrimary,
-              fontFeatures: [const FontFeature.tabularFigures()],
-            ),
-          ),
-          SizedBox(height: spacing.lg),
-
-          // Recording Controls
-          _buildRecordingControls(theme, spacing),
-
-          if (_hasRecording && !_isRecording) ...[
-            SizedBox(height: spacing.lg),
-            _buildAnalyzeButton(theme, spacing),
-          ],
-        ],
-      ),
-    );
-  }
-
-  Widget _buildRecordingVisualizer(ThemeData theme, CustomSpacing spacing) {
-    return Container(
-      height: 200,
-      width: double.infinity,
-      child: Stack(
-        alignment: Alignment.center,
-        children: [
-          // Background Circles
-          ...List.generate(3, (index) {
-            return AnimatedBuilder(
-              animation: _recordingController,
-              builder: (context, child) {
-                final scale =
-                    1.0 + (index * 0.3) + (_recordingController.value * 0.2);
-                final opacity =
-                    (1.0 - (index * 0.3)) *
-                    (_isRecording ? 0.3 : 0.1) *
-                    (1.0 - _recordingController.value);
-
-                return Transform.scale(
-                  scale: scale,
-                  child: Container(
-                    width: 120,
-                    height: 120,
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      color: gradientColors.first.withValues(alpha: opacity),
-                      border: Border.all(
-                        color: gradientColors.first.withValues(
-                          alpha: opacity * 0.5,
-                        ),
-                        width: 2,
-                      ),
-                    ),
-                  ),
-                );
-              },
-            );
-          }),
-
-          // Main Record Button
-          GestureDetector(
-            onTap: _toggleRecording,
-            child: AnimatedContainer(
-              duration: const Duration(milliseconds: 200),
-              width: 80,
-              height: 80,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                gradient: _isRecording
-                    ? LinearGradient(colors: [Colors.red, Colors.red.shade400])
-                    : LinearGradient(colors: gradientColors),
-                boxShadow: [
-                  BoxShadow(
-                    color: (_isRecording ? Colors.red : gradientColors.first)
-                        .withValues(alpha: 0.3),
-                    blurRadius: 20,
-                    offset: const Offset(0, 8),
-                  ),
-                ],
-              ),
-              child: Icon(
-                _isRecording ? Icons.stop : Icons.mic,
-                color: Colors.white,
-                size: 32,
-              ),
-            ),
-          ),
-
-          // Wave Animation
-          if (_isRecording)
-            ...List.generate(5, (index) {
-              return AnimatedBuilder(
-                animation: _waveController,
-                builder: (context, child) {
-                  final delay = index * 0.2;
-                  final value = (_waveController.value + delay) % 1.0;
-                  final height =
-                      20 + (sin(value * 2 * pi) * 15 * _recordingLevel);
-
-                  return Positioned(
-                    left: 40 + (index * 20.0),
-                    child: Container(
-                      width: 4,
-                      height: height,
-                      decoration: BoxDecoration(
-                        color: Colors.white.withValues(alpha: 0.8),
-                        borderRadius: BorderRadius.circular(2),
-                      ),
-                    ),
-                  );
-                },
-              );
-            }),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildRecordingControls(ThemeData theme, CustomSpacing spacing) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-      children: [
-        // Play/Pause
-        _buildControlButton(
-          icon: _hasRecording ? Icons.play_arrow : Icons.play_disabled,
-          label: 'Play',
-          onTap: _hasRecording ? _playRecording : null,
-          theme: theme,
-          spacing: spacing,
-        ),
-
-        // Delete
-        _buildControlButton(
-          icon: Icons.delete_outline,
-          label: 'Delete',
-          onTap: _hasRecording ? _deleteRecording : null,
-          theme: theme,
-          spacing: spacing,
-        ),
-
-        // Save
-        _buildControlButton(
-          icon: Icons.save_alt,
-          label: 'Save',
-          onTap: _hasRecording ? _saveRecording : null,
-          theme: theme,
-          spacing: spacing,
-        ),
-      ],
-    );
-  }
-
-  Widget _buildControlButton({
-    required IconData icon,
-    required String label,
-    required VoidCallback? onTap,
-    required ThemeData theme,
-    required CustomSpacing spacing,
-  }) {
-    final isEnabled = onTap != null;
-
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        padding: EdgeInsets.symmetric(
-          horizontal: spacing.md,
-          vertical: spacing.sm,
-        ),
-        decoration: BoxDecoration(
-          color: isEnabled
-              ? AppColors.surfaceVariant
-              : AppColors.surfaceVariant.withValues(alpha: 0.5),
-          borderRadius: BorderRadius.circular(12),
-          border: Border.all(
-            color: isEnabled
-                ? AppColors.border
-                : AppColors.border.withValues(alpha: 0.5),
-            width: 1,
-          ),
-        ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(
-              icon,
-              color: isEnabled
-                  ? AppColors.textPrimary
-                  : AppColors.textSecondary.withValues(alpha: 0.5),
-              size: 20,
-            ),
-            SizedBox(height: spacing.xs),
-            Text(
-              label,
-              style: theme.textTheme.bodySmall?.copyWith(
-                color: isEnabled
-                    ? AppColors.textPrimary
-                    : AppColors.textSecondary.withValues(alpha: 0.5),
-                fontWeight: FontWeight.w500,
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildAnalyzeButton(ThemeData theme, CustomSpacing spacing) {
-    return SizedBox(
-      width: double.infinity,
-      height: 56,
-      child: ElevatedButton(
-        onPressed: _isAnalyzing ? null : _performAnalysis,
-        style: ElevatedButton.styleFrom(
-          backgroundColor: gradientColors.first,
-          foregroundColor: Colors.white,
-          elevation: 0,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12),
-          ),
-        ),
-        child: _isAnalyzing
-            ? Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  SizedBox(
-                    width: 20,
-                    height: 20,
-                    child: CircularProgressIndicator(
-                      color: Colors.white,
-                      strokeWidth: 2,
-                    ),
-                  ),
-                  SizedBox(width: spacing.sm),
-                  const Text('Analyzing Voice...'),
-                ],
-              )
-            : Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  const Icon(Icons.psychology, size: 20),
-                  SizedBox(width: spacing.sm),
-                  const Text(
-                    'Analyze Voice',
-                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
-                  ),
-                ],
-              ),
-      ),
-    );
-  }
-
-  Widget _buildAnalysisResult(ThemeData theme, CustomSpacing spacing) {
-    return FadeTransition(
-      opacity: _resultAnimation,
-      child: Container(
-        padding: EdgeInsets.all(spacing.lg),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(16),
-          border: Border.all(
-            color: gradientColors.first.withValues(alpha: 0.2),
-            width: 2,
-          ),
-          boxShadow: [
-            BoxShadow(
-              color: gradientColors.first.withValues(alpha: 0.1),
-              blurRadius: 20,
-              offset: const Offset(0, 8),
-            ),
-          ],
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              children: [
-                Container(
-                  padding: EdgeInsets.all(spacing.sm),
-                  decoration: BoxDecoration(
-                    color: gradientColors.first.withValues(alpha: 0.1),
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  child: Icon(
-                    Icons.check_circle,
-                    color: gradientColors.first,
-                    size: 20,
-                  ),
-                ),
-                SizedBox(width: spacing.sm),
-                Expanded(
-                  child: Text(
-                    'Voice Analysis Complete',
-                    style: theme.textTheme.titleMedium?.copyWith(
-                      fontWeight: FontWeight.w700,
-                      color: AppColors.textPrimary,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-            SizedBox(height: spacing.lg),
-
-            // Voice metrics
-            _buildVoiceMetric('Emotion', 'Confident', '89%', AppColors.success),
-            SizedBox(height: spacing.md),
-            _buildVoiceMetric('Stress Level', 'Low', '23%', AppColors.info),
-            SizedBox(height: spacing.md),
-            _buildVoiceMetric('Clarity', 'Excellent', '95%', AppColors.warning),
-            SizedBox(height: spacing.md),
-            _buildVoiceMetric('Pace', 'Natural', '78%', AppColors.primary),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildVoiceMetric(
-    String label,
-    String value,
-    String confidence,
-    Color color,
-  ) {
-    return Row(
-      children: [
-        Expanded(
-          flex: 2,
-          child: Text(
-            label,
-            style: TextStyle(
-              color: AppColors.textSecondary,
-              fontWeight: FontWeight.w500,
-            ),
-          ),
-        ),
-        Expanded(
-          flex: 3,
-          child: Text(
-            value,
-            style: TextStyle(
-              color: AppColors.textPrimary,
-              fontWeight: FontWeight.w600,
-            ),
-          ),
-        ),
-        Container(
-          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-          decoration: BoxDecoration(
-            color: color.withValues(alpha: 0.1),
-            borderRadius: BorderRadius.circular(8),
-          ),
-          child: Text(
-            confidence,
-            style: TextStyle(
-              color: color,
-              fontWeight: FontWeight.w600,
-              fontSize: 12,
-            ),
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildQuickActions(ThemeData theme, CustomSpacing spacing) {
-    final actions = [
-      {
-        'title': 'Speech Training',
-        'icon': Icons.school,
-        'color': AppColors.primary,
-      },
-      {
-        'title': 'Voice Samples',
-        'icon': Icons.library_music,
-        'color': AppColors.info,
-      },
-      {'title': 'Settings', 'icon': Icons.tune, 'color': AppColors.warning},
-      {
-        'title': 'Export Data',
-        'icon': Icons.download,
-        'color': AppColors.success,
-      },
-    ];
-
-    return Container(
-      padding: EdgeInsets.all(spacing.lg),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.05),
+            color: Colors.black.withValues(alpha: 0.1),
             blurRadius: 20,
-            offset: const Offset(0, 8),
+            offset: const Offset(0, 10),
           ),
         ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            'Quick Actions',
-            style: theme.textTheme.titleMedium?.copyWith(
-              fontWeight: FontWeight.w700,
-              color: AppColors.textPrimary,
-            ),
+          // Header
+          Row(
+            children: [
+              Icon(Icons.audio_file, color: AppColors.primary, size: 24),
+              SizedBox(width: spacing.sm),
+              Text(
+                'Audio File Analysis',
+                style: theme.textTheme.titleLarge?.copyWith(
+                  color: AppColors.textPrimary,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ],
           ),
           SizedBox(height: spacing.md),
-          GridView.count(
-            shrinkWrap: true,
-            physics: const NeverScrollableScrollPhysics(),
-            crossAxisCount: 2,
-            crossAxisSpacing: spacing.sm,
-            mainAxisSpacing: spacing.sm,
-            childAspectRatio: 2.5,
-            children: actions.map((action) {
-              return _buildActionCard(
-                action['title'] as String,
-                action['icon'] as IconData,
-                action['color'] as Color,
-                theme,
-                spacing,
-              );
-            }).toList(),
+
+          // Analysis Type Selector
+          Container(
+            padding: EdgeInsets.symmetric(horizontal: spacing.md),
+            decoration: BoxDecoration(
+              color: AppColors.background,
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(
+                color: AppColors.primary.withValues(alpha: 0.2),
+              ),
+            ),
+            child: DropdownButtonHideUnderline(
+              child: DropdownButton<String>(
+                value: _selectedAnalysisType,
+                isExpanded: true,
+                icon: Icon(Icons.arrow_drop_down, color: AppColors.primary),
+                onChanged: _onAnalysisTypeChanged,
+                items: _analysisTypes.map((type) {
+                  return DropdownMenuItem(
+                    value: type,
+                    child: Text(
+                      type,
+                      style: TextStyle(color: AppColors.textPrimary),
+                    ),
+                  );
+                }).toList(),
+              ),
+            ),
+          ),
+          SizedBox(height: spacing.lg),
+
+          // File Path Input with Import Button
+          Row(
+            children: [
+              Expanded(
+                flex: 3,
+                child: TextField(
+                  controller: _filePathController,
+                  focusNode: _filePathFocusNode,
+                  decoration: InputDecoration(
+                    labelText: 'Audio File Path',
+                    hintText: 'Path to audio file (MP3, WAV, M4A)',
+                    prefixIcon: Icon(
+                      Icons.folder_open,
+                      color: AppColors.primary,
+                    ),
+                    suffixIcon: _isValidFile
+                        ? Icon(Icons.check_circle, color: AppColors.success)
+                        : null,
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      borderSide: BorderSide(
+                        color: AppColors.primary,
+                        width: 2,
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+              SizedBox(width: spacing.md),
+              ElevatedButton.icon(
+                onPressed: _selectAudioFile,
+                icon: Icon(Icons.upload_file),
+                label: Text('Import'),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: AppColors.secondary,
+                  foregroundColor: Colors.white,
+                  padding: EdgeInsets.symmetric(
+                    horizontal: spacing.lg,
+                    vertical: spacing.md + 2,
+                  ),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                ),
+              ),
+            ],
+          ),
+          SizedBox(height: spacing.md),
+
+          // Supported formats info
+          Container(
+            padding: EdgeInsets.all(spacing.md),
+            decoration: BoxDecoration(
+              color: AppColors.info.withValues(alpha: 0.1),
+              borderRadius: BorderRadius.circular(8),
+              border: Border.all(color: AppColors.info.withValues(alpha: 0.3)),
+            ),
+            child: Row(
+              children: [
+                Icon(Icons.info_outline, color: AppColors.info, size: 16),
+                SizedBox(width: spacing.sm),
+                Expanded(
+                  child: Text(
+                    'Supported formats: MP3, WAV, M4A • Max size: 50MB',
+                    style: theme.textTheme.bodySmall?.copyWith(
+                      color: AppColors.info,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          SizedBox(height: spacing.lg),
+
+          // Action Buttons
+          Row(
+            children: [
+              Expanded(
+                child: ElevatedButton.icon(
+                  onPressed: _isValidFile && state is! VoiceAnalysisLoading
+                      ? _analyzeAudio
+                      : null,
+                  icon: state is VoiceAnalysisLoading
+                      ? SizedBox(
+                          width: 20,
+                          height: 20,
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2,
+                            valueColor: AlwaysStoppedAnimation(Colors.white),
+                          ),
+                        )
+                      : Icon(Icons.analytics),
+                  label: Text(
+                    state is VoiceAnalysisLoading
+                        ? 'Analyzing...'
+                        : 'Analyze Audio',
+                  ),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: AppColors.primary,
+                    foregroundColor: Colors.white,
+                    padding: EdgeInsets.symmetric(vertical: spacing.md),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                  ),
+                ),
+              ),
+              SizedBox(width: spacing.md),
+              OutlinedButton.icon(
+                onPressed: _clearAnalysis,
+                icon: Icon(Icons.clear),
+                label: Text('Clear'),
+                style: OutlinedButton.styleFrom(
+                  foregroundColor: AppColors.error,
+                  side: BorderSide(color: AppColors.error),
+                  padding: EdgeInsets.symmetric(vertical: spacing.md),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                ),
+              ),
+            ],
           ),
         ],
       ),
     );
   }
 
-  Widget _buildActionCard(
-    String title,
-    IconData icon,
-    Color color,
-    ThemeData theme,
-    CustomSpacing spacing,
-  ) {
-    return GestureDetector(
-      onTap: () => HapticFeedback.lightImpact(),
-      child: Container(
-        padding: EdgeInsets.all(spacing.md),
-        decoration: BoxDecoration(
-          color: color.withValues(alpha: 0.1),
-          borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: color.withValues(alpha: 0.2), width: 1),
-        ),
-        child: Row(
-          children: [
-            Icon(icon, color: color, size: 20),
-            SizedBox(width: spacing.sm),
-            Expanded(
-              child: Text(
-                title,
-                style: theme.textTheme.bodyMedium?.copyWith(
-                  color: AppColors.textPrimary,
-                  fontWeight: FontWeight.w600,
-                ),
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildRecentRecordings(ThemeData theme, CustomSpacing spacing) {
+  Widget _buildAudioSamplesSection(ThemeData theme, CustomSpacing spacing) {
     return Container(
       padding: EdgeInsets.all(spacing.lg),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.05),
+            color: Colors.black.withValues(alpha: 0.1),
             blurRadius: 20,
-            offset: const Offset(0, 8),
+            offset: const Offset(0, 10),
           ),
         ],
       ),
@@ -641,147 +518,110 @@ class _EnhancedVoiceAnalysisScreenState
         children: [
           Row(
             children: [
-              Expanded(
-                child: Text(
-                  'Recent Recordings',
-                  style: theme.textTheme.titleMedium?.copyWith(
-                    fontWeight: FontWeight.w700,
-                    color: AppColors.textPrimary,
-                  ),
-                ),
-              ),
-              TextButton(
-                onPressed: () {},
-                child: Text(
-                  'View All',
-                  style: TextStyle(
-                    color: gradientColors.first,
-                    fontWeight: FontWeight.w600,
-                  ),
+              Icon(Icons.library_music, color: AppColors.secondary, size: 24),
+              SizedBox(width: spacing.sm),
+              Text(
+                'Sample Audio Files',
+                style: theme.textTheme.titleLarge?.copyWith(
+                  color: AppColors.textPrimary,
+                  fontWeight: FontWeight.bold,
                 ),
               ),
             ],
           ),
           SizedBox(height: spacing.md),
-
-          // Empty state
-          if (_recentRecordings.isEmpty)
-            Container(
-              padding: EdgeInsets.all(spacing.xl),
-              child: Column(
-                children: [
-                  Icon(
-                    Icons.mic_none,
-                    size: 48,
-                    color: AppColors.textSecondary.withValues(alpha: 0.5),
-                  ),
-                  SizedBox(height: spacing.md),
-                  Text(
-                    'No recordings yet',
-                    style: theme.textTheme.bodyMedium?.copyWith(
-                      color: AppColors.textSecondary,
-                    ),
-                  ),
-                  SizedBox(height: spacing.sm),
-                  Text(
-                    'Start recording to build your voice analysis history',
-                    style: theme.textTheme.bodySmall?.copyWith(
-                      color: AppColors.textSecondary.withValues(alpha: 0.7),
-                    ),
-                    textAlign: TextAlign.center,
-                  ),
-                ],
-              ),
+          Text(
+            'Select from pre-recorded audio samples to test the analysis',
+            style: theme.textTheme.bodyMedium?.copyWith(
+              color: AppColors.textSecondary,
             ),
+          ),
+          SizedBox(height: spacing.lg),
+          ...(_sampleAudioFiles.map(
+            (sample) => _buildSampleTile(sample, theme, spacing),
+          )),
         ],
       ),
     );
   }
 
-  void _toggleRecording() async {
-    HapticFeedback.mediumImpact();
-
-    if (_isRecording) {
-      // Stop recording
-      setState(() {
-        _isRecording = false;
-        _hasRecording = true;
-      });
-      _recordingController.stop();
-      _waveController.stop();
-    } else {
-      // Start recording
-      setState(() {
-        _isRecording = true;
-        _hasRecording = false;
-        _recordingSeconds = 0;
-        _recordingDuration = '00:00';
-      });
-      _recordingController.repeat();
-      _waveController.repeat();
-      _startTimer();
-    }
-  }
-
-  void _startTimer() {
-    Future.doWhile(() async {
-      await Future.delayed(const Duration(seconds: 1));
-      if (_isRecording) {
-        setState(() {
-          _recordingSeconds++;
-          final minutes = _recordingSeconds ~/ 60;
-          final seconds = _recordingSeconds % 60;
-          _recordingDuration =
-              '${minutes.toString().padLeft(2, '0')}:${seconds.toString().padLeft(2, '0')}';
-          _recordingLevel =
-              0.3 + (Random().nextDouble() * 0.7); // Simulate voice level
-        });
-        return true;
-      }
-      return false;
-    });
-  }
-
-  void _playRecording() {
-    HapticFeedback.lightImpact();
-    // Implement play functionality
-  }
-
-  void _deleteRecording() {
-    HapticFeedback.lightImpact();
-    setState(() {
-      _hasRecording = false;
-      _recordingDuration = '00:00';
-      _analysisResult = null;
-    });
-  }
-
-  void _saveRecording() {
-    HapticFeedback.lightImpact();
-    // Implement save functionality
-  }
-
-  void _performAnalysis() async {
-    if (!_hasRecording) return;
-
-    setState(() {
-      _isAnalyzing = true;
-    });
-
-    // Simulate analysis
-    await Future.delayed(const Duration(seconds: 3));
-
-    setState(() {
-      _isAnalyzing = false;
-      _analysisResult = {
-        'emotion': 'Confident',
-        'stress': 0.23,
-        'clarity': 0.95,
-        'pace': 0.78,
-      };
-    });
-
-    _resultController.forward();
-    HapticFeedback.mediumImpact();
+  Widget _buildSampleTile(
+    AudioSample sample,
+    ThemeData theme,
+    CustomSpacing spacing,
+  ) {
+    return Container(
+      margin: EdgeInsets.only(bottom: spacing.md),
+      child: InkWell(
+        onTap: () => _useSampleAudio(sample.filePath),
+        borderRadius: BorderRadius.circular(12),
+        child: Container(
+          padding: EdgeInsets.all(spacing.md),
+          decoration: BoxDecoration(
+            color: AppColors.background,
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(color: AppColors.primary.withValues(alpha: 0.1)),
+          ),
+          child: Row(
+            children: [
+              Container(
+                width: 48,
+                height: 48,
+                decoration: BoxDecoration(
+                  color: sample.category.color.withValues(alpha: 0.1),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Icon(
+                  sample.category.icon,
+                  color: sample.category.color,
+                  size: 24,
+                ),
+              ),
+              SizedBox(width: spacing.md),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      sample.title,
+                      style: theme.textTheme.titleMedium?.copyWith(
+                        color: AppColors.textPrimary,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                    SizedBox(height: spacing.xs),
+                    Text(
+                      sample.description,
+                      style: theme.textTheme.bodySmall?.copyWith(
+                        color: AppColors.textSecondary,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.end,
+                children: [
+                  Text(
+                    sample.duration,
+                    style: theme.textTheme.labelMedium?.copyWith(
+                      color: AppColors.primary,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                  SizedBox(height: spacing.xs),
+                  Text(
+                    sample.category.name,
+                    style: theme.textTheme.labelSmall?.copyWith(
+                      color: AppColors.textSecondary,
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
   }
 }

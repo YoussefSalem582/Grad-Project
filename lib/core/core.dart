@@ -6,6 +6,8 @@ export 'config/app_config.dart';
 export 'constants/app_colors.dart';
 export 'constants/app_strings.dart';
 export 'constants/app_theme.dart';
+export 'constants/text_templates.dart';
+export 'constants/audio_samples.dart';
 export 'di/injection_container.dart';
 export 'errors/failures.dart';
 export 'network/network_info.dart';

@@ -12,3 +12,4 @@ export 'employee/employee_widgets.dart';
 export 'dialogs/dialogs.dart';
 export 'sections/sections.dart';
 export 'dashboard/dashboard.dart';
+export 'navigation/navigation.dart';

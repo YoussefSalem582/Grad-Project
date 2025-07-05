@@ -130,7 +130,7 @@ class _LoginScreenState extends State<LoginScreen>
                 child: Column(
                   children: [
                     SizedBox(height: isSmallScreen ? 30 : 40),
-                    // LogoWidget(animation: _logoAnimation),
+                    LogoWidget(animation: _logoAnimation),
                     SizedBox(height: isSmallScreen ? 20 : 30),
                     WelcomeTextWidget(
                       animation: _formAnimation,

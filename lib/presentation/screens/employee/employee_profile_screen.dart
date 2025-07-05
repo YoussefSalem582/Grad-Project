@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../../core/core.dart';
 import '../../widgets/auth/animated_background_widget.dart';
+import '../../widgets/profile/profile.dart';
 
 class EmployeeProfileScreen extends StatefulWidget {
   const EmployeeProfileScreen({super.key});
@@ -54,15 +55,48 @@ class _EmployeeProfileScreenState extends State<EmployeeProfileScreen>
             padding: const EdgeInsets.all(16),
             child: Column(
               children: [
-                _buildProfileHeader(),
-                const SizedBox(height: 24),
-                _buildPersonalInfo(),
-                const SizedBox(height: 24),
-                _buildWorkInfo(),
-                const SizedBox(height: 24),
-                _buildSettings(),
-                const SizedBox(height: 24),
-                _buildActions(),
+                ProfileHeaderWidget(
+                  name: 'Youssef Hassan',
+                  position: 'Customer Service Representative',
+                  status: 'Active',
+                  onEditPressed: () => _showEditProfileDialog(),
+                ),
+                const SizedBox(height: 20),
+                ProfilePersonalInfoWidget(
+                  name: 'Youssef Hassan',
+                  email: 'youssef.hassan@company.com',
+                  phone: '+20 1026855881',
+                  department: 'Customer Support',
+                  employeeId: '211000582',
+                ),
+                const SizedBox(height: 20),
+                ProfileWorkInfoWidget(
+                  startDate: 'January 15, 2025',
+                  location: 'Giza',
+                  manager: 'Dr Walaa',
+                  team: 'Customer Experience',
+                ),
+                const SizedBox(height: 20),
+                ProfileSettingsWidget(
+                  notificationsEnabled: _notificationsEnabled,
+                  emailAlerts: _emailAlerts,
+                  selectedLanguage: _selectedLanguage,
+                  onNotificationsChanged: (value) =>
+                      setState(() => _notificationsEnabled = value),
+                  onEmailAlertsChanged: (value) =>
+                      setState(() => _emailAlerts = value),
+                  onLanguageChanged: (value) =>
+                      setState(() => _selectedLanguage = value!),
+                ),
+                const SizedBox(height: 20),
+                ProfileQuickActionsWidget(
+                  onEditProfile: () => _showEditProfileDialog(),
+                  onChangePassword: () => _showChangePasswordDialog(),
+                  onTimeOffRequest: () => _showTimeOffRequest(),
+                  onHelpSupport: () => _showHelpSupport(),
+                  onSignOut: () => _showSignOutDialog(),
+                ),
+                const SizedBox(height: 20),
               ],
             ),
           ),
@@ -71,472 +105,121 @@ class _EmployeeProfileScreenState extends State<EmployeeProfileScreen>
     );
   }
 
-  Widget _buildProfileHeader() {
-    return Card(
-      elevation: 8,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-      child: Container(
-        padding: const EdgeInsets.all(24),
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(20),
-          gradient: LinearGradient(
-            colors: [
-              Colors.white.withValues(alpha: 0.95),
-              Colors.white.withValues(alpha: 0.9),
-            ],
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
+  void _showEditProfileDialog() {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Edit Profile'),
+        content: const Text(
+          'Profile editing functionality will be implemented here.',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Cancel'),
           ),
-          border: Border.all(
-            color: Colors.white.withValues(alpha: 0.3),
-            width: 1,
-          ),
-        ),
-        child: Column(
-          children: [
-            Stack(
-              children: [
-                CircleAvatar(
-                  radius: 50,
-                  backgroundColor: AppColors.primary.withValues(alpha: 0.1),
-                  child: Container(
-                    width: 100,
-                    height: 100,
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      gradient: LinearGradient(
-                        colors: [
-                          AppColors.primary.withValues(alpha: 0.8),
-                          AppColors.secondary.withValues(alpha: 0.8),
-                        ],
-                      ),
-                    ),
-                    child: Icon(Icons.person, size: 50, color: Colors.white),
-                  ),
-                ),
-                Positioned(
-                  bottom: 0,
-                  right: 0,
-                  child: Container(
-                    padding: const EdgeInsets.all(4),
-                    decoration: BoxDecoration(
-                      color: AppColors.secondary,
-                      shape: BoxShape.circle,
-                    ),
-                    child: const Icon(
-                      Icons.edit,
-                      size: 16,
-                      color: Colors.white,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 16),
-            Text(
-              'John Smith',
-              style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                fontWeight: FontWeight.bold,
-                color: AppColors.textPrimary,
-              ),
-            ),
-            const SizedBox(height: 4),
-            Text(
-              'Customer Service Representative',
-              style: Theme.of(
-                context,
-              ).textTheme.bodyMedium?.copyWith(color: AppColors.textSecondary),
-            ),
-            const SizedBox(height: 8),
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  colors: [
-                    AppColors.success.withValues(alpha: 0.2),
-                    AppColors.success.withValues(alpha: 0.1),
-                  ],
-                ),
-                borderRadius: BorderRadius.circular(25),
-                border: Border.all(
-                  color: AppColors.success.withValues(alpha: 0.4),
-                  width: 1,
-                ),
-              ),
-              child: Text(
-                'Active',
-                style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                  color: AppColors.success,
-                  fontWeight: FontWeight.w500,
-                ),
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildPersonalInfo() {
-    return Card(
-      elevation: 6,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-      child: Container(
-        padding: const EdgeInsets.all(20),
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(16),
-          color: Colors.white.withValues(alpha: 0.9),
-          border: Border.all(
-            color: Colors.white.withValues(alpha: 0.3),
-            width: 1,
-          ),
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              children: [
-                Icon(Icons.person_outline, color: AppColors.primary),
-                const SizedBox(width: 8),
-                Text(
-                  'Personal Information',
-                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                    fontWeight: FontWeight.w600,
-                    color: AppColors.textPrimary,
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 16),
-            _buildInfoRow('Email', 'john.smith@company.com'),
-            _buildInfoRow('Phone', '+1 (555) 123-4567'),
-            _buildInfoRow('Department', 'Customer Support'),
-            _buildInfoRow('Employee ID', 'EMP-001'),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildWorkInfo() {
-    return Card(
-      elevation: 6,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-      child: Container(
-        padding: const EdgeInsets.all(20),
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(16),
-          color: Colors.white.withValues(alpha: 0.9),
-          border: Border.all(
-            color: Colors.white.withValues(alpha: 0.3),
-            width: 1,
-          ),
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              children: [
-                Icon(Icons.work_outline, color: AppColors.primary),
-                const SizedBox(width: 8),
-                Text(
-                  'Work Information',
-                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                    fontWeight: FontWeight.w600,
-                    color: AppColors.textPrimary,
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 16),
-            _buildInfoRow('Start Date', 'January 15, 2023'),
-            _buildInfoRow('Location', 'New York Office'),
-            _buildInfoRow('Manager', 'Sarah Johnson'),
-            _buildInfoRow('Team', 'Customer Experience'),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildSettings() {
-    return Card(
-      elevation: 6,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-      child: Container(
-        padding: const EdgeInsets.all(20),
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(16),
-          color: Colors.white.withValues(alpha: 0.9),
-          border: Border.all(
-            color: Colors.white.withValues(alpha: 0.3),
-            width: 1,
-          ),
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              children: [
-                Icon(Icons.settings_outlined, color: AppColors.primary),
-                const SizedBox(width: 8),
-                Text(
-                  'Settings',
-                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                    fontWeight: FontWeight.w600,
-                    color: AppColors.textPrimary,
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 16),
-            _buildSettingRow(
-              'Notifications',
-              _notificationsEnabled,
-              (value) => setState(() => _notificationsEnabled = value),
-            ),
-            _buildSettingRow(
-              'Email Alerts',
-              _emailAlerts,
-              (value) => setState(() => _emailAlerts = value),
-            ),
-            const SizedBox(height: 16),
-            _buildDropdownSetting(
-              'Language',
-              _selectedLanguage,
-              ['English', 'Spanish', 'French', 'German'],
-              (value) => setState(() => _selectedLanguage = value!),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildActions() {
-    return Card(
-      elevation: 6,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-      child: Container(
-        padding: const EdgeInsets.all(20),
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(16),
-          color: Colors.white.withValues(alpha: 0.9),
-          border: Border.all(
-            color: Colors.white.withValues(alpha: 0.3),
-            width: 1,
-          ),
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              children: [
-                Icon(
-                  Icons.admin_panel_settings_outlined,
-                  color: AppColors.primary,
-                ),
-                const SizedBox(width: 8),
-                Text(
-                  'Actions',
-                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                    fontWeight: FontWeight.w600,
-                    color: AppColors.textPrimary,
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 16),
-            _buildActionButton('Change Password', Icons.lock_outline, () {}),
-            const SizedBox(height: 8),
-            _buildActionButton(
-              'Download Performance Report',
-              Icons.download_outlined,
-              () {},
-            ),
-            const SizedBox(height: 8),
-            _buildActionButton(
-              'Request Time Off',
-              Icons.calendar_month_outlined,
-              () {},
-            ),
-            const SizedBox(height: 16),
-            SizedBox(
-              width: double.infinity,
-              child: Container(
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    colors: [
-                      AppColors.error,
-                      AppColors.error.withValues(alpha: 0.8),
-                    ],
-                  ),
-                  borderRadius: BorderRadius.circular(12),
-                  boxShadow: [
-                    BoxShadow(
-                      color: AppColors.error.withValues(alpha: 0.3),
-                      blurRadius: 8,
-                      offset: const Offset(0, 4),
-                    ),
-                  ],
-                ),
-                child: ElevatedButton(
-                  onPressed: () {},
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.transparent,
-                    foregroundColor: Colors.white,
-                    elevation: 0,
-                    padding: const EdgeInsets.symmetric(vertical: 16),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                  ),
-                  child: const Text(
-                    'Sign Out',
-                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
-                  ),
-                ),
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildInfoRow(String label, String value) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8),
-      child: Row(
-        children: [
-          Expanded(
-            flex: 2,
-            child: Text(
-              label,
-              style: Theme.of(
-                context,
-              ).textTheme.bodyMedium?.copyWith(color: AppColors.textSecondary),
-            ),
-          ),
-          Expanded(
-            flex: 3,
-            child: Text(
-              value,
-              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                color: AppColors.textPrimary,
-                fontWeight: FontWeight.w500,
-              ),
-            ),
+          ElevatedButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Save'),
           ),
         ],
       ),
     );
   }
 
-  Widget _buildSettingRow(String title, bool value, Function(bool) onChanged) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 4),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Text(
-            title,
-            style: Theme.of(
-              context,
-            ).textTheme.bodyMedium?.copyWith(color: AppColors.textPrimary),
+  void _showChangePasswordDialog() {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Change Password'),
+        content: const Text(
+          'Password change functionality will be implemented here.',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Cancel'),
           ),
-          Switch(
-            value: value,
-            onChanged: onChanged,
-            activeColor: AppColors.primary,
-            activeTrackColor: AppColors.primary.withValues(alpha: 0.3),
-            inactiveThumbColor: Colors.grey[400],
-            inactiveTrackColor: Colors.grey[300],
+          ElevatedButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Change'),
           ),
         ],
       ),
     );
   }
 
-  Widget _buildDropdownSetting(
-    String title,
-    String value,
-    List<String> options,
-    Function(String?) onChanged,
-  ) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        Text(
-          title,
-          style: Theme.of(
-            context,
-          ).textTheme.bodyMedium?.copyWith(color: AppColors.textPrimary),
+  void _showTimeOffRequest() {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Request Time Off'),
+        content: const Text(
+          'Time off request functionality will be implemented here.',
         ),
-        Container(
-          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-          decoration: BoxDecoration(
-            color: AppColors.primary.withValues(alpha: 0.1),
-            borderRadius: BorderRadius.circular(8),
-            border: Border.all(color: AppColors.primary.withValues(alpha: 0.3)),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Cancel'),
           ),
-          child: DropdownButton<String>(
-            value: value,
-            onChanged: onChanged,
-            underline: const SizedBox(),
-            icon: Icon(Icons.arrow_drop_down, color: AppColors.primary),
-            items: options.map((String option) {
-              return DropdownMenuItem<String>(
-                value: option,
-                child: Text(
-                  option,
-                  style: TextStyle(color: AppColors.textPrimary),
-                ),
-              );
-            }).toList(),
+          ElevatedButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Submit'),
           ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 
-  Widget _buildActionButton(String title, IconData icon, VoidCallback onTap) {
-    return InkWell(
-      onTap: onTap,
-      borderRadius: BorderRadius.circular(12),
-      child: Container(
-        padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 12),
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(12),
-          gradient: LinearGradient(
-            colors: [
-              AppColors.primary.withValues(alpha: 0.1),
-              AppColors.secondary.withValues(alpha: 0.1),
-            ],
-          ),
-          border: Border.all(
-            color: AppColors.primary.withValues(alpha: 0.3),
-            width: 1,
-          ),
-        ),
-        child: Row(
+  void _showHelpSupport() {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Help & Support'),
+        content: const Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Icon(icon, color: AppColors.primary, size: 20),
-            const SizedBox(width: 12),
-            Text(
-              title,
-              style: Theme.of(
-                context,
-              ).textTheme.bodyMedium?.copyWith(color: AppColors.textPrimary),
-            ),
-            const Spacer(),
-            Icon(
-              Icons.arrow_forward_ios,
-              size: 16,
-              color: AppColors.textSecondary,
-            ),
+            Text('Need help? Contact us:'),
+            SizedBox(height: 8),
+            Text('Email: support@graphsmile.com'),
+            Text('Phone: +1 (555) 123-4567'),
+            Text('Hours: 9 AM - 6 PM EST'),
           ],
         ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Close'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _showSignOutDialog() {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Sign Out'),
+        content: const Text('Are you sure you want to sign out?'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Cancel'),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              Navigator.pop(context);
+              Navigator.pushReplacementNamed(context, '/');
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: AppColors.error,
+              foregroundColor: Colors.white,
+            ),
+            child: const Text('Sign Out'),
+          ),
+        ],
       ),
     );
   }

@@ -2,12 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../core/core.dart';
-import '../../widgets/widgets.dart';
 import '../../cubit/employee_dashboard/employee_dashboard_cubit.dart';
-import '../../cubit/employee_performance/employee_performance_cubit.dart';
+import '../../widgets/navigation/employee_bottom_nav_bar.dart';
 import 'employee_dashboard_screen.dart';
 import 'employee_customer_interactions_screen.dart';
-import 'employee_performance_screen.dart';
 import 'employee_profile_screen.dart';
 import 'employee_analysis_tools_screen.dart';
 
@@ -36,13 +34,9 @@ class _EmployeeNavigationScreenState extends State<EmployeeNavigationScreen>
       create: (context) => EmployeeDashboardCubit(),
       child: const EmployeeDashboardScreen(),
     ),
-    const EmployeeCustomerInteractionsScreen(),
-    BlocProvider(
-      create: (context) => EmployeePerformanceCubit(),
-      child: const EmployeePerformanceScreen(),
-    ),
-    const EmployeeProfileScreen(),
     const EmployeeAnalysisToolsScreen(),
+    const EmployeeCustomerInteractionsScreen(),
+    const EmployeeProfileScreen(),
     const EnhancedTextAnalysisScreen(),
     const EnhancedVoiceAnalysisScreen(),
     const EnhancedVideoAnalysisScreen(),
@@ -107,7 +101,12 @@ class _EmployeeNavigationScreenState extends State<EmployeeNavigationScreen>
         body: Stack(
           children: [IndexedStack(index: _selectedIndex, children: _screens)],
         ),
-        bottomNavigationBar: _buildModernNavBar(),
+        bottomNavigationBar: EmployeeBottomNavBar(
+          selectedIndex: _selectedIndex,
+          onItemTapped: (index) {
+            setState(() => _selectedIndex = index);
+          },
+        ),
       ),
     );
   }
@@ -197,13 +196,6 @@ class _EmployeeNavigationScreenState extends State<EmployeeNavigationScreen>
                 child: Row(
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
-                    // Enhanced Employee Badge with Avatar
-                    Flexible(
-                      flex: 0,
-                      child: _buildAdvancedEmployeeBadge(customSpacing),
-                    ),
-                    SizedBox(width: customSpacing.sm),
-
                     // Dynamic Screen Title with Subtitle
                     Expanded(child: _buildDynamicTitle(theme, customSpacing)),
 
@@ -283,95 +275,6 @@ class _EmployeeNavigationScreenState extends State<EmployeeNavigationScreen>
     );
   }
 
-  Widget _buildAdvancedEmployeeBadge(CustomSpacing customSpacing) {
-    return ConstrainedBox(
-      constraints: const BoxConstraints(maxWidth: 125, maxHeight: 40),
-      child: GlassCard(
-        padding: EdgeInsets.symmetric(
-          horizontal: customSpacing.xs,
-          vertical: customSpacing.xs,
-        ),
-        borderRadius: 20,
-        opacity: 0.2,
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            // Animated Avatar
-            Stack(
-              children: [
-                Container(
-                  width: 28,
-                  height: 28,
-                  decoration: BoxDecoration(
-                    gradient: const LinearGradient(
-                      colors: [Color(0xFF48CAE4), Color(0xFF667EEA)],
-                    ),
-                    shape: BoxShape.circle,
-                    border: Border.all(color: Colors.white, width: 1.5),
-                  ),
-                  child: const Icon(
-                    Icons.person,
-                    color: Colors.white,
-                    size: 16,
-                  ),
-                ),
-                Positioned(
-                  bottom: 0,
-                  right: 0,
-                  child: AnimatedBuilder(
-                    animation: _pulseAnimation,
-                    builder: (context, child) {
-                      return Transform.scale(
-                        scale: _pulseAnimation.value,
-                        child: Container(
-                          width: 8,
-                          height: 8,
-                          decoration: BoxDecoration(
-                            color: AppColors.success,
-                            shape: BoxShape.circle,
-                            border: Border.all(color: Colors.white, width: 1),
-                          ),
-                        ),
-                      );
-                    },
-                  ),
-                ),
-              ],
-            ),
-            SizedBox(width: customSpacing.xs),
-            Flexible(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Text(
-                    'EMPLOYEE',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 9,
-                      fontWeight: FontWeight.w800,
-                      letterSpacing: 1.0,
-                    ),
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                  Text(
-                    'Youssef Hassan',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 11,
-                      fontWeight: FontWeight.w600,
-                    ),
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                ],
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
   Widget _buildDynamicTitle(ThemeData theme, CustomSpacing customSpacing) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -412,7 +315,7 @@ class _EmployeeNavigationScreenState extends State<EmployeeNavigationScreen>
       mainAxisSize: MainAxisSize.min,
       children: [
         // Quick Access Button
-        if (_selectedIndex >= 5)
+        if (_selectedIndex >= 4)
           _buildActionButton(
             Icons.home_outlined,
             'Home',
@@ -470,28 +373,35 @@ class _EmployeeNavigationScreenState extends State<EmployeeNavigationScreen>
   }
 
   Widget _buildNotificationButton(CustomSpacing customSpacing) {
+    const int unreadCount = 3; // This would come from your state management
+
     return Container(
       margin: EdgeInsets.only(right: customSpacing.xs),
       child: Material(
         color: Colors.transparent,
         child: InkWell(
-          borderRadius: BorderRadius.circular(16),
+          borderRadius: BorderRadius.circular(18),
           onTap: _showNotifications,
           child: Container(
             width: 36,
             height: 36,
             decoration: BoxDecoration(
-              color: Colors.white.withValues(alpha: 0.3),
+              color: Colors.white.withValues(alpha: 0.25),
               borderRadius: BorderRadius.circular(18),
               border: Border.all(
-                color: Colors.white.withValues(alpha: 0.5),
+                color: Colors.white.withValues(alpha: 0.4),
                 width: 1.5,
               ),
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withValues(alpha: 0.1),
+                  color: Colors.black.withValues(alpha: 0.15),
+                  blurRadius: 8,
+                  offset: const Offset(0, 3),
+                ),
+                BoxShadow(
+                  color: Colors.white.withValues(alpha: 0.2),
                   blurRadius: 4,
-                  offset: const Offset(0, 2),
+                  offset: const Offset(0, -1),
                 ),
               ],
             ),
@@ -499,31 +409,58 @@ class _EmployeeNavigationScreenState extends State<EmployeeNavigationScreen>
               children: [
                 Center(
                   child: Icon(
-                    Icons.notifications_outlined,
+                    unreadCount > 0
+                        ? Icons.notifications_active
+                        : Icons.notifications_outlined,
                     size: 18,
                     color: Colors.white,
                   ),
                 ),
-                Positioned(
-                  top: 6,
-                  right: 6,
-                  child: AnimatedBuilder(
-                    animation: _pulseAnimation,
-                    builder: (context, child) {
-                      return Transform.scale(
-                        scale: _pulseAnimation.value,
-                        child: Container(
-                          width: 6,
-                          height: 6,
-                          decoration: const BoxDecoration(
-                            color: AppColors.error,
-                            shape: BoxShape.circle,
+                if (unreadCount > 0)
+                  Positioned(
+                    top: 4,
+                    right: 4,
+                    child: AnimatedBuilder(
+                      animation: _pulseAnimation,
+                      builder: (context, child) {
+                        return Transform.scale(
+                          scale: 0.8 + (0.3 * _pulseAnimation.value),
+                          child: Container(
+                            constraints: const BoxConstraints(
+                              minWidth: 16,
+                              minHeight: 16,
+                            ),
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 2,
+                              vertical: 2,
+                            ),
+                            decoration: BoxDecoration(
+                              color: AppColors.error,
+                              borderRadius: BorderRadius.circular(10),
+                              border: Border.all(color: Colors.white, width: 1),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: AppColors.error.withValues(alpha: 0.4),
+                                  blurRadius: 4,
+                                  offset: const Offset(0, 1),
+                                ),
+                              ],
+                            ),
+                            child: Text(
+                              unreadCount > 99 ? '99+' : unreadCount.toString(),
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontSize: 10,
+                                fontWeight: FontWeight.bold,
+                                height: 1.0,
+                              ),
+                              textAlign: TextAlign.center,
+                            ),
                           ),
-                        ),
-                      );
-                    },
+                        );
+                      },
+                    ),
                   ),
-                ),
               ],
             ),
           ),
@@ -654,18 +591,16 @@ class _EmployeeNavigationScreenState extends State<EmployeeNavigationScreen>
       case 0:
         return 'My Dashboard';
       case 1:
-        return 'Customer Interactions';
+        return 'Analysis Tools';
       case 2:
-        return 'My Performance';
+        return 'Customer Interactions';
       case 3:
         return 'My Profile';
       case 4:
-        return 'Analysis Tools';
-      case 5:
         return 'Text Analysis';
-      case 6:
+      case 5:
         return 'Voice Analysis';
-      case 7:
+      case 6:
         return 'Video Analysis';
       default:
         return 'Employee Portal';
@@ -677,18 +612,16 @@ class _EmployeeNavigationScreenState extends State<EmployeeNavigationScreen>
       case 0:
         return 'Overview & insights • Real-time analytics';
       case 1:
-        return 'Manage customer tickets • Support dashboard';
+        return 'AI-powered insights & analytics';
       case 2:
-        return 'Track your achievements • 92% performance score';
+        return 'Manage customer tickets • Support dashboard';
       case 3:
         return 'Account settings & preferences';
       case 4:
-        return 'AI-powered insights & analytics';
-      case 5:
         return 'Text & message analysis tools';
-      case 6:
+      case 5:
         return 'Voice call analysis & insights';
-      case 7:
+      case 6:
         return 'Customer video analysis & feedback';
       default:
         return 'Professional customer service platform';
@@ -696,48 +629,123 @@ class _EmployeeNavigationScreenState extends State<EmployeeNavigationScreen>
   }
 
   void _showNotifications() {
-    // Show notifications dialog
+    // Show enhanced notifications dialog with better UX
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
         title: Row(
           children: [
-            Icon(Icons.notifications_active, color: AppColors.primary),
-            SizedBox(width: 8),
-            Text('Notifications'),
+            Container(
+              padding: const EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                color: AppColors.primary.withValues(alpha: 0.1),
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: Icon(Icons.notifications_active, color: AppColors.primary),
+            ),
+            const SizedBox(width: 12),
+            const Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Notifications',
+                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
+                  ),
+                  Text(
+                    '3 new updates',
+                    style: TextStyle(fontSize: 12, color: Colors.grey),
+                  ),
+                ],
+              ),
+            ),
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+              decoration: BoxDecoration(
+                color: AppColors.error,
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: const Text(
+                '3',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 12,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
           ],
         ),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            _buildNotificationItem(
-              'New customer message',
-              '2 minutes ago',
-              Icons.message,
-              AppColors.primary,
-            ),
-            _buildNotificationItem(
-              'Analysis complete',
-              '5 minutes ago',
-              Icons.check_circle,
-              AppColors.success,
-            ),
-            _buildNotificationItem(
-              'Task deadline approaching',
-              '10 minutes ago',
-              Icons.schedule,
-              AppColors.warning,
-            ),
-          ],
+        content: SizedBox(
+          width: double.maxFinite,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              _buildNotificationItem(
+                'New customer message received',
+                'Customer #1245 needs urgent assistance',
+                '2 minutes ago',
+                Icons.message_outlined,
+                AppColors.primary,
+                isUnread: true,
+              ),
+              const Divider(height: 1),
+              _buildNotificationItem(
+                'Analysis complete',
+                'Video analysis for customer session completed',
+                '5 minutes ago',
+                Icons.check_circle_outline,
+                AppColors.success,
+                isUnread: true,
+              ),
+              const Divider(height: 1),
+              _buildNotificationItem(
+                'Task deadline approaching',
+                'Customer follow-up due in 2 hours',
+                '10 minutes ago',
+                Icons.schedule_outlined,
+                AppColors.warning,
+                isUnread: true,
+              ),
+              const Divider(height: 1),
+              _buildNotificationItem(
+                'Weekly summary',
+                'Your weekly activity summary is ready',
+                '1 hour ago',
+                Icons.assessment_outlined,
+                AppColors.info,
+                isUnread: false,
+              ),
+            ],
+          ),
         ),
         actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: Text('Mark All as Read'),
+          TextButton.icon(
+            onPressed: () {
+              // Mark all as read logic
+              Navigator.pop(context);
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(
+                  content: Text('All notifications marked as read'),
+                  duration: Duration(seconds: 2),
+                ),
+              );
+            },
+            icon: const Icon(Icons.done_all),
+            label: const Text('Mark All Read'),
           ),
-          ElevatedButton(
+          ElevatedButton.icon(
             onPressed: () => Navigator.pop(context),
-            child: Text('Close'),
+            icon: const Icon(Icons.close),
+            label: const Text('Close'),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: AppColors.primary,
+              foregroundColor: Colors.white,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(8),
+              ),
+            ),
           ),
         ],
       ),
@@ -773,8 +781,8 @@ class _EmployeeNavigationScreenState extends State<EmployeeNavigationScreen>
               'Managing customer interactions',
             ),
             _buildHelpItem(
-              'Performance Tracking',
-              'Monitor your performance metrics',
+              'Settings & Profile',
+              'Manage your account and preferences',
             ),
             SizedBox(height: 16),
             Text(
@@ -804,33 +812,71 @@ class _EmployeeNavigationScreenState extends State<EmployeeNavigationScreen>
 
   Widget _buildNotificationItem(
     String title,
+    String description,
     String time,
     IconData icon,
-    Color color,
-  ) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8),
+    Color color, {
+    bool isUnread = false,
+  }) {
+    return Container(
+      padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 4),
       child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Container(
-            padding: EdgeInsets.all(8),
+            padding: const EdgeInsets.all(10),
             decoration: BoxDecoration(
               color: color.withValues(alpha: 0.1),
-              borderRadius: BorderRadius.circular(8),
+              borderRadius: BorderRadius.circular(10),
+              border: Border.all(color: color.withValues(alpha: 0.2), width: 1),
             ),
-            child: Icon(icon, color: color, size: 16),
+            child: Icon(icon, color: color, size: 18),
           ),
-          SizedBox(width: 12),
+          const SizedBox(width: 12),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(title, style: TextStyle(fontWeight: FontWeight.w500)),
+                Row(
+                  children: [
+                    Expanded(
+                      child: Text(
+                        title,
+                        style: TextStyle(
+                          fontWeight: isUnread
+                              ? FontWeight.w600
+                              : FontWeight.w500,
+                          fontSize: 14,
+                        ),
+                      ),
+                    ),
+                    if (isUnread)
+                      Container(
+                        width: 8,
+                        height: 8,
+                        decoration: const BoxDecoration(
+                          color: AppColors.error,
+                          shape: BoxShape.circle,
+                        ),
+                      ),
+                  ],
+                ),
+                const SizedBox(height: 2),
                 Text(
-                  time,
+                  description,
                   style: TextStyle(
                     color: AppColors.textSecondary,
                     fontSize: 12,
+                    height: 1.3,
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  time,
+                  style: TextStyle(
+                    color: AppColors.textSecondary.withValues(alpha: 0.7),
+                    fontSize: 11,
+                    fontWeight: FontWeight.w400,
                   ),
                 ),
               ],
@@ -857,197 +903,5 @@ class _EmployeeNavigationScreenState extends State<EmployeeNavigationScreen>
 
   void _logout() {
     Navigator.pushReplacementNamed(context, '/');
-  }
-
-  Widget _buildModernNavBar() {
-    // Only show navigation for main tabs (0-4)
-    final currentIndex = _selectedIndex > 4 ? 0 : _selectedIndex;
-
-    return Container(
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [
-            const Color(0xFF667EEA).withValues(alpha: 0.25),
-            const Color(0xFF764BA2).withValues(alpha: 0.2),
-            const Color(0xFF48CAE4).withValues(alpha: 0.15),
-          ],
-        ),
-        border: Border(
-          top: BorderSide(
-            color: Colors.white.withValues(alpha: 0.3),
-            width: 0.5,
-          ),
-        ),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.1),
-            blurRadius: 25,
-            offset: const Offset(0, -10),
-          ),
-          BoxShadow(
-            color: const Color(0xFF667EEA).withValues(alpha: 0.2),
-            blurRadius: 8,
-            offset: const Offset(0, -2),
-          ),
-        ],
-      ),
-      child: SafeArea(
-        child: Container(
-          height: 70,
-          padding: const EdgeInsets.symmetric(horizontal: 2, vertical: 8),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: [
-              Expanded(
-                flex: 1,
-                child: _buildEnhancedNavItem(
-                  Icons.home_outlined,
-                  Icons.home,
-                  'Home',
-                  0,
-                  currentIndex == 0,
-                ),
-              ),
-              Expanded(
-                flex: 1,
-                child: _buildEnhancedNavItem(
-                  Icons.support_outlined,
-                  Icons.support,
-                  'Support',
-                  1,
-                  currentIndex == 1,
-                ),
-              ),
-              Expanded(
-                flex: 1,
-                child: _buildEnhancedNavItem(
-                  Icons.trending_up_outlined,
-                  Icons.trending_up,
-                  'Stats',
-                  2,
-                  currentIndex == 2,
-                ),
-              ),
-              Expanded(
-                flex: 1,
-                child: _buildEnhancedNavItem(
-                  Icons.analytics_outlined,
-                  Icons.analytics,
-                  'Tools',
-                  3,
-                  currentIndex == 3,
-                ),
-              ),
-              Expanded(
-                flex: 1,
-                child: _buildEnhancedNavItem(
-                  Icons.person_outline,
-                  Icons.person,
-                  'Profile',
-                  4,
-                  currentIndex == 4,
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildEnhancedNavItem(
-    IconData outlinedIcon,
-    IconData filledIcon,
-    String label,
-    int index,
-    bool isSelected,
-  ) {
-    return GestureDetector(
-      onTap: () {
-        setState(() => _selectedIndex = index);
-        // Add haptic feedback for better UX
-        HapticFeedback.lightImpact();
-      },
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 200),
-        curve: Curves.easeInOut,
-        padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 6),
-        margin: const EdgeInsets.symmetric(horizontal: 1),
-        decoration: BoxDecoration(
-          gradient: isSelected
-              ? LinearGradient(
-                  colors: [
-                    Colors.white.withValues(alpha: 0.4),
-                    const Color(0xFF667EEA).withValues(alpha: 0.2),
-                    Colors.white.withValues(alpha: 0.3),
-                  ],
-                )
-              : null,
-          borderRadius: BorderRadius.circular(16),
-          border: isSelected
-              ? Border.all(color: Colors.white.withValues(alpha: 0.5), width: 1)
-              : null,
-          boxShadow: isSelected
-              ? [
-                  BoxShadow(
-                    color: const Color(0xFF667EEA).withValues(alpha: 0.3),
-                    blurRadius: 10,
-                    offset: const Offset(0, 2),
-                  ),
-                  BoxShadow(
-                    color: AppColors.primary.withValues(alpha: 0.2),
-                    blurRadius: 6,
-                    offset: const Offset(0, 1),
-                  ),
-                ]
-              : null,
-        ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            // Icon with smooth transition
-            AnimatedSwitcher(
-              duration: const Duration(milliseconds: 200),
-              transitionBuilder: (child, animation) {
-                return ScaleTransition(scale: animation, child: child);
-              },
-              child: Icon(
-                isSelected ? filledIcon : outlinedIcon,
-                key: ValueKey('$index-$isSelected'),
-                color: Colors.white,
-                size: isSelected ? 22 : 20,
-              ),
-            ),
-            const SizedBox(height: 2),
-            // Label with overflow protection and responsive font size
-            Flexible(
-              child: Container(
-                constraints: const BoxConstraints(minHeight: 12),
-                child: AnimatedDefaultTextStyle(
-                  duration: const Duration(milliseconds: 200),
-                  style: TextStyle(
-                    fontSize: 9,
-                    fontWeight: isSelected ? FontWeight.w700 : FontWeight.w600,
-                    color: Colors.white,
-                    letterSpacing: isSelected ? 0.2 : 0.0,
-                    height: 1.0,
-                  ),
-                  child: Text(
-                    label,
-                    overflow: TextOverflow.clip,
-                    maxLines: 1,
-                    textAlign: TextAlign.center,
-                    softWrap: false,
-                  ),
-                ),
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
   }
 }

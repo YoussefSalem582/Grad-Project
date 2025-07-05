@@ -1,802 +1,709 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
-import '../../providers/providers.dart';
-import '../../widgets/widgets.dart';
+import 'package:flutter/services.dart';
 import '../../../core/core.dart';
-import '../../../data/models/emotion_result.dart';
-import 'batch_processing_screen.dart';
-import '../core/model_info_screen.dart';
+import '../../widgets/analysis/analysis.dart';
+import '../../widgets/auth/animated_background_widget.dart';
 
 class EmotionAnalyzerScreen extends StatefulWidget {
   const EmotionAnalyzerScreen({super.key});
 
   @override
-  _EmotionAnalyzerScreenState createState() => _EmotionAnalyzerScreenState();
+  State<EmotionAnalyzerScreen> createState() => _EmotionAnalyzerScreenState();
 }
 
 class _EmotionAnalyzerScreenState extends State<EmotionAnalyzerScreen>
     with TickerProviderStateMixin {
   final TextEditingController _textController = TextEditingController();
-  late AnimationController _pulseController;
+  String _selectedEmotionModel = 'Advanced Neural Network';
+  bool _isAnalyzing = false;
+  Map<String, dynamic>? _analysisResult;
+
+  late AnimationController _backgroundController;
   late AnimationController _fadeController;
-  late Animation<double> _pulseAnimation;
+  late Animation<double> _backgroundAnimation;
   late Animation<double> _fadeAnimation;
 
-  // NEW: Tab controller for enhanced features
-  late TabController _tabController;
-  bool _showEnhancedFeatures = false;
+  final List<AnalysisHistoryItem> _analysisHistory = [];
+
+  final List<String> _emotionModels = [
+    'Advanced Neural Network',
+    'Basic Emotion Detection',
+    'Contextual Analysis',
+    'Multi-Modal Detection',
+    'Real-time Processing',
+  ];
+
+  final List<AnalysisHeaderStat> _quickStats = [
+    AnalysisHeaderStat(value: '156', label: 'Analyses', icon: Icons.psychology),
+    AnalysisHeaderStat(value: '94%', label: 'Accuracy', icon: Icons.grade),
+    AnalysisHeaderStat(value: '0.8s', label: 'Speed', icon: Icons.speed),
+  ];
+
+  final List<String> _quickTemplates = [
+    "I'm feeling overwhelmed with work lately.",
+    "Thank you so much for your excellent service!",
+    "I'm disappointed with the product quality.",
+    "This meeting was incredibly productive and energizing.",
+    "I'm concerned about the recent changes in policy.",
+    "Your team exceeded all my expectations today.",
+    "I feel anxious about the upcoming presentation.",
+    "The customer support was absolutely fantastic!",
+  ];
 
   @override
   void initState() {
     super.initState();
     _initializeAnimations();
-    _tabController = TabController(length: 4, vsync: this);
-    _tabController.addListener(() {
-      setState(() {
-        // Tab index changed
-      });
-    });
+    _loadSampleHistory();
   }
 
   void _initializeAnimations() {
-    _pulseController = AnimationController(
-      duration: const Duration(seconds: 2),
+    _backgroundController = AnimationController(
+      duration: const Duration(seconds: 8),
       vsync: this,
-    )..repeat(reverse: true);
+    );
 
     _fadeController = AnimationController(
-      duration: const Duration(milliseconds: 800),
+      duration: const Duration(milliseconds: 1200),
       vsync: this,
     );
 
-    _pulseAnimation = Tween<double>(begin: 0.8, end: 1.0).animate(
-      CurvedAnimation(parent: _pulseController, curve: Curves.easeInOut),
+    _backgroundAnimation = CurvedAnimation(
+      parent: _backgroundController,
+      curve: Curves.linear,
     );
 
-    _fadeAnimation = Tween<double>(
-      begin: 0.0,
-      end: 1.0,
-    ).animate(CurvedAnimation(parent: _fadeController, curve: Curves.easeOut));
+    _fadeAnimation = CurvedAnimation(
+      parent: _fadeController,
+      curve: Curves.easeOutCubic,
+    );
+
+    _fadeController.forward();
+    _backgroundController.repeat();
+  }
+
+  void _loadSampleHistory() {
+    _analysisHistory.addAll([
+      AnalysisHistoryItem(
+        id: '1',
+        title: 'Customer Feedback Analysis',
+        type: 'Advanced Neural Network',
+        timestamp: DateTime.now().subtract(const Duration(hours: 1)),
+        confidence: 0.89,
+        result: {'emotion': 'Joy', 'confidence': 0.89},
+      ),
+      AnalysisHistoryItem(
+        id: '2',
+        title: 'Support Ticket Emotion',
+        type: 'Contextual Analysis',
+        timestamp: DateTime.now().subtract(const Duration(hours: 4)),
+        confidence: 0.76,
+        result: {'emotion': 'Frustration', 'confidence': 0.76},
+      ),
+      AnalysisHistoryItem(
+        id: '3',
+        title: 'Product Review Sentiment',
+        type: 'Multi-Modal Detection',
+        timestamp: DateTime.now().subtract(const Duration(days: 1)),
+        confidence: 0.92,
+        result: {'emotion': 'Satisfaction', 'confidence': 0.92},
+      ),
+    ]);
   }
 
   @override
   void dispose() {
-    _pulseController.dispose();
+    _backgroundController.dispose();
     _fadeController.dispose();
-    _tabController.dispose();
     _textController.dispose();
     super.dispose();
   }
 
-  void _showSnackBar(String message, {required bool isError}) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Row(
+  Future<void> _analyzeEmotion() async {
+    final text = _textController.text.trim();
+    if (text.isEmpty) return;
+
+    HapticFeedback.mediumImpact();
+    setState(() => _isAnalyzing = true);
+
+    // Simulate emotion analysis
+    await Future.delayed(const Duration(milliseconds: 1500));
+
+    final result = {
+      'text': text,
+      'primary_emotion': _generatePrimaryEmotion(text),
+      'confidence': 0.87 + (0.13 * (text.length / 100).clamp(0, 1)),
+      'emotions': _generateEmotionBreakdown(text),
+      'sentiment_score': _generateSentimentScore(text),
+      'emotional_intensity': _generateIntensity(text),
+      'emotional_categories': {
+        'Positive': _calculatePositive(text),
+        'Negative': _calculateNegative(text),
+        'Neutral': _calculateNeutral(text),
+      },
+      'insights': _generateInsights(text),
+      'recommendations': _generateRecommendations(text),
+      'detailed_analysis': {
+        'word_count': text.split(' ').length,
+        'character_count': text.length,
+        'emotional_keywords': _extractEmotionalKeywords(text),
+        'tone': _analyzeTone(text),
+      },
+    };
+
+    setState(() {
+      _analysisResult = result;
+      _isAnalyzing = false;
+    });
+
+    // Add to history
+    final historyItem = AnalysisHistoryItem(
+      id: DateTime.now().millisecondsSinceEpoch.toString(),
+      title: 'Text: ${text.length > 30 ? text.substring(0, 30) + '...' : text}',
+      type: _selectedEmotionModel,
+      timestamp: DateTime.now(),
+      confidence: (result['confidence'] as double?) ?? 0.0,
+      result: result,
+    );
+
+    setState(() {
+      _analysisHistory.insert(0, historyItem);
+    });
+
+    HapticFeedback.lightImpact();
+  }
+
+  String _generatePrimaryEmotion(String text) {
+    final lowerText = text.toLowerCase();
+    if (lowerText.contains(
+      RegExp(r'happy|joy|excited|amazing|fantastic|excellent|love|wonderful'),
+    )) {
+      return 'Joy';
+    } else if (lowerText.contains(
+      RegExp(r'sad|disappointed|upset|terrible|awful|hate|horrible'),
+    )) {
+      return 'Sadness';
+    } else if (lowerText.contains(
+      RegExp(r'angry|furious|mad|annoyed|frustrated|irritated'),
+    )) {
+      return 'Anger';
+    } else if (lowerText.contains(
+      RegExp(r'scared|afraid|worried|anxious|nervous|concerned'),
+    )) {
+      return 'Fear';
+    } else if (lowerText.contains(
+      RegExp(r'surprised|shocked|amazed|astonished'),
+    )) {
+      return 'Surprise';
+    } else if (lowerText.contains(RegExp(r'disgusted|revolted|repulsed'))) {
+      return 'Disgust';
+    } else {
+      return 'Neutral';
+    }
+  }
+
+  Map<String, double> _generateEmotionBreakdown(String text) {
+    final primary = _generatePrimaryEmotion(text);
+    final emotions = <String, double>{};
+
+    switch (primary) {
+      case 'Joy':
+        emotions['Joy'] = 0.85;
+        emotions['Surprise'] = 0.15;
+        emotions['Neutral'] = 0.05;
+        break;
+      case 'Sadness':
+        emotions['Sadness'] = 0.80;
+        emotions['Fear'] = 0.20;
+        emotions['Neutral'] = 0.10;
+        break;
+      case 'Anger':
+        emotions['Anger'] = 0.85;
+        emotions['Disgust'] = 0.25;
+        emotions['Sadness'] = 0.15;
+        break;
+      case 'Fear':
+        emotions['Fear'] = 0.80;
+        emotions['Sadness'] = 0.30;
+        emotions['Surprise'] = 0.20;
+        break;
+      default:
+        emotions['Neutral'] = 0.75;
+        emotions['Joy'] = 0.15;
+        emotions['Sadness'] = 0.10;
+    }
+
+    return emotions;
+  }
+
+  double _generateSentimentScore(String text) {
+    final lowerText = text.toLowerCase();
+    double score = 0.0;
+
+    if (lowerText.contains(
+      RegExp(r'good|great|excellent|amazing|fantastic|wonderful|love|perfect'),
+    )) {
+      score += 0.3;
+    }
+    if (lowerText.contains(
+      RegExp(r'bad|terrible|awful|horrible|hate|worst|disgusting'),
+    )) {
+      score -= 0.3;
+    }
+    if (lowerText.contains(RegExp(r'thank|thanks|appreciate|grateful'))) {
+      score += 0.2;
+    }
+    if (lowerText.contains(RegExp(r'sorry|apologize|regret|unfortunately'))) {
+      score -= 0.1;
+    }
+
+    return (score + 0.5).clamp(0.0, 1.0);
+  }
+
+  double _generateIntensity(String text) {
+    final exclamationMarks = text.split('!').length - 1;
+    final capsWords = RegExp(r'\b[A-Z]{2,}\b').allMatches(text).length;
+    final emotionalWords = RegExp(
+      r'very|extremely|absolutely|completely|totally|incredibly|amazingly',
+    ).allMatches(text.toLowerCase()).length;
+
+    return ((exclamationMarks * 0.1) +
+            (capsWords * 0.15) +
+            (emotionalWords * 0.2))
+        .clamp(0.0, 1.0);
+  }
+
+  double _calculatePositive(String text) {
+    return _generateSentimentScore(text);
+  }
+
+  double _calculateNegative(String text) {
+    return 1.0 - _generateSentimentScore(text);
+  }
+
+  double _calculateNeutral(String text) {
+    final sentiment = _generateSentimentScore(text);
+    return 1.0 - (sentiment - 0.5).abs() * 2;
+  }
+
+  List<String> _generateInsights(String text) {
+    final insights = <String>[];
+    final primary = _generatePrimaryEmotion(text);
+
+    insights.add('Primary emotion detected: $primary');
+
+    if (text.length > 100) {
+      insights.add('Detailed text provides rich emotional context');
+    }
+
+    if (text.contains('!')) {
+      insights.add('Exclamation marks indicate heightened emotional state');
+    }
+
+    if (RegExp(r'\b[A-Z]{2,}\b').hasMatch(text)) {
+      insights.add('Capital letters suggest emphasis or strong feelings');
+    }
+
+    return insights;
+  }
+
+  List<String> _generateRecommendations(String text) {
+    final recommendations = <String>[];
+    final primary = _generatePrimaryEmotion(text);
+
+    switch (primary) {
+      case 'Joy':
+        recommendations.add('Maintain positive engagement');
+        recommendations.add('Consider amplifying this positive feedback');
+        break;
+      case 'Sadness':
+        recommendations.add('Provide empathetic response');
+        recommendations.add('Offer support and assistance');
+        break;
+      case 'Anger':
+        recommendations.add('Address concerns promptly');
+        recommendations.add('Use de-escalation techniques');
+        break;
+      case 'Fear':
+        recommendations.add('Provide reassurance and clarity');
+        recommendations.add('Address underlying concerns');
+        break;
+      default:
+        recommendations.add('Monitor for emotional changes');
+        recommendations.add('Engage with balanced approach');
+    }
+
+    return recommendations;
+  }
+
+  List<String> _extractEmotionalKeywords(String text) {
+    final keywords = <String>[];
+    final lowerText = text.toLowerCase();
+    final emotionalWords = [
+      'happy',
+      'sad',
+      'angry',
+      'excited',
+      'disappointed',
+      'frustrated',
+      'amazing',
+      'terrible',
+      'wonderful',
+      'awful',
+      'fantastic',
+      'horrible',
+      'love',
+      'hate',
+      'like',
+      'dislike',
+      'enjoy',
+      'despise',
+    ];
+
+    for (final word in emotionalWords) {
+      if (lowerText.contains(word)) {
+        keywords.add(word);
+      }
+    }
+
+    return keywords.take(5).toList();
+  }
+
+  String _analyzeTone(String text) {
+    final lowerText = text.toLowerCase();
+
+    if (lowerText.contains(
+      RegExp(r'please|thank|appreciate|kindly|would you'),
+    )) {
+      return 'Polite';
+    } else if (lowerText.contains(
+      RegExp(r'amazing|fantastic|excellent|wonderful'),
+    )) {
+      return 'Enthusiastic';
+    } else if (lowerText.contains(
+      RegExp(r'unfortunately|sorry|regret|apologize'),
+    )) {
+      return 'Apologetic';
+    } else if (lowerText.contains(RegExp(r'immediately|urgent|asap|now'))) {
+      return 'Urgent';
+    } else {
+      return 'Neutral';
+    }
+  }
+
+  void _useTemplate(String template) {
+    _textController.text = template;
+  }
+
+  Widget _buildTextInputField(ThemeData theme, CustomSpacing spacing) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        // Analysis Model Selector
+        Row(
           children: [
-            Icon(
-              isError ? Icons.error_outline : Icons.check_circle_outline,
-              color: Colors.white,
+            Icon(Icons.tune, color: AppColors.primary, size: 16),
+            SizedBox(width: spacing.sm),
+            Text(
+              'Analysis Model',
+              style: theme.textTheme.titleSmall?.copyWith(
+                color: AppColors.textPrimary,
+                fontWeight: FontWeight.w600,
+              ),
             ),
-            const SizedBox(width: 8),
-            Expanded(child: Text(message)),
           ],
         ),
-        backgroundColor: isError ? AppColors.error : AppColors.success,
-        behavior: SnackBarBehavior.floating,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-        margin: const EdgeInsets.all(16),
-      ),
-    );
-  }
-
-  void _onAnalyzePressed() {
-    final provider = context.read<EmotionProvider>();
-    provider.analyzeEmotion(_textController.text).then((_) {
-      if (provider.state == EmotionState.success) {
-        _fadeController.forward();
-        _showSnackBar(AppStrings.successMessage, isError: false);
-      } else if (provider.error != null) {
-        _showSnackBar(provider.error!, isError: true);
-      }
-    });
-  }
-
-  // NEW: Handle demo example selection
-  void _onDemoExampleSelected(String text) {
-    _textController.text = text;
-    if (_showEnhancedFeatures) {
-      setState(() {
-        _showEnhancedFeatures = false;
-        _tabController.animateTo(0);
-      });
-    }
-    _onAnalyzePressed();
-  }
-
-  // NEW: Show batch processing dialog
-  void _showBatchProcessingDialog() {
-    final textControllers = List.generate(
-      5,
-      (index) => TextEditingController(),
-    );
-
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Batch Analysis'),
-        content: SizedBox(
-          width: double.maxFinite,
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              const Text('Enter up to 5 texts for batch analysis:'),
-              const SizedBox(height: 16),
-              ...textControllers.asMap().entries.map((entry) {
-                return Padding(
-                  padding: const EdgeInsets.only(bottom: 8),
-                  child: TextField(
-                    controller: entry.value,
-                    decoration: InputDecoration(
-                      labelText: 'Text ${entry.key + 1}',
-                      border: const OutlineInputBorder(),
+        SizedBox(height: spacing.sm),
+        Container(
+          padding: EdgeInsets.symmetric(horizontal: spacing.md),
+          decoration: BoxDecoration(
+            color: AppColors.background,
+            borderRadius: BorderRadius.circular(8),
+            border: Border.all(color: AppColors.primary.withValues(alpha: 0.2)),
+          ),
+          child: DropdownButtonHideUnderline(
+            child: DropdownButton<String>(
+              value: _selectedEmotionModel,
+              isExpanded: true,
+              icon: Icon(
+                Icons.arrow_drop_down,
+                color: AppColors.primary,
+                size: 16,
+              ),
+              onChanged: (value) {
+                setState(() {
+                  _selectedEmotionModel = value!;
+                });
+              },
+              items: _emotionModels.map((model) {
+                return DropdownMenuItem(
+                  value: model,
+                  child: Text(
+                    model,
+                    style: TextStyle(
+                      color: AppColors.textPrimary,
+                      fontSize: 14,
                     ),
-                    maxLines: 2,
                   ),
                 );
               }).toList(),
-            ],
+            ),
           ),
         ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Cancel'),
-          ),
-          ElevatedButton(
-            onPressed: () {
-              final texts = textControllers
-                  .map((controller) => controller.text.trim())
-                  .where((text) => text.isNotEmpty)
-                  .toList();
+        SizedBox(height: spacing.md),
 
-              if (texts.isNotEmpty) {
-                context.read<EmotionProvider>().analyzeBatchEmotions(texts);
-                Navigator.pop(context);
-                _showSnackBar('Batch analysis started!', isError: false);
-              }
-            },
-            child: const Text('Analyze'),
+        // Text Input Field
+        Container(
+          decoration: BoxDecoration(
+            color: AppColors.background,
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(color: AppColors.primary.withValues(alpha: 0.2)),
           ),
-        ],
-      ),
+          child: TextField(
+            controller: _textController,
+            decoration: InputDecoration(
+              hintText: 'Enter text to analyze emotions...',
+              hintStyle: TextStyle(color: AppColors.textSecondary),
+              border: InputBorder.none,
+              contentPadding: EdgeInsets.all(spacing.md),
+            ),
+            style: TextStyle(color: AppColors.textPrimary),
+            maxLines: 4,
+            minLines: 3,
+          ),
+        ),
+      ],
     );
   }
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final customSpacing = theme.extension<CustomSpacing>()!;
+
     return Scaffold(
-      body: Container(
-        decoration: const BoxDecoration(gradient: AppColors.primaryGradient),
-        child: SafeArea(
-          child: Column(
-            children: [
-              _buildEnhancedAppBar(),
-              if (_showEnhancedFeatures) _buildTabBar(),
-              _buildMainContent(),
-            ],
-          ),
-        ),
-      ),
-      floatingActionButton: _buildFloatingActionMenu(),
-      floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
-    );
-  }
-
-  Widget _buildEnhancedAppBar() {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
-      child: Row(
+      backgroundColor: AppColors.background,
+      body: Stack(
         children: [
-          Container(
-            padding: const EdgeInsets.all(12),
-            decoration: BoxDecoration(
-              color: Colors.white.withValues(alpha: 0.2),
-              borderRadius: BorderRadius.circular(16),
-            ),
-            child: const Icon(Icons.psychology, color: Colors.white, size: 28),
-          ),
-          const SizedBox(width: 16),
-          const Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  AppStrings.appTitle,
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 24,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                Text(
-                  'Enhanced v3.0 • AI + Analytics',
-                  style: TextStyle(color: Colors.white70, fontSize: 14),
-                ),
-              ],
-            ),
-          ),
-          // NEW: Enhanced features toggle
-          IconButton(
-            onPressed: () {
-              setState(() {
-                _showEnhancedFeatures = !_showEnhancedFeatures;
-                if (!_showEnhancedFeatures) {
-                  _tabController.animateTo(0);
-                }
-              });
-            },
-            icon: Icon(
-              _showEnhancedFeatures ? Icons.close : Icons.dashboard,
-              color: Colors.white,
-              size: 24,
-            ),
-            tooltip: _showEnhancedFeatures
-                ? 'Close Dashboard'
-                : 'Open Dashboard',
-          ),
-          // NEW: Menu button
-          PopupMenuButton<String>(
-            onSelected: (value) {
-              final provider = context.read<EmotionProvider>();
-              switch (value) {
-                case 'batch':
-                  _showBatchProcessingDialog();
-                  break;
-                case 'refresh':
-                  provider.refreshAllData();
-                  _showSnackBar('Refreshing all data...', isError: false);
-                  break;
-                case 'metrics_toggle':
-                  provider.toggleAutoRefreshMetrics();
-                  _showSnackBar(
-                    provider.autoRefreshMetrics
-                        ? 'Auto-refresh enabled'
-                        : 'Auto-refresh disabled',
-                    isError: false,
-                  );
-                  break;
-                case 'clear_cache':
-                  provider.clearCache();
-                  _showSnackBar('Cache cleared!', isError: false);
-                  break;
-              }
-            },
-            icon: const Icon(Icons.more_vert, color: Colors.white),
-            itemBuilder: (context) => [
-              const PopupMenuItem(
-                value: 'batch',
-                child: Row(
-                  children: [
-                    Icon(Icons.batch_prediction),
-                    SizedBox(width: 8),
-                    Text('Batch Analysis'),
-                  ],
-                ),
-              ),
-              const PopupMenuItem(
-                value: 'refresh',
-                child: Row(
-                  children: [
-                    Icon(Icons.refresh),
-                    SizedBox(width: 8),
-                    Text('Refresh All Data'),
-                  ],
-                ),
-              ),
-              PopupMenuItem(
-                value: 'metrics_toggle',
-                child: Consumer<EmotionProvider>(
-                  builder: (context, provider, child) {
-                    return Row(
-                      children: [
-                        Icon(
-                          provider.autoRefreshMetrics
-                              ? Icons.pause
-                              : Icons.play_arrow,
-                        ),
-                        const SizedBox(width: 8),
-                        Text(
-                          provider.autoRefreshMetrics
-                              ? 'Pause Auto-refresh'
-                              : 'Start Auto-refresh',
-                        ),
+          // Animated Background
+          AnimatedBackgroundWidget(animation: _backgroundAnimation),
+
+          // Main Content
+          FadeTransition(
+            opacity: _fadeAnimation,
+            child: SafeArea(
+              child: CustomScrollView(
+                slivers: [
+                  // Header
+                  SliverToBoxAdapter(
+                    child: AnalysisHeaderWidget(
+                      title: 'Emotion Analyzer',
+                      description: 'Advanced AI emotion detection and analysis',
+                      icon: Icons.psychology,
+                      gradientColors: const [
+                        Color(0xFFf093fb),
+                        Color(0xFFf5576c),
                       ],
-                    );
-                  },
-                ),
-              ),
-              const PopupMenuItem(
-                value: 'clear_cache',
-                child: Row(
-                  children: [
-                    Icon(Icons.clear_all),
-                    SizedBox(width: 8),
-                    Text('Clear Cache'),
-                  ],
-                ),
-              ),
-            ],
-          ),
-          Consumer<EmotionProvider>(
-            builder: (context, provider, child) {
-              return AnimatedBuilder(
-                animation: _pulseAnimation,
-                builder: (context, child) {
-                  return Transform.scale(
-                    scale: provider.isConnected ? _pulseAnimation.value : 1.0,
-                    child: Container(
-                      padding: const EdgeInsets.all(8),
-                      decoration: BoxDecoration(
-                        color: provider.isConnected
-                            ? AppColors.success
-                            : AppColors.error,
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      child: Icon(
-                        provider.isConnected ? Icons.wifi : Icons.wifi_off,
-                        color: Colors.white,
-                        size: 20,
-                      ),
+                      stats: _quickStats,
                     ),
-                  );
-                },
-              );
-            },
-          ),
-        ],
-      ),
-    );
-  }
-
-  // NEW: Tab bar for enhanced features
-  Widget _buildTabBar() {
-    return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 24),
-      decoration: BoxDecoration(
-        color: Colors.white.withValues(alpha: 0.2),
-        borderRadius: BorderRadius.circular(25),
-      ),
-      child: TabBar(
-        controller: _tabController,
-        indicator: BoxDecoration(
-          color: Colors.white.withValues(alpha: 0.3),
-          borderRadius: BorderRadius.circular(25),
-        ),
-        labelColor: Colors.white,
-        unselectedLabelColor: Colors.white70,
-        tabs: const [
-          Tab(icon: Icon(Icons.analytics), text: 'Analyzer'),
-          Tab(icon: Icon(Icons.monitor), text: 'Metrics'),
-          Tab(icon: Icon(Icons.insights), text: 'Analytics'),
-          Tab(icon: Icon(Icons.lightbulb), text: 'Examples'),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildMainContent() {
-    return Expanded(
-      child: Container(
-        margin: const EdgeInsets.only(top: 16),
-        decoration: const BoxDecoration(
-          color: AppColors.background,
-          borderRadius: BorderRadius.only(
-            topLeft: Radius.circular(40),
-            topRight: Radius.circular(40),
-          ),
-        ),
-        child: ClipRRect(
-          borderRadius: const BorderRadius.only(
-            topLeft: Radius.circular(40),
-            topRight: Radius.circular(40),
-          ),
-          child: _showEnhancedFeatures
-              ? _buildTabContent()
-              : _buildAnalyzerContent(),
-        ),
-      ),
-    );
-  }
-
-  // NEW: Tab content based on selected tab
-  Widget _buildTabContent() {
-    return TabBarView(
-      controller: _tabController,
-      children: [
-        _buildAnalyzerContent(),
-        _buildMetricsContent(),
-        _buildAnalyticsContent(),
-        _buildExamplesContent(),
-      ],
-    );
-  }
-
-  Widget _buildAnalyzerContent() {
-    return SingleChildScrollView(
-      physics: const BouncingScrollPhysics(),
-      child: Padding(
-        padding: const EdgeInsets.fromLTRB(24, 32, 24, 32),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            const ConnectionStatusCard(),
-            const SizedBox(height: 24),
-            EmotionInputField(controller: _textController),
-            const SizedBox(height: 24),
-            AnalyzeButton(onPressed: _onAnalyzePressed),
-            const SizedBox(height: 32),
-            Consumer<EmotionProvider>(
-              builder: (context, provider, child) {
-                if (provider.hasResult) {
-                  return FadeTransition(
-                    opacity: _fadeAnimation,
-                    child: const ResultsCard(),
-                  );
-                } else {
-                  return const InstructionsCard();
-                }
-              },
-            ),
-            // NEW: Show batch results if available
-            Consumer<EmotionProvider>(
-              builder: (context, provider, child) {
-                if (provider.batchResults.isNotEmpty) {
-                  return Column(
-                    children: [
-                      const SizedBox(height: 24),
-                      _buildBatchResultsCard(provider.batchResults),
-                    ],
-                  );
-                }
-                return const SizedBox.shrink();
-              },
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  // NEW: System metrics content
-  Widget _buildMetricsContent() {
-    return SingleChildScrollView(
-      physics: const BouncingScrollPhysics(),
-      child: Padding(
-        padding: const EdgeInsets.fromLTRB(24, 32, 24, 32),
-        child: Consumer<EmotionProvider>(
-          builder: (context, provider, child) {
-            return SystemMetricsCard(
-              metrics: provider.systemMetrics,
-              onRefresh: () => provider.loadSystemMetrics(),
-              isAutoRefresh: provider.autoRefreshMetrics,
-              onToggleAutoRefresh: () => provider.toggleAutoRefreshMetrics(),
-            );
-          },
-        ),
-      ),
-    );
-  }
-
-  // NEW: Analytics content
-  Widget _buildAnalyticsContent() {
-    return SingleChildScrollView(
-      physics: const BouncingScrollPhysics(),
-      child: Padding(
-        padding: const EdgeInsets.fromLTRB(24, 32, 24, 32),
-        child: Consumer<EmotionProvider>(
-          builder: (context, provider, child) {
-            return AnalyticsCard(
-              analytics: provider.analyticsSummary,
-              onRefresh: () => provider.loadAnalytics(),
-            );
-          },
-        ),
-      ),
-    );
-  }
-
-  // NEW: Demo examples content
-  Widget _buildExamplesContent() {
-    return SingleChildScrollView(
-      physics: const BouncingScrollPhysics(),
-      child: Padding(
-        padding: const EdgeInsets.fromLTRB(24, 32, 24, 32),
-        child: Consumer<EmotionProvider>(
-          builder: (context, provider, child) {
-            return DemoExamplesCard(
-              demoResult: provider.demoResult,
-              onRefresh: () => provider.loadDemoData(),
-              onAnalyzeExample: _onDemoExampleSelected,
-            );
-          },
-        ),
-      ),
-    );
-  }
-
-  // NEW: Batch results card
-  Widget _buildBatchResultsCard(List<dynamic> results) {
-    return Card(
-      elevation: 8,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-      child: Container(
-        padding: const EdgeInsets.all(20),
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(20),
-          gradient: LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            colors: [
-              Colors.green.withValues(alpha: 0.1),
-              Colors.blue.withValues(alpha: 0.1),
-            ],
-          ),
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              children: [
-                const Icon(
-                  Icons.batch_prediction,
-                  color: Colors.green,
-                  size: 28,
-                ),
-                const SizedBox(width: 12),
-                const Text(
-                  'Batch Analysis Results',
-                  style: TextStyle(
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
-                    color: AppColors.textPrimary,
                   ),
-                ),
-                const Spacer(),
-                IconButton(
-                  onPressed: () =>
-                      context.read<EmotionProvider>().clearBatchResults(),
-                  icon: const Icon(Icons.clear, color: AppColors.textSecondary),
-                  tooltip: 'Clear results',
-                ),
-              ],
-            ),
-            const SizedBox(height: 16),
-            Text(
-              '${results.length} texts analyzed successfully',
-              style: const TextStyle(
-                color: AppColors.textSecondary,
-                fontSize: 14,
-              ),
-            ),
-            const SizedBox(height: 12),
-            ...results.asMap().entries.map((entry) {
-              final result = entry.value;
-              return Container(
-                margin: const EdgeInsets.only(bottom: 8),
-                padding: const EdgeInsets.all(12),
-                decoration: BoxDecoration(
-                  color: AppColors.surface.withValues(alpha: 0.3),
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: Row(
-                  children: [
-                    Text(
-                      '${entry.key + 1}.',
-                      style: const TextStyle(
-                        fontWeight: FontWeight.bold,
-                        color: AppColors.textSecondary,
+
+                  // Text Input Section
+                  SliverToBoxAdapter(
+                    child: Padding(
+                      padding: EdgeInsets.all(customSpacing.md),
+                      child: AnalysisInputWidget(
+                        inputType: 'Text Analysis',
+                        inputWidget: _buildTextInputField(theme, customSpacing),
+                        onAnalyze: _analyzeEmotion,
+                        isAnalyzing: _isAnalyzing,
+                        analyzeButtonText: 'Analyze Emotion',
+                        quickActions: _quickTemplates.take(4).toList(),
+                        onQuickAction: _useTemplate,
                       ),
                     ),
-                    const SizedBox(width: 8),
-                    Expanded(
-                      child: Text(
-                        result.emotion,
-                        style: TextStyle(
-                          color: result.emotion == 'joy'
-                              ? Colors.amber[700]
-                              : AppColors.primary,
-                          fontWeight: FontWeight.w600,
+                  ),
+
+                  // Quick Templates
+                  SliverToBoxAdapter(
+                    child: Padding(
+                      padding: EdgeInsets.all(customSpacing.md),
+                      child: _buildQuickTemplatesSection(theme, customSpacing),
+                    ),
+                  ),
+
+                  // Analysis Result
+                  if (_analysisResult != null)
+                    SliverToBoxAdapter(
+                      child: Padding(
+                        padding: EdgeInsets.symmetric(
+                          horizontal: customSpacing.md,
+                        ),
+                        child: AnalysisResultWidget(
+                          result: _analysisResult!,
+                          isLoading: false,
+                          analysisType: 'emotion',
                         ),
                       ),
                     ),
-                    Text(
-                      '${(result.confidence * 100).toStringAsFixed(1)}%',
-                      style: const TextStyle(
-                        color: AppColors.success,
-                        fontWeight: FontWeight.bold,
+
+                  // Quick Actions
+                  SliverToBoxAdapter(
+                    child: Padding(
+                      padding: EdgeInsets.all(customSpacing.md),
+                      child: AnalysisQuickActionsWidget(
+                        actions: [
+                          AnalysisQuickAction(
+                            title: 'Batch Analysis',
+                            description: 'Process multiple texts',
+                            icon: Icons.batch_prediction,
+                            color: AppColors.primary,
+                            onTap: () => _showBatchAnalysis(),
+                          ),
+                          AnalysisQuickAction(
+                            title: 'Model Info',
+                            description: 'View model details',
+                            icon: Icons.model_training,
+                            color: AppColors.secondary,
+                            onTap: () => _showModelInfo(),
+                          ),
+                          AnalysisQuickAction(
+                            title: 'Emotion Trends',
+                            description: 'View trends analytics',
+                            icon: Icons.analytics,
+                            color: AppColors.success,
+                            onTap: () => _showEmotionTrends(),
+                          ),
+                          AnalysisQuickAction(
+                            title: 'Settings',
+                            description: 'Configure analysis',
+                            icon: Icons.settings,
+                            color: AppColors.warning,
+                            onTap: () => _showSettings(),
+                          ),
+                        ],
                       ),
                     ),
-                  ],
+                  ),
+
+                  // Analysis History
+                  SliverToBoxAdapter(
+                    child: Padding(
+                      padding: EdgeInsets.all(customSpacing.md),
+                      child: AnalysisHistoryWidget(
+                        historyItems: _analysisHistory,
+                        onItemTap: (item) => _showHistoryDetails(item),
+                      ),
+                    ),
+                  ),
+
+                  // Bottom spacing
+                  SliverToBoxAdapter(child: SizedBox(height: customSpacing.xl)),
+                ],
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildQuickTemplatesSection(ThemeData theme, CustomSpacing spacing) {
+    return Container(
+      padding: EdgeInsets.all(spacing.lg),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(20),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.1),
+            blurRadius: 20,
+            offset: const Offset(0, 10),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Icon(Icons.text_snippet, color: AppColors.primary, size: 20),
+              SizedBox(width: spacing.sm),
+              Text(
+                'Quick Templates',
+                style: theme.textTheme.titleMedium?.copyWith(
+                  color: AppColors.textPrimary,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ],
+          ),
+          SizedBox(height: spacing.md),
+          Wrap(
+            spacing: spacing.sm,
+            runSpacing: spacing.sm,
+            children: _quickTemplates.map((template) {
+              return GestureDetector(
+                onTap: () => _useTemplate(template),
+                child: Container(
+                  padding: EdgeInsets.symmetric(
+                    horizontal: spacing.md,
+                    vertical: spacing.sm,
+                  ),
+                  decoration: BoxDecoration(
+                    color: AppColors.background,
+                    borderRadius: BorderRadius.circular(20),
+                    border: Border.all(
+                      color: AppColors.primary.withValues(alpha: 0.2),
+                    ),
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Flexible(
+                        child: Text(
+                          template.length > 40
+                              ? template.substring(0, 40) + '...'
+                              : template,
+                          style: theme.textTheme.bodySmall?.copyWith(
+                            color: AppColors.textPrimary,
+                          ),
+                        ),
+                      ),
+                      SizedBox(width: spacing.xs),
+                      Icon(
+                        Icons.add_circle_outline,
+                        color: AppColors.primary,
+                        size: 16,
+                      ),
+                    ],
+                  ),
                 ),
               );
             }).toList(),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildFloatingActionMenu() {
-    return FloatingActionButton(
-      onPressed: _showQuickActionsDialog,
-      backgroundColor: AppColors.accent,
-      foregroundColor: Colors.white,
-      child: const Icon(Icons.more_vert),
-    );
-  }
-
-  void _showQuickActionsDialog() {
-    showModalBottomSheet(
-      context: context,
-      backgroundColor: Colors.transparent,
-      builder: (context) => Container(
-        padding: const EdgeInsets.all(24),
-        decoration: const BoxDecoration(
-          color: AppColors.surface,
-          borderRadius: BorderRadius.only(
-            topLeft: Radius.circular(24),
-            topRight: Radius.circular(24),
-          ),
-        ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Container(
-              width: 40,
-              height: 4,
-              decoration: BoxDecoration(
-                color: AppColors.textSecondary.withValues(alpha: 0.3),
-                borderRadius: BorderRadius.circular(2),
-              ),
-            ),
-            const SizedBox(height: 24),
-            Text(
-              'Quick Actions',
-              style: TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-                color: AppColors.textPrimary,
-              ),
-            ),
-            const SizedBox(height: 24),
-            _buildQuickActionTile(
-              'Batch Processing',
-              'Analyze multiple texts at once',
-              Icons.batch_prediction,
-              AppColors.primary,
-              () {
-                Navigator.pop(context);
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => const BatchProcessingScreen(),
-                  ),
-                );
-              },
-            ),
-            _buildQuickActionTile(
-              'Model Information',
-              'Learn about AI capabilities',
-              Icons.psychology,
-              AppColors.success,
-              () {
-                Navigator.pop(context);
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => const ModelInfoScreen(),
-                  ),
-                );
-              },
-            ),
-            _buildQuickActionTile(
-              'Send Feedback',
-              'Help us improve the app',
-              Icons.feedback,
-              AppColors.warning,
-              () {
-                Navigator.pop(context);
-                _showFeedbackDialog();
-              },
-            ),
-            const SizedBox(height: 24),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildQuickActionTile(
-    String title,
-    String subtitle,
-    IconData icon,
-    Color color,
-    VoidCallback onTap,
-  ) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 16),
-      child: Material(
-        color: Colors.transparent,
-        child: InkWell(
-          borderRadius: BorderRadius.circular(16),
-          onTap: onTap,
-          child: Container(
-            padding: const EdgeInsets.all(16),
-            decoration: BoxDecoration(
-              border: Border.all(color: color.withValues(alpha: 0.3)),
-              borderRadius: BorderRadius.circular(16),
-            ),
-            child: Row(
-              children: [
-                Container(
-                  padding: const EdgeInsets.all(12),
-                  decoration: BoxDecoration(
-                    color: color.withValues(alpha: 0.2),
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: Icon(icon, color: color, size: 24),
-                ),
-                const SizedBox(width: 16),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        title,
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w600,
-                          color: AppColors.textPrimary,
-                        ),
-                      ),
-                      Text(
-                        subtitle,
-                        style: TextStyle(
-                          fontSize: 14,
-                          color: AppColors.textSecondary,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                Icon(
-                  Icons.arrow_forward_ios,
-                  color: AppColors.textSecondary,
-                  size: 16,
-                ),
-              ],
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-
-  void _showFeedbackDialog() {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Send Feedback'),
-        content: const Text(
-          'Feedback functionality coming soon! Thank you for your interest in improving the app.',
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Close'),
           ),
         ],
       ),
     );
+  }
+
+  void _showBatchAnalysis() {
+    // Navigate to batch analysis screen
+  }
+
+  void _showModelInfo() {
+    // Show model information dialog
+  }
+
+  void _showEmotionTrends() {
+    // Show emotion trends analytics
+  }
+
+  void _showSettings() {
+    // Show settings dialog
+  }
+
+  void _showHistoryDetails(AnalysisHistoryItem item) {
+    // Show detailed history item
   }
 }

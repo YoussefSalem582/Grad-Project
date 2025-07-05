@@ -192,7 +192,7 @@ class _SignUpScreenState extends State<SignUpScreen>
                       child: Column(
                         children: [
                           SizedBox(height: isSmallScreen ? 10 : 20),
-                          // LogoWidget(animation: _formAnimation),
+                          LogoWidget(animation: _formAnimation),
                           SizedBox(height: isSmallScreen ? 15 : 20),
                           WelcomeTextWidget(
                             title: 'Create Account',

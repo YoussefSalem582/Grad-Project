@@ -45,7 +45,7 @@ class RecentActivityListWidget extends StatelessWidget {
               Text(
                 'Recent Activity',
                 style: theme.textTheme.titleLarge?.copyWith(
-                  color: AppColors.textPrimary,
+                  color: Colors.white,
                   fontWeight: FontWeight.w700,
                 ),
               ),

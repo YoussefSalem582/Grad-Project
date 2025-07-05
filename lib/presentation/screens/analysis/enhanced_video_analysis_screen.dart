@@ -1,10 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../core/core.dart';
-import '../../../data/models/video_analysis_response.dart';
-import '../../cubit/video_analysis/video_analysis_cubit.dart';
-import '../../widgets/widgets.dart';
+import '../../widgets/analysis/analysis.dart';
+import '../../widgets/auth/animated_background_widget.dart';
 
 class EnhancedVideoAnalysisScreen extends StatefulWidget {
   const EnhancedVideoAnalysisScreen({super.key});
@@ -20,11 +18,82 @@ class _EnhancedVideoAnalysisScreenState
   final TextEditingController _urlController = TextEditingController();
   final FocusNode _urlFocusNode = FocusNode();
   bool _isValidUrl = false;
+  bool _isAnalyzing = false;
+  Map<String, dynamic>? _analysisResult;
+  String _selectedAnalysisType = 'Full Analysis';
+  bool _isResultExpanded = false;
 
+  late AnimationController _backgroundController;
   late AnimationController _fadeController;
-  late AnimationController _cardController;
+  late Animation<double> _backgroundAnimation;
   late Animation<double> _fadeAnimation;
-  late Animation<double> _cardAnimation;
+
+  final List<AnalysisHistoryItem> _analysisHistory = [];
+
+  final List<String> _analysisTypes = [
+    'Full Analysis',
+    'Facial Expression',
+    'Body Language',
+    'Engagement Level',
+    'Presentation Quality',
+  ];
+
+  final List<AnalysisHeaderStat> _quickStats = [
+    AnalysisHeaderStat(value: '24', label: 'Videos', icon: Icons.video_library),
+    AnalysisHeaderStat(value: '8.7', label: 'Avg Score', icon: Icons.grade),
+    AnalysisHeaderStat(value: '12s', label: 'Processing', icon: Icons.speed),
+  ];
+
+  final List<VideoSample> _sampleVideos = [
+    VideoSample(
+      id: '1',
+      title: 'Customer Service Training',
+      description: 'Professional customer interaction training session',
+      url: 'https://example.com/customer-service-training.mp4',
+      duration: '3:45',
+      category: VideoCategory.training,
+    ),
+    VideoSample(
+      id: '2',
+      title: 'Product Presentation Demo',
+      description: 'Executive presenting new product features',
+      url: 'https://example.com/product-presentation.mp4',
+      duration: '5:20',
+      category: VideoCategory.presentation,
+    ),
+    VideoSample(
+      id: '3',
+      title: 'Job Interview Simulation',
+      description: 'Mock interview for communication analysis',
+      url: 'https://example.com/job-interview.mp4',
+      duration: '4:15',
+      category: VideoCategory.interview,
+    ),
+    VideoSample(
+      id: '4',
+      title: 'Team Feedback Session',
+      description: 'Manager providing constructive feedback',
+      url: 'https://example.com/feedback-session.mp4',
+      duration: '2:30',
+      category: VideoCategory.feedback,
+    ),
+    VideoSample(
+      id: '5',
+      title: 'Leadership Workshop',
+      description: 'Leadership skills development session',
+      url: 'https://example.com/leadership-workshop.mp4',
+      duration: '6:10',
+      category: VideoCategory.training,
+    ),
+    VideoSample(
+      id: '6',
+      title: 'Sales Pitch Practice',
+      description: 'Sales representative practicing pitch delivery',
+      url: 'https://example.com/sales-pitch.mp4',
+      duration: '4:05',
+      category: VideoCategory.presentation,
+    ),
+  ];
 
   @override
   void initState() {
@@ -32,39 +101,69 @@ class _EnhancedVideoAnalysisScreenState
     _initializeAnimations();
     _urlFocusNode.addListener(_onFocusChanged);
     _urlController.addListener(_validateUrl);
+    _loadSampleHistory();
   }
 
   void _initializeAnimations() {
-    _fadeController = AnimationController(
-      duration: const Duration(milliseconds: 800),
+    _backgroundController = AnimationController(
+      duration: const Duration(seconds: 8),
       vsync: this,
     );
-    _cardController = AnimationController(
-      duration: const Duration(milliseconds: 600),
+
+    _fadeController = AnimationController(
+      duration: const Duration(milliseconds: 1200),
       vsync: this,
+    );
+
+    _backgroundAnimation = CurvedAnimation(
+      parent: _backgroundController,
+      curve: Curves.linear,
     );
 
     _fadeAnimation = CurvedAnimation(
       parent: _fadeController,
-      curve: Curves.easeOut,
-    );
-    _cardAnimation = CurvedAnimation(
-      parent: _cardController,
-      curve: Curves.elasticOut,
+      curve: Curves.easeOutCubic,
     );
 
     _fadeController.forward();
-    _cardController.forward();
+    _backgroundController.repeat();
+  }
+
+  void _loadSampleHistory() {
+    _analysisHistory.addAll([
+      AnalysisHistoryItem(
+        id: '1',
+        title: 'Customer Service Training Analysis',
+        type: 'Full Analysis',
+        timestamp: DateTime.now().subtract(const Duration(hours: 2)),
+        confidence: 0.94,
+        result: {'overall_score': 0.94, 'type': 'video'},
+      ),
+      AnalysisHistoryItem(
+        id: '2',
+        title: 'Product Presentation Analysis',
+        type: 'Presentation Quality',
+        timestamp: DateTime.now().subtract(const Duration(hours: 5)),
+        confidence: 0.88,
+        result: {'overall_score': 0.88, 'type': 'video'},
+      ),
+      AnalysisHistoryItem(
+        id: '3',
+        title: 'Interview Communication Analysis',
+        type: 'Facial Expression',
+        timestamp: DateTime.now().subtract(const Duration(days: 1)),
+        confidence: 0.82,
+        result: {'overall_score': 0.82, 'type': 'video'},
+      ),
+    ]);
   }
 
   @override
   void dispose() {
-    _urlFocusNode.removeListener(_onFocusChanged);
-    _urlController.removeListener(_validateUrl);
+    _backgroundController.dispose();
+    _fadeController.dispose();
     _urlController.dispose();
     _urlFocusNode.dispose();
-    _fadeController.dispose();
-    _cardController.dispose();
     super.dispose();
   }
 
@@ -74,88 +173,171 @@ class _EnhancedVideoAnalysisScreenState
 
   void _validateUrl() {
     final url = _urlController.text.trim();
-    final isValid =
-        url.isNotEmpty &&
-        (url.startsWith('http://') || url.startsWith('https://')) &&
-        (url.contains('.mp4') ||
-            url.contains('.mov') ||
-            url.contains('.avi') ||
-            url.contains('youtube.com') ||
-            url.contains('youtu.be') ||
-            url.contains('vimeo.com'));
-
-    if (_isValidUrl != isValid) {
+    final isValid = _isValidVideoUrl(url);
+    if (isValid != _isValidUrl) {
       setState(() {
         _isValidUrl = isValid;
       });
     }
   }
 
-  void _analyzeVideo() {
-    if (_urlController.text.trim().isEmpty) {
-      _showSnackBar('Please enter a video URL');
-      return;
+  bool _isValidVideoUrl(String url) {
+    if (url.isEmpty) return false;
+    try {
+      final uri = Uri.parse(url);
+      return uri.hasScheme &&
+          (uri.scheme == 'http' || uri.scheme == 'https') &&
+          (url.contains('.mp4') ||
+              url.contains('.mov') ||
+              url.contains('.avi') ||
+              url.contains('.webm') ||
+              url.contains('youtube.com') ||
+              url.contains('youtu.be') ||
+              url.contains('vimeo.com'));
+    } catch (e) {
+      return false;
     }
+  }
 
-    if (!_isValidUrl) {
-      _showSnackBar('Please enter a valid video URL');
-      return;
-    }
+  Future<void> _analyzeVideo() async {
+    if (!_isValidUrl) return;
+
+    HapticFeedback.mediumImpact();
+    setState(() => _isAnalyzing = true);
+
+    // Simulate video analysis with realistic timing
+    await Future.delayed(const Duration(seconds: 5));
+
+    final result = {
+      'overall_score': 0.87,
+      'video_url': _urlController.text,
+      'duration': '3:42',
+      'analysis_type': _selectedAnalysisType,
+      'facial_analysis': {
+        'Happiness': 0.75,
+        'Confidence': 0.92,
+        'Engagement': 0.78,
+        'Professionalism': 0.95,
+        'Eye Contact': 0.88,
+        'Expressiveness': 0.74,
+      },
+      'body_language': {
+        'Posture': 0.91,
+        'Gestures': 0.76,
+        'Movement': 0.82,
+        'Hand Positioning': 0.79,
+        'Body Orientation': 0.85,
+        'Energy Level': 0.73,
+      },
+      'presentation_quality': {
+        'Voice Clarity': 0.89,
+        'Speaking Pace': 0.83,
+        'Volume Control': 0.91,
+        'Articulation': 0.87,
+        'Tone Variation': 0.76,
+        'Filler Words': 0.68,
+      },
+      'engagement_metrics': {
+        'Attention Holding': 0.84,
+        'Emotional Connection': 0.78,
+        'Information Delivery': 0.92,
+        'Overall Impact': 0.85,
+        'Audience Appeal': 0.81,
+        'Message Clarity': 0.89,
+      },
+      'insights': [
+        'Excellent professional demeanor maintained throughout the video',
+        'Strong eye contact and confident posture demonstrate authority',
+        'Clear voice delivery with good pacing and articulation',
+        'Engaging hand gestures effectively support the verbal message',
+        'Consistent energy level keeps audience engaged',
+        'Professional attire and setup enhance credibility',
+      ],
+      'recommendations': [
+        'Consider reducing filler words for more polished delivery',
+        'Add more dynamic movement to increase visual interest',
+        'Vary tone more to emphasize key points',
+        'Practice pausing for emphasis instead of using filler words',
+        'Use more open gestures to appear more approachable',
+        'Consider adding visual aids to support complex concepts',
+      ],
+      'key_moments': [
+        {
+          'timestamp': '0:15',
+          'description':
+              'Strong opening with confident introduction and clear objectives',
+        },
+        {
+          'timestamp': '1:25',
+          'description':
+              'Peak engagement during main content delivery with excellent gestures',
+        },
+        {
+          'timestamp': '2:45',
+          'description':
+              'Effective use of pause and emphasis for key point delivery',
+        },
+        {
+          'timestamp': '3:30',
+          'description':
+              'Professional closing with clear call-to-action and summary',
+        },
+      ],
+      'detailed_metrics': {
+        'speaking_time': '3:12',
+        'pause_frequency': 'Optimal',
+        'gesture_count': 45,
+        'eye_contact_percentage': 88,
+        'smile_frequency': 'High',
+        'posture_stability': 'Excellent',
+      },
+    };
+
+    setState(() {
+      _analysisResult = result;
+      _isAnalyzing = false;
+    });
+
+    // Add to history
+    final historyItem = AnalysisHistoryItem(
+      id: DateTime.now().millisecondsSinceEpoch.toString(),
+      title: 'Video Analysis - $_selectedAnalysisType',
+      type: _selectedAnalysisType,
+      timestamp: DateTime.now(),
+      confidence: (result['overall_score'] as double?) ?? 0.0,
+      result: result,
+    );
+
+    setState(() {
+      _analysisHistory.insert(0, historyItem);
+    });
 
     HapticFeedback.lightImpact();
-    context.read<VideoAnalysisCubit>().analyzeVideo(
-      videoUrl: _urlController.text.trim(),
-    );
   }
 
-  void _showSnackBar(String message) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(message),
-        backgroundColor: AppColors.primary,
-        behavior: SnackBarBehavior.floating,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-      ),
-    );
+  void _clearAnalysis() {
+    setState(() {
+      _analysisResult = null;
+      _urlController.clear();
+      _isValidUrl = false;
+    });
   }
 
-  void _clearUrl() {
-    _urlController.clear();
-    FocusScope.of(context).unfocus();
+  void _useSampleVideo(String url) {
+    _urlController.text = url;
+    _validateUrl();
   }
 
-  void _pasteFromClipboard() async {
-    try {
-      final clipboardData = await Clipboard.getData(Clipboard.kTextPlain);
-      if (clipboardData?.text != null && clipboardData!.text!.isNotEmpty) {
-        _urlController.text = clipboardData.text!;
-        _validateUrl();
-      }
-    } catch (e) {
-      _showSnackBar('Failed to paste from clipboard');
-    }
+  void _onAnalysisTypeChanged(String type) {
+    setState(() {
+      _selectedAnalysisType = type;
+    });
   }
 
-  Widget _buildAnimatedCard({required Widget child}) {
-    return ScaleTransition(
-      scale: _cardAnimation,
-      child: Container(
-        margin: const EdgeInsets.only(bottom: 16),
-        padding: const EdgeInsets.all(24),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(16),
-          boxShadow: [
-            BoxShadow(
-              color: AppColors.primary.withValues(alpha: 0.1),
-              blurRadius: 8,
-              offset: const Offset(0, 2),
-            ),
-          ],
-        ),
-        child: child,
-      ),
-    );
+  void _toggleResultExpanded() {
+    setState(() {
+      _isResultExpanded = !_isResultExpanded;
+    });
   }
 
   @override
@@ -164,23 +346,119 @@ class _EnhancedVideoAnalysisScreenState
     final customSpacing = theme.extension<CustomSpacing>()!;
 
     return Scaffold(
-      backgroundColor: Colors.transparent,
+      backgroundColor: AppColors.background,
       body: Stack(
         children: [
-          AnimatedBackgroundWidget(animation: _fadeAnimation),
+          // Animated Background
+          AnimatedBackgroundWidget(animation: _backgroundAnimation),
+
+          // Main Content
           FadeTransition(
             opacity: _fadeAnimation,
-            child: SingleChildScrollView(
-              padding: EdgeInsets.all(customSpacing.lg),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  SizedBox(height: customSpacing.xl),
-                  _buildHeader(),
-                  SizedBox(height: customSpacing.xl),
-                  _buildInputSection(),
-                  SizedBox(height: customSpacing.lg),
-                  _buildResultsSection(),
+            child: SafeArea(
+              child: CustomScrollView(
+                slivers: [
+                  // Header
+                  SliverToBoxAdapter(
+                    child: AnalysisHeaderWidget(
+                      title: 'AI Video Analysis',
+                      description:
+                          'Advanced video emotion and behavior analysis with AI',
+                      icon: Icons.video_camera_back,
+                      gradientColors: const [
+                        Color(0xFF667eea),
+                        Color(0xFF764ba2),
+                      ],
+                      stats: _quickStats,
+                    ),
+                  ),
+
+                  // Video Input Section
+                  SliverToBoxAdapter(
+                    child: VideoInputWidget(
+                      urlController: _urlController,
+                      urlFocusNode: _urlFocusNode,
+                      isValidUrl: _isValidUrl,
+                      isAnalyzing: _isAnalyzing,
+                      selectedAnalysisType: _selectedAnalysisType,
+                      analysisTypes: _analysisTypes,
+                      onAnalysisTypeChanged: _onAnalysisTypeChanged,
+                      onAnalyze: _analyzeVideo,
+                      onClear: _clearAnalysis,
+                      analysisResult: _analysisResult,
+                    ),
+                  ),
+
+                  // Sample Videos
+                  SliverToBoxAdapter(
+                    child: VideoSamplesWidget(
+                      sampleVideos: _sampleVideos,
+                      onSampleSelected: _useSampleVideo,
+                    ),
+                  ),
+
+                  // Analysis Result
+                  if (_analysisResult != null)
+                    SliverToBoxAdapter(
+                      child: VideoAnalysisResultWidget(
+                        result: _analysisResult!,
+                        isExpanded: _isResultExpanded,
+                        onToggleExpand: _toggleResultExpanded,
+                      ),
+                    ),
+
+                  // Quick Actions
+                  SliverToBoxAdapter(
+                    child: Padding(
+                      padding: EdgeInsets.all(customSpacing.md),
+                      child: AnalysisQuickActionsWidget(
+                        actions: [
+                          AnalysisQuickAction(
+                            title: 'Video Settings',
+                            description: 'Configure analysis parameters',
+                            icon: Icons.video_settings,
+                            color: AppColors.primary,
+                            onTap: () => _showVideoSettings(),
+                          ),
+                          AnalysisQuickAction(
+                            title: 'Video Library',
+                            description: 'Browse uploaded videos',
+                            icon: Icons.video_library,
+                            color: AppColors.secondary,
+                            onTap: () => _showVideoLibrary(),
+                          ),
+                          AnalysisQuickAction(
+                            title: 'Analytics Dashboard',
+                            description: 'View detailed analytics',
+                            icon: Icons.analytics,
+                            color: AppColors.success,
+                            onTap: () => _showVideoAnalytics(),
+                          ),
+                          AnalysisQuickAction(
+                            title: 'Training Resources',
+                            description: 'Video analysis tutorials',
+                            icon: Icons.school,
+                            color: AppColors.warning,
+                            onTap: () => _showVideoTraining(),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+
+                  // Analysis History
+                  SliverToBoxAdapter(
+                    child: Padding(
+                      padding: EdgeInsets.all(customSpacing.md),
+                      child: AnalysisHistoryWidget(
+                        historyItems: _analysisHistory,
+                        onItemTap: (item) => _showHistoryDetails(item),
+                      ),
+                    ),
+                  ),
+
+                  // Bottom spacing
+                  SliverToBoxAdapter(child: SizedBox(height: customSpacing.xl)),
                 ],
               ),
             ),
@@ -190,622 +468,377 @@ class _EnhancedVideoAnalysisScreenState
     );
   }
 
-  Widget _buildHeader() {
-    return Container(
-      padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        gradient: const LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [Color(0xFF667EEA), Color(0xFF764BA2), Color(0xFF6B73FF)],
+  void _showVideoSettings() {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (context) => _VideoSettingsBottomSheet(),
+    );
+  }
+
+  void _showVideoLibrary() {
+    // Navigate to video library screen
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text('Video Library - Feature coming soon!'),
+        backgroundColor: AppColors.info,
+      ),
+    );
+  }
+
+  void _showVideoAnalytics() {
+    // Navigate to video analytics screen
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text('Analytics Dashboard - Feature coming soon!'),
+        backgroundColor: AppColors.success,
+      ),
+    );
+  }
+
+  void _showVideoTraining() {
+    // Navigate to video training screen
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text('Training Resources - Feature coming soon!'),
+        backgroundColor: AppColors.warning,
+      ),
+    );
+  }
+
+  void _showHistoryDetails(AnalysisHistoryItem item) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text('Analysis Details'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text('Title: ${item.title}'),
+            Text('Type: ${item.type}'),
+            Text('Confidence: ${((item.confidence ?? 0.0) * 100).toInt()}%'),
+            Text('Date: ${item.timestamp.toString().split('.')[0]}'),
+          ],
         ),
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: [
-          BoxShadow(
-            color: const Color(0xFF667EEA).withValues(alpha: 0.3),
-            blurRadius: 15,
-            offset: const Offset(0, 8),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: Text('Close'),
           ),
         ],
       ),
-      child: Row(
+    );
+  }
+}
+
+class _VideoSettingsBottomSheet extends StatefulWidget {
+  @override
+  State<_VideoSettingsBottomSheet> createState() =>
+      _VideoSettingsBottomSheetState();
+}
+
+class _VideoSettingsBottomSheetState extends State<_VideoSettingsBottomSheet> {
+  bool _enableFacialAnalysis = true;
+  bool _enableBodyLanguage = true;
+  bool _enableVoiceAnalysis = true;
+  bool _enableEngagementMetrics = true;
+  double _analysisDepth = 0.8;
+  String _outputFormat = 'Detailed';
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final customSpacing = theme.extension<CustomSpacing>()!;
+
+    return Container(
+      height: MediaQuery.of(context).size.height * 0.7,
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+      ),
+      child: Column(
         children: [
+          // Handle
           Container(
-            padding: const EdgeInsets.all(12),
+            margin: EdgeInsets.only(top: customSpacing.md),
+            width: 40,
+            height: 4,
             decoration: BoxDecoration(
-              color: Colors.white.withValues(alpha: 0.2),
-              borderRadius: BorderRadius.circular(12),
-            ),
-            child: const Icon(
-              Icons.video_library_rounded,
-              color: Colors.white,
-              size: 28,
+              color: AppColors.textSecondary.withValues(alpha: 0.3),
+              borderRadius: BorderRadius.circular(2),
             ),
           ),
-          const SizedBox(width: 16),
+
+          // Header
+          Padding(
+            padding: EdgeInsets.all(customSpacing.lg),
+            child: Row(
+              children: [
+                Text(
+                  'Video Analysis Settings',
+                  style: theme.textTheme.headlineSmall?.copyWith(
+                    color: AppColors.textPrimary,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                const Spacer(),
+                IconButton(
+                  onPressed: () => Navigator.pop(context),
+                  icon: Icon(Icons.close),
+                ),
+              ],
+            ),
+          ),
+
+          // Settings
+          Expanded(
+            child: ListView(
+              padding: EdgeInsets.symmetric(horizontal: customSpacing.lg),
+              children: [
+                _buildSettingToggle(
+                  'Facial Expression Analysis',
+                  'Analyze facial expressions and emotions',
+                  _enableFacialAnalysis,
+                  (value) => setState(() => _enableFacialAnalysis = value),
+                  theme,
+                  customSpacing,
+                ),
+                _buildSettingToggle(
+                  'Body Language Analysis',
+                  'Analyze posture, gestures, and movement',
+                  _enableBodyLanguage,
+                  (value) => setState(() => _enableBodyLanguage = value),
+                  theme,
+                  customSpacing,
+                ),
+                _buildSettingToggle(
+                  'Voice Analysis',
+                  'Analyze speech patterns and vocal delivery',
+                  _enableVoiceAnalysis,
+                  (value) => setState(() => _enableVoiceAnalysis = value),
+                  theme,
+                  customSpacing,
+                ),
+                _buildSettingToggle(
+                  'Engagement Metrics',
+                  'Measure audience engagement indicators',
+                  _enableEngagementMetrics,
+                  (value) => setState(() => _enableEngagementMetrics = value),
+                  theme,
+                  customSpacing,
+                ),
+
+                SizedBox(height: customSpacing.lg),
+
+                _buildSliderSetting(
+                  'Analysis Depth',
+                  'Higher depth provides more detailed analysis',
+                  _analysisDepth,
+                  (value) => setState(() => _analysisDepth = value),
+                  theme,
+                  customSpacing,
+                ),
+
+                SizedBox(height: customSpacing.lg),
+
+                _buildDropdownSetting(
+                  'Output Format',
+                  'Choose the format for analysis results',
+                  _outputFormat,
+                  ['Summary', 'Detailed', 'Technical'],
+                  (value) => setState(() => _outputFormat = value!),
+                  theme,
+                  customSpacing,
+                ),
+              ],
+            ),
+          ),
+
+          // Apply Button
+          Padding(
+            padding: EdgeInsets.all(customSpacing.lg),
+            child: SizedBox(
+              width: double.infinity,
+              child: ElevatedButton(
+                onPressed: () {
+                  Navigator.pop(context);
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text('Settings saved successfully!'),
+                      backgroundColor: AppColors.success,
+                    ),
+                  );
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: AppColors.primary,
+                  foregroundColor: Colors.white,
+                  padding: EdgeInsets.symmetric(vertical: customSpacing.md),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                ),
+                child: Text(
+                  'Apply Settings',
+                  style: TextStyle(fontWeight: FontWeight.w600, fontSize: 16),
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildSettingToggle(
+    String title,
+    String description,
+    bool value,
+    Function(bool) onChanged,
+    ThemeData theme,
+    CustomSpacing spacing,
+  ) {
+    return Container(
+      margin: EdgeInsets.only(bottom: spacing.md),
+      padding: EdgeInsets.all(spacing.md),
+      decoration: BoxDecoration(
+        color: AppColors.background,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: AppColors.primary.withValues(alpha: 0.1)),
+      ),
+      child: Row(
+        children: [
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text(
-                  'Video Analysis',
-                  style: TextStyle(
-                    fontSize: 20,
-                    fontWeight: FontWeight.w700,
-                    color: Colors.white,
-                  ),
-                ),
-                const SizedBox(height: 4),
                 Text(
-                  'Analyze customer emotions in videos',
-                  style: TextStyle(
-                    fontSize: 13,
-                    fontWeight: FontWeight.w500,
-                    color: Colors.white.withValues(alpha: 0.9),
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildInputSection() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: [
-        _buildVideoUrlInput(),
-        const SizedBox(height: 16),
-        _buildAnalyzeButton(),
-      ],
-    );
-  }
-
-  Widget _buildResultsSection() {
-    return BlocBuilder<VideoAnalysisCubit, VideoAnalysisState>(
-      builder: (context, state) {
-        if (state is VideoAnalysisLoading) {
-          return _buildLoadingState();
-        } else if (state is VideoAnalysisSuccess) {
-          return _buildSuccessState(state.result);
-        } else if (state is VideoAnalysisError) {
-          return _buildErrorState(state.message);
-        }
-        return const SizedBox.shrink();
-      },
-    );
-  }
-
-  Widget _buildVideoUrlInput() {
-    return Container(
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(
-          color: _urlFocusNode.hasFocus
-              ? AppColors.primary
-              : (_isValidUrl
-                    ? Colors.green
-                    : AppColors.border.withValues(alpha: 0.3)),
-          width: _urlFocusNode.hasFocus ? 2 : 1,
-        ),
-        boxShadow: [
-          BoxShadow(
-            color: AppColors.primary.withValues(alpha: 0.1),
-            blurRadius: 8,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Padding(
-            padding: const EdgeInsets.fromLTRB(20, 20, 20, 8),
-            child: Row(
-              children: [
-                Icon(
-                  Icons.link_rounded,
-                  color: _urlFocusNode.hasFocus
-                      ? AppColors.primary
-                      : AppColors.textSecondary,
-                  size: 20,
-                ),
-                const SizedBox(width: 8),
-                Text(
-                  'Video URL',
-                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                    color: _urlFocusNode.hasFocus
-                        ? AppColors.primary
-                        : AppColors.textSecondary,
+                  title,
+                  style: theme.textTheme.titleMedium?.copyWith(
+                    color: AppColors.textPrimary,
                     fontWeight: FontWeight.w600,
                   ),
                 ),
-                const Spacer(),
-                if (_urlController.text.isNotEmpty)
-                  IconButton(
-                    onPressed: _clearUrl,
-                    icon: Icon(
-                      Icons.clear_rounded,
-                      color: AppColors.textSecondary,
-                      size: 20,
-                    ),
-                    constraints: const BoxConstraints(),
-                    padding: EdgeInsets.zero,
-                  ),
-              ],
-            ),
-          ),
-          Padding(
-            padding: const EdgeInsets.fromLTRB(20, 0, 20, 12),
-            child: TextField(
-              controller: _urlController,
-              focusNode: _urlFocusNode,
-              decoration: InputDecoration(
-                hintText: 'Enter video URL (YouTube, Vimeo, or direct link)',
-                hintStyle: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                  color: AppColors.textSecondary.withValues(alpha: 0.6),
-                ),
-                border: InputBorder.none,
-                suffixIcon: IconButton(
-                  onPressed: _pasteFromClipboard,
-                  icon: Icon(
-                    Icons.content_paste_rounded,
+                SizedBox(height: spacing.xs),
+                Text(
+                  description,
+                  style: theme.textTheme.bodySmall?.copyWith(
                     color: AppColors.textSecondary,
-                    size: 20,
                   ),
-                  tooltip: 'Paste from clipboard',
                 ),
-              ),
-              style: Theme.of(context).textTheme.bodyMedium,
-              keyboardType: TextInputType.url,
-              textInputAction: TextInputAction.done,
-              onSubmitted: (_) => _analyzeVideo(),
+              ],
             ),
           ),
-          if (_isValidUrl)
-            Container(
-              margin: const EdgeInsets.fromLTRB(20, 0, 20, 16),
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-              decoration: BoxDecoration(
-                color: Colors.green.withValues(alpha: 0.1),
+          Switch(
+            value: value,
+            onChanged: onChanged,
+            activeColor: AppColors.primary,
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildSliderSetting(
+    String title,
+    String description,
+    double value,
+    Function(double) onChanged,
+    ThemeData theme,
+    CustomSpacing spacing,
+  ) {
+    return Container(
+      padding: EdgeInsets.all(spacing.md),
+      decoration: BoxDecoration(
+        color: Colors.grey,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: AppColors.primary.withValues(alpha: 0.1)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            title,
+            style: theme.textTheme.titleMedium?.copyWith(
+              color: AppColors.textPrimary,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+          SizedBox(height: spacing.xs),
+          Text(
+            description,
+            style: theme.textTheme.bodySmall?.copyWith(
+              color: AppColors.textSecondary,
+            ),
+          ),
+          SizedBox(height: spacing.md),
+          Slider(
+            value: value,
+            onChanged: onChanged,
+            activeColor: AppColors.primary,
+            min: 0.1,
+            max: 1.0,
+            divisions: 9,
+            label: '${(value * 100).toInt()}%',
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildDropdownSetting(
+    String title,
+    String description,
+    String value,
+    List<String> options,
+    Function(String?) onChanged,
+    ThemeData theme,
+    CustomSpacing spacing,
+  ) {
+    return Container(
+      padding: EdgeInsets.all(spacing.md),
+      decoration: BoxDecoration(
+        color: AppColors.background,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: AppColors.primary.withValues(alpha: 0.1)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            title,
+            style: theme.textTheme.titleMedium?.copyWith(
+              color: AppColors.textPrimary,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+          SizedBox(height: spacing.xs),
+          Text(
+            description,
+            style: theme.textTheme.bodySmall?.copyWith(
+              color: AppColors.textSecondary,
+            ),
+          ),
+          SizedBox(height: spacing.md),
+          DropdownButtonFormField<String>(
+            value: value,
+            onChanged: onChanged,
+            decoration: InputDecoration(
+              border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(8),
-                border: Border.all(color: Colors.green.withValues(alpha: 0.3)),
-              ),
-              child: Row(
-                children: [
-                  Icon(
-                    Icons.check_circle_rounded,
-                    color: Colors.green,
-                    size: 16,
-                  ),
-                  const SizedBox(width: 8),
-                  Text(
-                    'Valid video URL detected',
-                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                      color: Colors.green.shade700,
-                      fontWeight: FontWeight.w500,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildAnalyzeButton() {
-    return BlocBuilder<VideoAnalysisCubit, VideoAnalysisState>(
-      builder: (context, state) {
-        final isLoading = state is VideoAnalysisLoading;
-
-        return Container(
-          height: 56,
-          decoration: BoxDecoration(
-            gradient: _isValidUrl && !isLoading
-                ? const LinearGradient(
-                    colors: [AppColors.primary, AppColors.secondary],
-                  )
-                : null,
-            color: !_isValidUrl || isLoading ? AppColors.border : null,
-            borderRadius: BorderRadius.circular(16),
-            boxShadow: _isValidUrl && !isLoading
-                ? [
-                    BoxShadow(
-                      color: AppColors.primary.withValues(alpha: 0.3),
-                      blurRadius: 12,
-                      offset: const Offset(0, 4),
-                    ),
-                  ]
-                : null,
-          ),
-          child: Material(
-            color: Colors.transparent,
-            child: InkWell(
-              onTap: _isValidUrl && !isLoading ? _analyzeVideo : null,
-              borderRadius: BorderRadius.circular(16),
-              child: Center(
-                child: isLoading
-                    ? Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          SizedBox(
-                            width: 20,
-                            height: 20,
-                            child: CircularProgressIndicator(
-                              strokeWidth: 2,
-                              valueColor: AlwaysStoppedAnimation<Color>(
-                                AppColors.textSecondary,
-                              ),
-                            ),
-                          ),
-                          const SizedBox(width: 12),
-                          Text(
-                            'Analyzing Video...',
-                            style: Theme.of(context).textTheme.bodyMedium
-                                ?.copyWith(color: AppColors.textSecondary),
-                          ),
-                        ],
-                      )
-                    : Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Icon(
-                            Icons.play_arrow_rounded,
-                            color: _isValidUrl
-                                ? Colors.white
-                                : AppColors.textSecondary,
-                          ),
-                          const SizedBox(width: 8),
-                          Text(
-                            'Analyze Video',
-                            style: Theme.of(context).textTheme.bodyMedium
-                                ?.copyWith(
-                                  color: _isValidUrl
-                                      ? Colors.white
-                                      : AppColors.textSecondary,
-                                  fontWeight: FontWeight.w600,
-                                ),
-                          ),
-                        ],
-                      ),
-              ),
-            ),
-          ),
-        );
-      },
-    );
-  }
-
-  Widget _buildLoadingState() {
-    return _buildAnimatedCard(
-      child: Column(
-        children: [
-          Container(
-            width: 80,
-            height: 80,
-            decoration: BoxDecoration(
-              color: AppColors.primary.withValues(alpha: 0.1),
-              shape: BoxShape.circle,
-            ),
-            child: Center(
-              child: CircularProgressIndicator(
-                color: AppColors.primary,
-                strokeWidth: 3,
-              ),
-            ),
-          ),
-          const SizedBox(height: 24),
-          Text(
-            'Analyzing Video',
-            style: Theme.of(
-              context,
-            ).textTheme.titleLarge?.copyWith(color: AppColors.textPrimary),
-          ),
-          const SizedBox(height: 8),
-          Text(
-            'Processing video content and detecting emotions...',
-            style: Theme.of(
-              context,
-            ).textTheme.bodyMedium?.copyWith(color: AppColors.textSecondary),
-            textAlign: TextAlign.center,
-          ),
-          const SizedBox(height: 24),
-          LinearProgressIndicator(
-            backgroundColor: AppColors.border.withValues(alpha: 0.3),
-            valueColor: AlwaysStoppedAnimation<Color>(AppColors.primary),
-            borderRadius: BorderRadius.circular(4),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildSuccessState(VideoAnalysisResponse response) {
-    return Column(
-      children: [
-        _buildOverallAnalysis(response),
-        const SizedBox(height: 16),
-        _buildEmotionDistribution(response),
-        const SizedBox(height: 16),
-        _buildVideoDetails(response),
-      ],
-    );
-  }
-
-  Widget _buildOverallAnalysis(VideoAnalysisResponse response) {
-    final emotion = response.dominantEmotion;
-    final confidence = response.averageConfidence;
-
-    Color emotionColor;
-    IconData emotionIcon;
-
-    switch (emotion.toLowerCase()) {
-      case 'happy':
-      case 'joy':
-        emotionColor = Colors.green;
-        emotionIcon = Icons.sentiment_very_satisfied_rounded;
-        break;
-      case 'sad':
-      case 'sadness':
-        emotionColor = Colors.blue;
-        emotionIcon = Icons.sentiment_very_dissatisfied_rounded;
-        break;
-      case 'angry':
-      case 'anger':
-        emotionColor = Colors.red;
-        emotionIcon = Icons.sentiment_very_dissatisfied_rounded;
-        break;
-      case 'surprised':
-      case 'surprise':
-        emotionColor = Colors.orange;
-        emotionIcon = Icons.sentiment_satisfied_rounded;
-        break;
-      default:
-        emotionColor = Colors.grey;
-        emotionIcon = Icons.sentiment_neutral_rounded;
-    }
-
-    return _buildAnimatedCard(
-      child: Column(
-        children: [
-          Row(
-            children: [
-              Container(
-                padding: const EdgeInsets.all(12),
-                decoration: BoxDecoration(
-                  color: emotionColor.withValues(alpha: 0.1),
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: Icon(emotionIcon, color: emotionColor, size: 24),
-              ),
-              const SizedBox(width: 16),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      'Dominant Emotion',
-                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                        color: AppColors.textSecondary,
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ),
-                    const SizedBox(height: 4),
-                    Text(
-                      emotion.toUpperCase(),
-                      style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                        color: emotionColor,
-                        fontWeight: FontWeight.w700,
-                      ),
-                    ),
-                  ],
+                borderSide: BorderSide(
+                  color: AppColors.primary.withValues(alpha: 0.2),
                 ),
               ),
-              Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 12,
-                  vertical: 6,
-                ),
-                decoration: BoxDecoration(
-                  color: AppColors.primary.withValues(alpha: 0.1),
-                  borderRadius: BorderRadius.circular(20),
-                ),
-                child: Text(
-                  '${(confidence * 100).toInt()}%',
-                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                    color: AppColors.primary,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildEmotionDistribution(VideoAnalysisResponse response) {
-    final emotions = response.summarySnapshot.emotionDistribution;
-    if (emotions.isEmpty) return const SizedBox.shrink();
-
-    return _buildAnimatedCard(
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            'Emotion Distribution',
-            style: Theme.of(
-              context,
-            ).textTheme.titleLarge?.copyWith(color: AppColors.textPrimary),
-          ),
-          const SizedBox(height: 16),
-          ...emotions.entries.map((entry) {
-            final emotionName = entry.key;
-            final count = entry.value;
-            final total = emotions.values.reduce((a, b) => a + b);
-            final percentage = (count / total * 100).toInt();
-
-            return Padding(
-              padding: const EdgeInsets.only(bottom: 12),
-              child: Column(
-                children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        emotionName,
-                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                      Text(
-                        '$percentage%',
-                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                          color: AppColors.primary,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 6),
-                  LinearProgressIndicator(
-                    value: count / total,
-                    backgroundColor: AppColors.border.withValues(alpha: 0.3),
-                    valueColor: AlwaysStoppedAnimation<Color>(
-                      AppColors.primary,
-                    ),
-                    borderRadius: BorderRadius.circular(4),
-                  ),
-                ],
-              ),
-            );
-          }).toList(),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildVideoDetails(VideoAnalysisResponse response) {
-    return _buildAnimatedCard(
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              Icon(
-                Icons.info_outline_rounded,
-                color: AppColors.primary,
-                size: 20,
-              ),
-              const SizedBox(width: 8),
-              Text(
-                'Analysis Details',
-                style: Theme.of(
-                  context,
-                ).textTheme.titleLarge?.copyWith(color: AppColors.textPrimary),
-              ),
-            ],
-          ),
-          const SizedBox(height: 16),
-          _buildDetailRow('Video URL', _urlController.text),
-          _buildDetailRow('Frames Analyzed', '${response.framesAnalyzed}'),
-          _buildDetailRow(
-            'Average Confidence',
-            '${(response.averageConfidence * 100).toInt()}%',
-          ),
-          _buildDetailRow(
-            'Analysis Time',
-            DateTime.now().toString().split('.')[0],
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildDetailRow(String label, String value) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 8),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          SizedBox(
-            width: 120,
-            child: Text(
-              label,
-              style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                color: AppColors.textSecondary,
-                fontWeight: FontWeight.w500,
+              contentPadding: EdgeInsets.symmetric(
+                horizontal: spacing.md,
+                vertical: spacing.sm,
               ),
             ),
-          ),
-          Expanded(
-            child: Text(
-              value,
-              style: Theme.of(
-                context,
-              ).textTheme.bodySmall?.copyWith(color: AppColors.textPrimary),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildErrorState(String message) {
-    return _buildAnimatedCard(
-      child: Column(
-        children: [
-          Container(
-            width: 80,
-            height: 80,
-            decoration: BoxDecoration(
-              color: Colors.red.withValues(alpha: 0.1),
-              shape: BoxShape.circle,
-            ),
-            child: const Center(
-              child: Icon(
-                Icons.error_outline_rounded,
-                color: Colors.red,
-                size: 40,
-              ),
-            ),
-          ),
-          const SizedBox(height: 24),
-          Text(
-            'Analysis Failed',
-            style: Theme.of(
-              context,
-            ).textTheme.titleLarge?.copyWith(color: AppColors.textPrimary),
-          ),
-          const SizedBox(height: 8),
-          Text(
-            message,
-            style: Theme.of(
-              context,
-            ).textTheme.bodyMedium?.copyWith(color: AppColors.textSecondary),
-            textAlign: TextAlign.center,
-          ),
-          const SizedBox(height: 24),
-          SizedBox(
-            width: double.infinity,
-            child: ElevatedButton.icon(
-              onPressed: () => _analyzeVideo(),
-              icon: const Icon(Icons.refresh_rounded),
-              label: const Text('Try Again'),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: AppColors.primary,
-                foregroundColor: Colors.white,
-                padding: const EdgeInsets.symmetric(vertical: 12),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
-                ),
-              ),
-            ),
+            items: options.map((option) {
+              return DropdownMenuItem(value: option, child: Text(option));
+            }).toList(),
           ),
         ],
       ),

@@ -7,11 +7,7 @@ import '../../widgets/dashboard/welcome_header_widget.dart';
 import '../../widgets/dashboard/quick_stats_grid_widget.dart';
 import '../../widgets/dashboard/analysis_tools_grid_widget.dart';
 import '../../widgets/dashboard/recent_activity_list_widget.dart';
-import '../../widgets/dashboard/performance_goals_widget.dart';
-import 'employee_text_analysis_screen.dart';
-import 'employee_voice_analysis_screen.dart';
-import 'employee_video_analysis_screen.dart';
-import 'employee_analysis_tools_screen.dart';
+import '../screens.dart';
 
 class EmployeeDashboardScreen extends StatefulWidget {
   const EmployeeDashboardScreen({super.key});
@@ -144,11 +140,6 @@ class _EmployeeDashboardScreenState extends State<EmployeeDashboardScreen>
                         child: WelcomeHeaderWidget(data: data),
                       ),
 
-                      // Quick Stats Overview
-                      SliverToBoxAdapter(
-                        child: QuickStatsGridWidget(data: data),
-                      ),
-
                       // Analysis Tools Section
                       SliverToBoxAdapter(
                         child: AnalysisToolsGridWidget(
@@ -164,10 +155,15 @@ class _EmployeeDashboardScreenState extends State<EmployeeDashboardScreen>
                         child: RecentActivityListWidget(data: data),
                       ),
 
-                      // Performance Summary
+                      // Quick Stats Overview
                       SliverToBoxAdapter(
-                        child: PerformanceGoalsWidget(data: data),
+                        child: QuickStatsGridWidget(data: data),
                       ),
+
+                      // // Performance Summary
+                      // SliverToBoxAdapter(
+                      //   child: PerformanceGoalsWidget(data: data),
+                      // ),
 
                       // Bottom padding
                       SliverToBoxAdapter(
@@ -189,7 +185,7 @@ class _EmployeeDashboardScreenState extends State<EmployeeDashboardScreen>
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => const EmployeeTextAnalysisScreen(),
+        builder: (context) => const EnhancedTextAnalysisScreen(),
       ),
     );
   }
@@ -198,7 +194,7 @@ class _EmployeeDashboardScreenState extends State<EmployeeDashboardScreen>
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => const EmployeeVoiceAnalysisScreen(),
+        builder: (context) => const EnhancedVoiceAnalysisScreen(),
       ),
     );
   }

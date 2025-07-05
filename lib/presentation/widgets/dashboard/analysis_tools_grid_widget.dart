@@ -59,7 +59,7 @@ class AnalysisToolsGridWidget extends StatelessWidget {
           Text(
             'Analysis Tools',
             style: theme.textTheme.titleLarge?.copyWith(
-              color: AppColors.textPrimary,
+              color: Colors.white,
               fontWeight: FontWeight.w700,
             ),
           ),
