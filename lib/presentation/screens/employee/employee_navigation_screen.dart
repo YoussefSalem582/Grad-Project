@@ -1,17 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../core/core.dart';
 import '../../widgets/widgets.dart';
-import '../analysis/batch_processing_screen.dart';
+import '../../cubit/employee_dashboard/employee_dashboard_cubit.dart';
+import '../../cubit/employee_performance/employee_performance_cubit.dart';
 import 'employee_dashboard_screen.dart';
 import 'employee_customer_interactions_screen.dart';
 import 'employee_performance_screen.dart';
 import 'employee_profile_screen.dart';
 import 'employee_analysis_tools_screen.dart';
 
-import 'employee_text_analysis_screen.dart';
-import 'employee_voice_analysis_screen.dart';
-import 'employee_video_analysis_screen.dart';
+import '../analysis/enhanced_text_analysis_screen.dart';
+import '../analysis/enhanced_voice_analysis_screen.dart';
+import '../analysis/enhanced_video_analysis_screen.dart';
 
 class EmployeeNavigationScreen extends StatefulWidget {
   const EmployeeNavigationScreen({super.key});
@@ -24,23 +26,26 @@ class EmployeeNavigationScreen extends StatefulWidget {
 class _EmployeeNavigationScreenState extends State<EmployeeNavigationScreen>
     with TickerProviderStateMixin {
   int _selectedIndex = 0;
-  bool _showAnalysisOverlay = false;
-  late AnimationController _overlayController;
   late AnimationController _pulseController;
   late AnimationController _shimmerController;
-  late Animation<double> _overlayAnimation;
   late Animation<double> _pulseAnimation;
   late Animation<double> _shimmerAnimation;
 
   final List<Widget> _screens = [
-    const EmployeeDashboardScreen(),
+    BlocProvider(
+      create: (context) => EmployeeDashboardCubit(),
+      child: const EmployeeDashboardScreen(),
+    ),
     const EmployeeCustomerInteractionsScreen(),
-    const EmployeePerformanceScreen(),
+    BlocProvider(
+      create: (context) => EmployeePerformanceCubit(),
+      child: const EmployeePerformanceScreen(),
+    ),
     const EmployeeProfileScreen(),
     const EmployeeAnalysisToolsScreen(),
-    const EmployeeTextAnalysisScreen(),
-    const EmployeeVoiceAnalysisScreen(),
-    const EmployeeVideoAnalysisScreen(),
+    const EnhancedTextAnalysisScreen(),
+    const EnhancedVoiceAnalysisScreen(),
+    const EnhancedVideoAnalysisScreen(),
   ];
 
   @override
@@ -50,10 +55,6 @@ class _EmployeeNavigationScreenState extends State<EmployeeNavigationScreen>
   }
 
   void _initializeAnimations() {
-    _overlayController = AnimationController(
-      duration: const Duration(milliseconds: 300),
-      vsync: this,
-    );
     _pulseController = AnimationController(
       duration: const Duration(milliseconds: 2000),
       vsync: this,
@@ -63,10 +64,6 @@ class _EmployeeNavigationScreenState extends State<EmployeeNavigationScreen>
       vsync: this,
     );
 
-    _overlayAnimation = CurvedAnimation(
-      parent: _overlayController,
-      curve: Curves.easeInOut,
-    );
     _pulseAnimation = Tween<double>(begin: 1.0, end: 1.1).animate(
       CurvedAnimation(parent: _pulseController, curve: Curves.easeInOut),
     );
@@ -82,7 +79,6 @@ class _EmployeeNavigationScreenState extends State<EmployeeNavigationScreen>
 
   @override
   void dispose() {
-    _overlayController.dispose();
     _pulseController.dispose();
     _shimmerController.dispose();
     super.dispose();
@@ -93,18 +89,26 @@ class _EmployeeNavigationScreenState extends State<EmployeeNavigationScreen>
     final theme = Theme.of(context);
     final customSpacing = theme.extension<CustomSpacing>()!;
 
-    return Scaffold(
-      backgroundColor: AppColors.background,
-      appBar: _buildEnhancedAppBar(theme, customSpacing),
-      body: Stack(
-        children: [
-          IndexedStack(index: _selectedIndex, children: _screens),
-          if (_showAnalysisOverlay) _buildAnalysisOverlay(),
-        ],
+    return Container(
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [
+            const Color(0xFF667EEA).withValues(alpha: 0.1),
+            const Color(0xFF764BA2).withValues(alpha: 0.1),
+            const Color(0xFF48CAE4).withValues(alpha: 0.1),
+          ],
+        ),
       ),
-      bottomNavigationBar: _buildModernNavBar(),
-      floatingActionButton: _buildEnhancedAnalysisFAB(),
-      floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
+      child: Scaffold(
+        backgroundColor: Colors.transparent,
+        appBar: _buildEnhancedAppBar(theme, customSpacing),
+        body: Stack(
+          children: [IndexedStack(index: _selectedIndex, children: _screens)],
+        ),
+        bottomNavigationBar: _buildModernNavBar(),
+      ),
     );
   }
 
@@ -119,22 +123,31 @@ class _EmployeeNavigationScreenState extends State<EmployeeNavigationScreen>
       toolbarHeight: 95,
       flexibleSpace: Container(
         decoration: BoxDecoration(
-          gradient: const LinearGradient(
+          gradient: LinearGradient(
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
             colors: [
-              Color(0xFF667EEA),
-              Color(0xFF764BA2),
-              Color(0xFF48CAE4),
-              Color(0xFF667EEA),
+              const Color(0xFF667EEA).withValues(alpha: 0.25),
+              const Color(0xFF764BA2).withValues(alpha: 0.2),
+              const Color(0xFF48CAE4).withValues(alpha: 0.15),
             ],
-            stops: [0.0, 0.3, 0.7, 1.0],
+          ),
+          border: Border(
+            bottom: BorderSide(
+              color: Colors.white.withValues(alpha: 0.3),
+              width: 0.5,
+            ),
           ),
           boxShadow: [
             BoxShadow(
-              color: const Color(0xFF667EEA).withValues(alpha: 0.3),
+              color: Colors.black.withValues(alpha: 0.1),
               blurRadius: 20,
-              offset: const Offset(0, 10),
+              offset: const Offset(0, 8),
+            ),
+            BoxShadow(
+              color: const Color(0xFF667EEA).withValues(alpha: 0.2),
+              blurRadius: 10,
+              offset: const Offset(0, 2),
             ),
           ],
         ),
@@ -152,11 +165,11 @@ class _EmployeeNavigationScreenState extends State<EmployeeNavigationScreen>
                         begin: Alignment.topLeft,
                         end: Alignment.bottomRight,
                         colors: [
-                          Colors.white.withValues(alpha: 0.0),
-                          Colors.white.withValues(
-                            alpha: 0.1 * _shimmerAnimation.value,
-                          ),
-                          Colors.white.withValues(alpha: 0.0),
+                          const Color(0xFF667EEA).withValues(alpha: 0.0),
+                          const Color(
+                            0xFF667EEA,
+                          ).withValues(alpha: 0.3 * _shimmerAnimation.value),
+                          const Color(0xFF48CAE4).withValues(alpha: 0.0),
                         ],
                         stops: [
                           _shimmerAnimation.value - 0.3,
@@ -228,8 +241,12 @@ class _EmployeeNavigationScreenState extends State<EmployeeNavigationScreen>
                     width: 40,
                     height: 40,
                     decoration: BoxDecoration(
-                      color: Colors.white.withValues(alpha: 0.08),
+                      color: const Color(0xFF667EEA).withValues(alpha: 0.12),
                       shape: BoxShape.circle,
+                      border: Border.all(
+                        color: const Color(0xFF667EEA).withValues(alpha: 0.2),
+                        width: 0.5,
+                      ),
                     ),
                   ),
                 );
@@ -249,8 +266,12 @@ class _EmployeeNavigationScreenState extends State<EmployeeNavigationScreen>
                     width: 30,
                     height: 30,
                     decoration: BoxDecoration(
-                      color: Colors.white.withValues(alpha: 0.06),
+                      color: const Color(0xFF48CAE4).withValues(alpha: 0.10),
                       shape: BoxShape.circle,
+                      border: Border.all(
+                        color: const Color(0xFF48CAE4).withValues(alpha: 0.15),
+                        width: 0.5,
+                      ),
                     ),
                   ),
                 );
@@ -427,14 +448,21 @@ class _EmployeeNavigationScreenState extends State<EmployeeNavigationScreen>
             width: 36,
             height: 36,
             decoration: BoxDecoration(
-              color: Colors.white.withValues(alpha: 0.2),
-              borderRadius: BorderRadius.circular(16),
+              color: Colors.white.withValues(alpha: 0.3),
+              borderRadius: BorderRadius.circular(18),
               border: Border.all(
-                color: Colors.white.withValues(alpha: 0.3),
-                width: 1,
+                color: Colors.white.withValues(alpha: 0.5),
+                width: 1.5,
               ),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withValues(alpha: 0.1),
+                  blurRadius: 4,
+                  offset: const Offset(0, 2),
+                ),
+              ],
             ),
-            child: Icon(icon, size: 18, color: Colors.white),
+            child: Icon(icon, size: 18, color: AppColors.primary),
           ),
         ),
       ),
@@ -453,12 +481,19 @@ class _EmployeeNavigationScreenState extends State<EmployeeNavigationScreen>
             width: 36,
             height: 36,
             decoration: BoxDecoration(
-              color: Colors.white.withValues(alpha: 0.2),
-              borderRadius: BorderRadius.circular(16),
+              color: Colors.white.withValues(alpha: 0.3),
+              borderRadius: BorderRadius.circular(18),
               border: Border.all(
-                color: Colors.white.withValues(alpha: 0.3),
-                width: 1,
+                color: Colors.white.withValues(alpha: 0.5),
+                width: 1.5,
               ),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withValues(alpha: 0.1),
+                  blurRadius: 4,
+                  offset: const Offset(0, 2),
+                ),
+              ],
             ),
             child: Stack(
               children: [
@@ -642,7 +677,7 @@ class _EmployeeNavigationScreenState extends State<EmployeeNavigationScreen>
       case 0:
         return 'Overview & insights • Real-time analytics';
       case 1:
-        return 'Manage customer conversations • 8 active chats';
+        return 'Manage customer tickets • Support dashboard';
       case 2:
         return 'Track your achievements • 92% performance score';
       case 3:
@@ -658,39 +693,6 @@ class _EmployeeNavigationScreenState extends State<EmployeeNavigationScreen>
       default:
         return 'Professional customer service platform';
     }
-  }
-
-  void _toggleAnalysisOverlay() {
-    setState(() {
-      _showAnalysisOverlay = !_showAnalysisOverlay;
-    });
-
-    if (_showAnalysisOverlay) {
-      _overlayController.forward();
-    } else {
-      _overlayController.reverse();
-    }
-  }
-
-  void _navigateToAnalysis(int index) {
-    _toggleAnalysisOverlay();
-    Future.delayed(const Duration(milliseconds: 200), () {
-      setState(() => _selectedIndex = index);
-    });
-  }
-
-  void _quickTextAnalysis() {
-    _toggleAnalysisOverlay();
-    _navigateToAnalysis(6);
-  }
-
-  void _batchAnalysis() {
-    _toggleAnalysisOverlay();
-    // Navigate to batch processing screen (will create this)
-    Navigator.push(
-      context,
-      MaterialPageRoute(builder: (context) => const BatchProcessingScreen()),
-    );
   }
 
   void _showNotifications() {
@@ -863,61 +865,90 @@ class _EmployeeNavigationScreenState extends State<EmployeeNavigationScreen>
 
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white,
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [
+            const Color(0xFF667EEA).withValues(alpha: 0.25),
+            const Color(0xFF764BA2).withValues(alpha: 0.2),
+            const Color(0xFF48CAE4).withValues(alpha: 0.15),
+          ],
+        ),
+        border: Border(
+          top: BorderSide(
+            color: Colors.white.withValues(alpha: 0.3),
+            width: 0.5,
+          ),
+        ),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.08),
-            blurRadius: 16,
-            offset: const Offset(0, -4),
+            color: Colors.black.withValues(alpha: 0.1),
+            blurRadius: 25,
+            offset: const Offset(0, -10),
           ),
           BoxShadow(
-            color: AppColors.primary.withValues(alpha: 0.05),
-            blurRadius: 24,
-            offset: const Offset(0, -8),
+            color: const Color(0xFF667EEA).withValues(alpha: 0.2),
+            blurRadius: 8,
+            offset: const Offset(0, -2),
           ),
         ],
       ),
       child: SafeArea(
         child: Container(
           height: 70,
-          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+          padding: const EdgeInsets.symmetric(horizontal: 2, vertical: 8),
           child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
-              _buildEnhancedNavItem(
-                Icons.home_outlined,
-                Icons.home,
-                'Home',
-                0,
-                currentIndex == 0,
+              Expanded(
+                flex: 1,
+                child: _buildEnhancedNavItem(
+                  Icons.home_outlined,
+                  Icons.home,
+                  'Home',
+                  0,
+                  currentIndex == 0,
+                ),
               ),
-              _buildEnhancedNavItem(
-                Icons.chat_outlined,
-                Icons.chat,
-                'Customers',
-                1,
-                currentIndex == 1,
+              Expanded(
+                flex: 1,
+                child: _buildEnhancedNavItem(
+                  Icons.support_outlined,
+                  Icons.support,
+                  'Support',
+                  1,
+                  currentIndex == 1,
+                ),
               ),
-              _buildEnhancedNavItem(
-                Icons.trending_up_outlined,
-                Icons.trending_up,
-                'Performance',
-                2,
-                currentIndex == 2,
+              Expanded(
+                flex: 1,
+                child: _buildEnhancedNavItem(
+                  Icons.trending_up_outlined,
+                  Icons.trending_up,
+                  'Stats',
+                  2,
+                  currentIndex == 2,
+                ),
               ),
-              _buildEnhancedNavItem(
-                Icons.person_outline,
-                Icons.person,
-                'Profile',
-                3,
-                currentIndex == 3,
+              Expanded(
+                flex: 1,
+                child: _buildEnhancedNavItem(
+                  Icons.analytics_outlined,
+                  Icons.analytics,
+                  'Tools',
+                  3,
+                  currentIndex == 3,
+                ),
               ),
-              _buildEnhancedNavItem(
-                Icons.analytics_outlined,
-                Icons.analytics,
-                'Analysis',
-                4,
-                currentIndex == 4,
+              Expanded(
+                flex: 1,
+                child: _buildEnhancedNavItem(
+                  Icons.person_outline,
+                  Icons.person,
+                  'Profile',
+                  4,
+                  currentIndex == 4,
+                ),
               ),
             ],
           ),
@@ -942,16 +973,33 @@ class _EmployeeNavigationScreenState extends State<EmployeeNavigationScreen>
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 200),
         curve: Curves.easeInOut,
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+        padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 6),
+        margin: const EdgeInsets.symmetric(horizontal: 1),
         decoration: BoxDecoration(
-          gradient: isSelected ? AppColors.primaryGradient : null,
+          gradient: isSelected
+              ? LinearGradient(
+                  colors: [
+                    Colors.white.withValues(alpha: 0.4),
+                    const Color(0xFF667EEA).withValues(alpha: 0.2),
+                    Colors.white.withValues(alpha: 0.3),
+                  ],
+                )
+              : null,
           borderRadius: BorderRadius.circular(16),
+          border: isSelected
+              ? Border.all(color: Colors.white.withValues(alpha: 0.5), width: 1)
+              : null,
           boxShadow: isSelected
               ? [
                   BoxShadow(
-                    color: AppColors.primary.withValues(alpha: 0.3),
-                    blurRadius: 8,
-                    offset: const Offset(0, 4),
+                    color: const Color(0xFF667EEA).withValues(alpha: 0.3),
+                    blurRadius: 10,
+                    offset: const Offset(0, 2),
+                  ),
+                  BoxShadow(
+                    color: AppColors.primary.withValues(alpha: 0.2),
+                    blurRadius: 6,
+                    offset: const Offset(0, 1),
                   ),
                 ]
               : null,
@@ -969,547 +1017,33 @@ class _EmployeeNavigationScreenState extends State<EmployeeNavigationScreen>
               child: Icon(
                 isSelected ? filledIcon : outlinedIcon,
                 key: ValueKey('$index-$isSelected'),
-                color: isSelected ? Colors.white : AppColors.textSecondary,
-                size: isSelected ? 24 : 22,
+                color: Colors.white,
+                size: isSelected ? 22 : 20,
               ),
             ),
-            const SizedBox(height: 4),
-            // Label with smooth color transition
-            AnimatedDefaultTextStyle(
-              duration: const Duration(milliseconds: 200),
-              style: TextStyle(
-                fontSize: 10,
-                fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
-                color: isSelected ? Colors.white : AppColors.textSecondary,
-                letterSpacing: isSelected ? 0.5 : 0.0,
-              ),
-              child: Text(label),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildEnhancedAnalysisFAB() {
-    return AnimatedScale(
-      scale: _showAnalysisOverlay ? 1.1 : 1.0,
-      duration: const Duration(milliseconds: 200),
-      child: Container(
-        margin: const EdgeInsets.only(bottom: 90, right: 16),
-        child: Container(
-          width: 64,
-          height: 64,
-          decoration: BoxDecoration(
-            gradient: _showAnalysisOverlay
-                ? LinearGradient(
-                    colors: [
-                      AppColors.warning,
-                      AppColors.warning.withValues(alpha: 0.8),
-                    ],
-                  )
-                : AppColors.accentGradient,
-            shape: BoxShape.circle,
-            boxShadow: [
-              BoxShadow(
-                color:
-                    (_showAnalysisOverlay
-                            ? AppColors.warning
-                            : AppColors.accent)
-                        .withValues(alpha: 0.6),
-                blurRadius: _showAnalysisOverlay ? 25 : 15,
-                offset: const Offset(0, 8),
-              ),
-              BoxShadow(
-                color:
-                    (_showAnalysisOverlay
-                            ? AppColors.warning
-                            : AppColors.accent)
-                        .withValues(alpha: 0.3),
-                blurRadius: _showAnalysisOverlay ? 35 : 25,
-                offset: const Offset(0, 12),
-              ),
-              // Additional glow for visibility
-              BoxShadow(
-                color: Colors.white.withValues(alpha: 0.2),
-                blurRadius: 8,
-                offset: const Offset(0, 0),
-              ),
-            ],
-          ),
-          child: Material(
-            color: Colors.transparent,
-            elevation: _showAnalysisOverlay ? 12 : 8,
-            shape: const CircleBorder(),
-            child: InkWell(
-              borderRadius: BorderRadius.circular(32),
-              onTap: _toggleAnalysisOverlay,
-              child: Stack(
-                alignment: Alignment.center,
-                children: [
-                  AnimatedRotation(
-                    turns: _showAnalysisOverlay ? 0.125 : 0,
-                    duration: const Duration(milliseconds: 200),
-                    child: Icon(
-                      _showAnalysisOverlay ? Icons.close : Icons.analytics,
-                      color: Colors.white,
-                      size: 28,
-                    ),
-                  ),
-                  if (!_showAnalysisOverlay)
-                    Positioned(
-                      top: 8,
-                      right: 8,
-                      child: Container(
-                        width: 16,
-                        height: 16,
-                        decoration: const BoxDecoration(
-                          color: AppColors.warning,
-                          shape: BoxShape.circle,
-                        ),
-                        child: const Center(
-                          child: Text(
-                            '3',
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 10,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-                ],
-              ),
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildAnalysisOverlay() {
-    return AnimatedBuilder(
-      animation: _overlayAnimation,
-      builder: (context, child) {
-        return Stack(
-          children: [
-            // Background overlay - excludes FAB area
-            Positioned.fill(
-              child: GestureDetector(
-                onTap: _toggleAnalysisOverlay,
-                child: Container(
-                  color: Colors.black.withValues(
-                    alpha: 0.5 * _overlayAnimation.value,
-                  ),
-                ),
-              ),
-            ),
-
-            // Analysis menu positioned to not overlap with FAB
-            Positioned(
-              left: 0,
-              right: 0,
-              bottom: 160, // Leave space for FAB and fixed bottom nav
-              child: Transform.scale(
-                scale: _overlayAnimation.value,
-                child: Transform.translate(
-                  offset: Offset(0, 50 * (1 - _overlayAnimation.value)),
-                  child: _buildAnalysisMenu(),
-                ),
-              ),
-            ),
-          ],
-        );
-      },
-    );
-  }
-
-  Widget _buildAnalysisMenu() {
-    return Container(
-      margin: EdgeInsets.symmetric(
-        horizontal: context.responsiveSpacing(
-          mobile: 16,
-          tablet: 32,
-          desktop: 48,
-        ),
-      ),
-      constraints: BoxConstraints(
-        maxWidth: ResponsiveUtils.getContainerWidth(
-          context,
-          mobile: MediaQuery.of(context).size.width * 0.95,
-          tablet: 600,
-          desktop: 700,
-        ),
-      ),
-      child: Container(
-        decoration: BoxDecoration(
-          color: AppColors.surface,
-          borderRadius: BorderRadius.circular(
-            ResponsiveUtils.getBorderRadius(
-              context,
-              mobile: 20,
-              tablet: 24,
-              desktop: 28,
-            ),
-          ),
-          border: Border.all(
-            color: AppColors.primary.withValues(alpha: 0.3),
-            width: 1,
-          ),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withValues(alpha: 0.2),
-              blurRadius: ResponsiveUtils.getCardElevation(context) * 4,
-              offset: Offset(0, ResponsiveUtils.getCardElevation(context) * 2),
-            ),
-            BoxShadow(
-              color: AppColors.primary.withValues(alpha: 0.1),
-              blurRadius: ResponsiveUtils.getCardElevation(context) * 6,
-              offset: Offset(0, ResponsiveUtils.getCardElevation(context)),
-            ),
-          ],
-        ),
-        padding: context.responsivePadding(mobile: 20, tablet: 24, desktop: 28),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            // Header - Responsive
-            Row(
-              children: [
-                Container(
-                  padding: EdgeInsets.all(
-                    context.responsiveSpacing(
-                      mobile: 10,
-                      tablet: 12,
-                      desktop: 14,
-                    ),
-                  ),
-                  decoration: BoxDecoration(
-                    gradient: AppColors.accentGradient,
-                    borderRadius: BorderRadius.circular(
-                      ResponsiveUtils.getBorderRadius(
-                        context,
-                        mobile: 12,
-                        tablet: 16,
-                        desktop: 18,
-                      ),
-                    ),
-                  ),
-                  child: Icon(
-                    Icons.analytics,
+            const SizedBox(height: 2),
+            // Label with overflow protection and responsive font size
+            Flexible(
+              child: Container(
+                constraints: const BoxConstraints(minHeight: 12),
+                child: AnimatedDefaultTextStyle(
+                  duration: const Duration(milliseconds: 200),
+                  style: TextStyle(
+                    fontSize: 9,
+                    fontWeight: isSelected ? FontWeight.w700 : FontWeight.w600,
                     color: Colors.white,
-                    size: ResponsiveUtils.getIconSize(
-                      context,
-                      mobile: 20,
-                      tablet: 24,
-                      desktop: 28,
-                    ),
+                    letterSpacing: isSelected ? 0.2 : 0.0,
+                    height: 1.0,
+                  ),
+                  child: Text(
+                    label,
+                    overflow: TextOverflow.clip,
+                    maxLines: 1,
+                    textAlign: TextAlign.center,
+                    softWrap: false,
                   ),
                 ),
-                SizedBox(
-                  width: context.responsiveSpacing(
-                    mobile: 12,
-                    tablet: 16,
-                    desktop: 20,
-                  ),
-                ),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'Analysis Tools',
-                        style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                          fontWeight: FontWeight.bold,
-                          color: AppColors.textPrimary,
-                          fontSize: context.responsiveFontSize(
-                            mobile: 18,
-                            tablet: 20,
-                            desktop: 22,
-                          ),
-                        ),
-                      ),
-                      Text(
-                        'AI-powered customer insights',
-                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                          color: AppColors.textSecondary,
-                          fontSize: context.responsiveFontSize(
-                            mobile: 13,
-                            tablet: 14,
-                            desktop: 15,
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                IconButton(
-                  onPressed: _toggleAnalysisOverlay,
-                  icon: Icon(
-                    Icons.close,
-                    size: ResponsiveUtils.getIconSize(
-                      context,
-                      mobile: 20,
-                      tablet: 22,
-                      desktop: 24,
-                    ),
-                  ),
-                  color: AppColors.textSecondary,
-                ),
-              ],
-            ),
-            SizedBox(
-              height: context.responsiveSpacing(
-                mobile: 20,
-                tablet: 24,
-                desktop: 28,
               ),
-            ),
-
-            // Analysis Options - Responsive Grid
-            LayoutBuilder(
-              builder: (context, constraints) {
-                final screenWidth = MediaQuery.of(context).size.width;
-                final isTablet = screenWidth > 600;
-                final crossAxisCount = isTablet
-                    ? 2
-                    : 1; // Changed from 3 to 2 for better layout with 3 items
-                final childAspectRatio = isTablet ? 1.2 : 3.5;
-
-                if (crossAxisCount == 1) {
-                  // Mobile layout - vertical list
-                  return Column(
-                    children: [
-                      _buildAnalysisOptionHorizontal(
-                        'Text Analysis',
-                        'Messages, emails & feedback',
-                        Icons.text_fields,
-                        AppColors.secondary,
-                        () => _navigateToAnalysis(5),
-                      ),
-                      const SizedBox(height: 12),
-                      _buildAnalysisOptionHorizontal(
-                        'Voice Analysis',
-                        'Calls, recordings & audio',
-                        Icons.mic,
-                        AppColors.success,
-                        () => _navigateToAnalysis(6),
-                      ),
-                      const SizedBox(height: 12),
-                      _buildAnalysisOptionHorizontal(
-                        'Video Analysis',
-                        'Customer videos & interviews',
-                        Icons.video_library,
-                        const Color(0xFF667EEA),
-                        () => _navigateToAnalysis(7),
-                      ),
-                    ],
-                  );
-                } else {
-                  // Tablet layout - grid
-                  return GridView.count(
-                    crossAxisCount: crossAxisCount,
-                    shrinkWrap: true,
-                    physics: const NeverScrollableScrollPhysics(),
-                    crossAxisSpacing: 16,
-                    mainAxisSpacing: 16,
-                    childAspectRatio: childAspectRatio,
-                    children: [
-                      _buildAnalysisOption(
-                        'Text Analysis',
-                        'Messages & feedback',
-                        Icons.text_fields,
-                        AppColors.secondary,
-                        () => _navigateToAnalysis(5),
-                      ),
-                      _buildAnalysisOption(
-                        'Voice Analysis',
-                        'Calls & recordings',
-                        Icons.mic,
-                        AppColors.success,
-                        () => _navigateToAnalysis(6),
-                      ),
-                      _buildAnalysisOption(
-                        'Video Analysis',
-                        'Customer videos',
-                        Icons.video_library,
-                        const Color(0xFF667EEA),
-                        () => _navigateToAnalysis(7),
-                      ),
-                    ],
-                  );
-                }
-              },
-            ),
-            const SizedBox(height: 16),
-
-            // Quick Actions
-            Row(
-              children: [
-                Expanded(
-                  child: ModernButton(
-                    onPressed: _quickTextAnalysis,
-                    style: ModernButtonStyle.outlined,
-                    text: 'Quick Text',
-                    icon: Icons.flash_on,
-                  ),
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: ModernButton(
-                    onPressed: _batchAnalysis,
-                    style: ModernButtonStyle.secondary,
-                    text: 'Batch Process',
-                    icon: Icons.batch_prediction,
-                  ),
-                ),
-              ],
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildAnalysisOptionHorizontal(
-    String title,
-    String description,
-    IconData icon,
-    Color color,
-    VoidCallback onTap,
-  ) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            colors: [
-              color.withValues(alpha: 0.1),
-              color.withValues(alpha: 0.05),
-            ],
-          ),
-          borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: color.withValues(alpha: 0.3), width: 1),
-        ),
-        padding: const EdgeInsets.all(16),
-        child: Row(
-          children: [
-            Container(
-              padding: const EdgeInsets.all(12),
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  colors: [color, color.withValues(alpha: 0.8)],
-                ),
-                borderRadius: BorderRadius.circular(12),
-                boxShadow: [
-                  BoxShadow(
-                    color: color.withValues(alpha: 0.3),
-                    blurRadius: 8,
-                    offset: const Offset(0, 4),
-                  ),
-                ],
-              ),
-              child: Icon(icon, color: Colors.white, size: 24),
-            ),
-            const SizedBox(width: 16),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    title,
-                    style: const TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                      color: AppColors.textPrimary,
-                    ),
-                  ),
-                  const SizedBox(height: 4),
-                  Text(
-                    description,
-                    style: const TextStyle(
-                      fontSize: 14,
-                      color: AppColors.textSecondary,
-                    ),
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                ],
-              ),
-            ),
-            Icon(Icons.arrow_forward_ios, color: color, size: 16),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildAnalysisOption(
-    String title,
-    String description,
-    IconData icon,
-    Color color,
-    VoidCallback onTap,
-  ) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            colors: [
-              color.withValues(alpha: 0.1),
-              color.withValues(alpha: 0.05),
-            ],
-          ),
-          borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: color.withValues(alpha: 0.3), width: 1),
-        ),
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Container(
-              padding: const EdgeInsets.all(12),
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  colors: [color, color.withValues(alpha: 0.8)],
-                ),
-                borderRadius: BorderRadius.circular(12),
-                boxShadow: [
-                  BoxShadow(
-                    color: color.withValues(alpha: 0.3),
-                    blurRadius: 8,
-                    offset: const Offset(0, 4),
-                  ),
-                ],
-              ),
-              child: Icon(icon, color: Colors.white, size: 20),
-            ),
-            const SizedBox(height: 12),
-            Text(
-              title,
-              style: const TextStyle(
-                fontSize: 14,
-                fontWeight: FontWeight.bold,
-                color: AppColors.textPrimary,
-              ),
-              textAlign: TextAlign.center,
-            ),
-            const SizedBox(height: 4),
-            Text(
-              description,
-              style: const TextStyle(
-                fontSize: 10,
-                color: AppColors.textSecondary,
-              ),
-              textAlign: TextAlign.center,
-              maxLines: 2,
-              overflow: TextOverflow.ellipsis,
             ),
           ],
         ),

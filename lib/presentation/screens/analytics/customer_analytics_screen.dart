@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-
 import '../../../core/core.dart';
 import '../../providers/providers.dart';
 
@@ -609,7 +608,7 @@ class _CustomerAnalyticsScreenState extends State<CustomerAnalyticsScreen>
           const SizedBox(height: 16),
           _buildChannelSentiment('Email Support', 0.89, AppColors.positive),
           const SizedBox(height: 12),
-          _buildChannelSentiment('Live Chat', 0.94, AppColors.positive),
+          _buildChannelSentiment('Ticket System', 0.94, AppColors.positive),
           const SizedBox(height: 12),
           _buildChannelSentiment('Phone Support', 0.87, AppColors.positive),
           const SizedBox(height: 12),
@@ -750,4 +749,3 @@ class _CustomerAnalyticsScreenState extends State<CustomerAnalyticsScreen>
     );
   }
 }
-

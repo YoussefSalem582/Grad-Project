@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../../core/core.dart';
+import '../../widgets/auth/animated_background_widget.dart';
 import '../analysis/batch_processing_screen.dart';
 
 class EmployeeAnalysisToolsScreen extends StatefulWidget {
@@ -15,8 +16,10 @@ class _EmployeeAnalysisToolsScreenState
     with TickerProviderStateMixin {
   late AnimationController _fadeController;
   late AnimationController _slideController;
+  late AnimationController _backgroundController;
   late Animation<double> _fadeAnimation;
   late Animation<Offset> _slideAnimation;
+  late Animation<double> _backgroundAnimation;
 
   @override
   void initState() {
@@ -33,6 +36,10 @@ class _EmployeeAnalysisToolsScreenState
       duration: const Duration(milliseconds: 600),
       vsync: this,
     );
+    _backgroundController = AnimationController(
+      duration: const Duration(milliseconds: 3000),
+      vsync: this,
+    );
 
     _fadeAnimation = CurvedAnimation(
       parent: _fadeController,
@@ -42,15 +49,20 @@ class _EmployeeAnalysisToolsScreenState
         Tween<Offset>(begin: const Offset(0, 0.3), end: Offset.zero).animate(
           CurvedAnimation(parent: _slideController, curve: Curves.easeOutBack),
         );
+    _backgroundAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
+      CurvedAnimation(parent: _backgroundController, curve: Curves.linear),
+    );
 
     _fadeController.forward();
     _slideController.forward();
+    _backgroundController.repeat(reverse: true);
   }
 
   @override
   void dispose() {
     _fadeController.dispose();
     _slideController.dispose();
+    _backgroundController.dispose();
     super.dispose();
   }
 
@@ -60,30 +72,35 @@ class _EmployeeAnalysisToolsScreenState
     final customSpacing = theme.extension<CustomSpacing>()!;
 
     return Scaffold(
-      backgroundColor: AppColors.background,
-      body: FadeTransition(
-        opacity: _fadeAnimation,
-        child: SlideTransition(
-          position: _slideAnimation,
-          child: SingleChildScrollView(
-            padding: EdgeInsets.all(customSpacing.lg),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                SizedBox(height: customSpacing.xl),
-                _buildHeader(theme, customSpacing),
-                SizedBox(height: customSpacing.xl),
-                _buildQuickActions(customSpacing),
-                SizedBox(height: customSpacing.xl),
-                _buildAnalysisToolsGrid(customSpacing),
-                SizedBox(height: customSpacing.xl),
-                _buildRecentAnalysis(theme, customSpacing),
-                SizedBox(height: customSpacing.xl),
-                _buildAnalyticsInsights(theme, customSpacing),
-              ],
+      backgroundColor: Colors.transparent,
+      body: Stack(
+        children: [
+          AnimatedBackgroundWidget(animation: _backgroundAnimation),
+          FadeTransition(
+            opacity: _fadeAnimation,
+            child: SlideTransition(
+              position: _slideAnimation,
+              child: SingleChildScrollView(
+                padding: EdgeInsets.all(customSpacing.lg),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    SizedBox(height: customSpacing.xl),
+                    _buildHeader(theme, customSpacing),
+                    SizedBox(height: customSpacing.xl),
+                    _buildQuickActions(customSpacing),
+                    SizedBox(height: customSpacing.xl),
+                    _buildAnalysisToolsGrid(customSpacing),
+                    SizedBox(height: customSpacing.xl),
+                    _buildRecentAnalysis(theme, customSpacing),
+                    SizedBox(height: customSpacing.xl),
+                    _buildAnalyticsInsights(theme, customSpacing),
+                  ],
+                ),
+              ),
             ),
           ),
-        ),
+        ],
       ),
     );
   }

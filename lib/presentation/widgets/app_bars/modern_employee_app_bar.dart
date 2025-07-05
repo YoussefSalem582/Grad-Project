@@ -114,13 +114,17 @@ class ModernEmployeeAppBar extends StatelessWidget
         // Enhanced shadow effects with multiple layers and color blending
         boxShadow: [
           BoxShadow(
-            color: (gradientStart ?? const Color(0xFF667eea)).withValues(alpha: 0.4),
+            color: (gradientStart ?? const Color(0xFF667eea)).withValues(
+              alpha: 0.4,
+            ),
             blurRadius: 25,
             offset: const Offset(0, 12),
             spreadRadius: 3,
           ),
           BoxShadow(
-            color: (gradientEnd ?? const Color(0xFF764ba2)).withValues(alpha: 0.2),
+            color: (gradientEnd ?? const Color(0xFF764ba2)).withValues(
+              alpha: 0.2,
+            ),
             blurRadius: 15,
             offset: const Offset(0, 6),
             spreadRadius: 1,
@@ -161,7 +165,7 @@ class ModernEmployeeAppBar extends StatelessWidget
               },
             ),
           ),
-          
+
           // Subtle noise texture overlay for premium feel
           Positioned.fill(
             child: Container(
@@ -301,7 +305,10 @@ class ModernEmployeeAppBar extends StatelessWidget
                 },
                 child: Container(
                   padding: EdgeInsets.all(customSpacing.sm),
-                  constraints: const BoxConstraints(minWidth: 44, minHeight: 44),
+                  constraints: const BoxConstraints(
+                    minWidth: 44,
+                    minHeight: 44,
+                  ),
                   child: Icon(
                     Icons.arrow_back_ios_new, // iOS-style back arrow
                     color: Colors.white,
@@ -406,8 +413,8 @@ class ModernEmployeeAppBar extends StatelessWidget
                     ),
                   ),
                   child: Icon(
-                    mainIcon, 
-                    color: Colors.white, 
+                    mainIcon,
+                    color: Colors.white,
                     size: 32,
                     shadows: [
                       Shadow(
@@ -605,7 +612,10 @@ class ModernEmployeeAppBar extends StatelessWidget
                     },
                     child: Container(
                       padding: EdgeInsets.all(customSpacing.sm + 2),
-                      constraints: const BoxConstraints(minWidth: 48, minHeight: 48),
+                      constraints: const BoxConstraints(
+                        minWidth: 48,
+                        minHeight: 48,
+                      ),
                       child: Icon(
                         Icons.notifications_outlined,
                         color: Colors.white,
@@ -761,22 +771,26 @@ class ModernEmployeeAppBar extends StatelessWidget
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
                 colors: [
-                  (isAvailable ? AppColors.success : AppColors.error).withValues(alpha: 0.25),
-                  (isAvailable ? AppColors.success : AppColors.error).withValues(alpha: 0.15),
+                  (isAvailable ? AppColors.success : AppColors.error)
+                      .withValues(alpha: 0.25),
+                  (isAvailable ? AppColors.success : AppColors.error)
+                      .withValues(alpha: 0.15),
                 ],
               ),
               borderRadius: BorderRadius.circular(20),
 
               // Enhanced border with gradient
               border: Border.all(
-                color: (isAvailable ? AppColors.success : AppColors.error).withValues(alpha: 0.6),
+                color: (isAvailable ? AppColors.success : AppColors.error)
+                    .withValues(alpha: 0.6),
                 width: 2,
               ),
 
               // Multiple shadow layers for depth
               boxShadow: [
                 BoxShadow(
-                  color: (isAvailable ? AppColors.success : AppColors.error).withValues(alpha: 0.3),
+                  color: (isAvailable ? AppColors.success : AppColors.error)
+                      .withValues(alpha: 0.3),
                   blurRadius: 12,
                   offset: const Offset(0, 4),
                   spreadRadius: 1,
@@ -805,8 +819,11 @@ class ModernEmployeeAppBar extends StatelessWidget
                           height: 20 * rippleValue,
                           decoration: BoxDecoration(
                             shape: BoxShape.circle,
-                            color: (isAvailable ? AppColors.success : AppColors.error)
-                                .withValues(alpha: 0.3 * (1 - rippleValue)),
+                            color:
+                                (isAvailable
+                                        ? AppColors.success
+                                        : AppColors.error)
+                                    .withValues(alpha: 0.3 * (1 - rippleValue)),
                           ),
                         );
                       },
@@ -820,13 +837,19 @@ class ModernEmployeeAppBar extends StatelessWidget
                           width: 12,
                           height: 12,
                           decoration: BoxDecoration(
-                            color: (isAvailable ? AppColors.success : AppColors.error)
-                                .withValues(alpha: pulseValue),
+                            color:
+                                (isAvailable
+                                        ? AppColors.success
+                                        : AppColors.error)
+                                    .withValues(alpha: pulseValue),
                             shape: BoxShape.circle,
                             boxShadow: [
                               BoxShadow(
-                                color: (isAvailable ? AppColors.success : AppColors.error)
-                                    .withValues(alpha: 0.6),
+                                color:
+                                    (isAvailable
+                                            ? AppColors.success
+                                            : AppColors.error)
+                                        .withValues(alpha: 0.6),
                                 blurRadius: 6 * pulseValue,
                                 spreadRadius: 2,
                               ),
@@ -879,19 +902,24 @@ class ModernEmployeeAppBar extends StatelessWidget
         final index = entry.key;
         final stat = entry.value;
         final isLast = index == stats.length - 1;
-        
+
         return Expanded(
           child: Row(
             children: [
               // Each stat takes equal space with staggered animation delay
               Expanded(
                 child: TweenAnimationBuilder<double>(
-                  duration: Duration(milliseconds: 800 + (index * 150)), // Staggered timing
+                  duration: Duration(
+                    milliseconds: 800 + (index * 150),
+                  ), // Staggered timing
                   tween: Tween(begin: 0.0, end: 1.0),
                   curve: Curves.easeOutBack,
                   builder: (context, staggerValue, child) {
                     return Transform.translate(
-                      offset: Offset(0, 30 * (1 - staggerValue)), // Slide up effect
+                      offset: Offset(
+                        0,
+                        30 * (1 - staggerValue),
+                      ), // Slide up effect
                       child: Opacity(
                         opacity: staggerValue,
                         child: _buildEnhancedStat(stat, customSpacing),
@@ -993,7 +1021,10 @@ class ModernEmployeeAppBar extends StatelessWidget
                         children: [
                           // Enhanced colored icon container with gradient and shadows
                           TweenAnimationBuilder<double>(
-                            duration: Duration(milliseconds: 600 + (animationValue * 200).toInt()),
+                            duration: Duration(
+                              milliseconds:
+                                  600 + (animationValue * 200).toInt(),
+                            ),
                             tween: Tween(begin: 0.0, end: 1.0),
                             curve: Curves.easeOutBack,
                             builder: (context, iconValue, child) {
@@ -1012,24 +1043,30 @@ class ModernEmployeeAppBar extends StatelessWidget
                                     ),
                                     borderRadius: BorderRadius.circular(10),
                                     border: Border.all(
-                                      color: stat.accentColor.withValues(alpha: 0.4),
+                                      color: stat.accentColor.withValues(
+                                        alpha: 0.4,
+                                      ),
                                       width: 1.5,
                                     ),
                                     boxShadow: [
                                       BoxShadow(
-                                        color: stat.accentColor.withValues(alpha: 0.3),
+                                        color: stat.accentColor.withValues(
+                                          alpha: 0.3,
+                                        ),
                                         blurRadius: 8,
                                         offset: const Offset(0, 2),
                                       ),
                                     ],
                                   ),
                                   child: Icon(
-                                    stat.icon, 
-                                    color: Colors.white, 
+                                    stat.icon,
+                                    color: Colors.white,
                                     size: 20,
                                     shadows: [
                                       Shadow(
-                                        color: Colors.black.withValues(alpha: 0.3),
+                                        color: Colors.black.withValues(
+                                          alpha: 0.3,
+                                        ),
                                         offset: const Offset(1, 1),
                                         blurRadius: 2,
                                       ),
@@ -1042,7 +1079,10 @@ class ModernEmployeeAppBar extends StatelessWidget
 
                           // Enhanced trending indicator with animation
                           TweenAnimationBuilder<double>(
-                            duration: Duration(milliseconds: 800 + (animationValue * 300).toInt()),
+                            duration: Duration(
+                              milliseconds:
+                                  800 + (animationValue * 300).toInt(),
+                            ),
                             tween: Tween(begin: 0.0, end: 1.0),
                             curve: Curves.easeOut,
                             builder: (context, trendValue, child) {
@@ -1052,11 +1092,15 @@ class ModernEmployeeAppBar extends StatelessWidget
                                   opacity: trendValue * 0.8,
                                   child: Icon(
                                     Icons.trending_up,
-                                    color: stat.accentColor.withValues(alpha: 0.9),
+                                    color: stat.accentColor.withValues(
+                                      alpha: 0.9,
+                                    ),
                                     size: 18,
                                     shadows: [
                                       Shadow(
-                                        color: Colors.black.withValues(alpha: 0.2),
+                                        color: Colors.black.withValues(
+                                          alpha: 0.2,
+                                        ),
                                         offset: const Offset(0.5, 0.5),
                                         blurRadius: 1,
                                       ),
@@ -1072,7 +1116,9 @@ class ModernEmployeeAppBar extends StatelessWidget
 
                       // Main stat value with enhanced animation and typography
                       TweenAnimationBuilder<double>(
-                        duration: Duration(milliseconds: 1000 + (animationValue * 400).toInt()),
+                        duration: Duration(
+                          milliseconds: 1000 + (animationValue * 400).toInt(),
+                        ),
                         tween: Tween(begin: 0.0, end: 1.0),
                         curve: Curves.easeOut,
                         builder: (context, valueAnimValue, child) {
@@ -1087,17 +1133,23 @@ class ModernEmployeeAppBar extends StatelessWidget
                                   style: TextStyle(
                                     color: Colors.white,
                                     fontSize: 26,
-                                    fontWeight: FontWeight.w900, // Extra bold for emphasis
-                                    letterSpacing: -0.8, // Tighter spacing for modern look
+                                    fontWeight: FontWeight
+                                        .w900, // Extra bold for emphasis
+                                    letterSpacing:
+                                        -0.8, // Tighter spacing for modern look
                                     height: 1.1,
                                     shadows: [
                                       Shadow(
-                                        color: Colors.black.withValues(alpha: 0.4),
+                                        color: Colors.black.withValues(
+                                          alpha: 0.4,
+                                        ),
                                         offset: const Offset(1.5, 1.5),
                                         blurRadius: 3,
                                       ),
                                       Shadow(
-                                        color: stat.accentColor.withValues(alpha: 0.3),
+                                        color: stat.accentColor.withValues(
+                                          alpha: 0.3,
+                                        ),
                                         offset: const Offset(-0.5, -0.5),
                                         blurRadius: 1,
                                       ),
@@ -1113,7 +1165,9 @@ class ModernEmployeeAppBar extends StatelessWidget
 
                       // Bottom row: Enhanced label and subtitle with staggered animation
                       TweenAnimationBuilder<double>(
-                        duration: Duration(milliseconds: 1200 + (animationValue * 500).toInt()),
+                        duration: Duration(
+                          milliseconds: 1200 + (animationValue * 500).toInt(),
+                        ),
                         tween: Tween(begin: 0.0, end: 1.0),
                         curve: Curves.easeOut,
                         builder: (context, labelAnimValue, child) {
@@ -1122,20 +1176,25 @@ class ModernEmployeeAppBar extends StatelessWidget
                             child: Opacity(
                               opacity: labelAnimValue * 0.9,
                               child: Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
                                 children: [
                                   // Enhanced stat label with better typography
                                   Flexible(
                                     child: Text(
                                       stat.label,
                                       style: TextStyle(
-                                        color: Colors.white.withValues(alpha: 0.85),
+                                        color: Colors.white.withValues(
+                                          alpha: 0.85,
+                                        ),
                                         fontSize: 13,
                                         fontWeight: FontWeight.w700,
                                         letterSpacing: 0.2,
                                         shadows: [
                                           Shadow(
-                                            color: Colors.black.withValues(alpha: 0.3),
+                                            color: Colors.black.withValues(
+                                              alpha: 0.3,
+                                            ),
                                             offset: const Offset(0.5, 1),
                                             blurRadius: 2,
                                           ),
@@ -1147,17 +1206,26 @@ class ModernEmployeeAppBar extends StatelessWidget
 
                                   // Enhanced stat subtitle with accent color and animation
                                   Container(
-                                    padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: 6,
+                                      vertical: 2,
+                                    ),
                                     decoration: BoxDecoration(
                                       gradient: LinearGradient(
                                         colors: [
-                                          stat.accentColor.withValues(alpha: 0.3),
-                                          stat.accentColor.withValues(alpha: 0.2),
+                                          stat.accentColor.withValues(
+                                            alpha: 0.3,
+                                          ),
+                                          stat.accentColor.withValues(
+                                            alpha: 0.2,
+                                          ),
                                         ],
                                       ),
                                       borderRadius: BorderRadius.circular(8),
                                       border: Border.all(
-                                        color: stat.accentColor.withValues(alpha: 0.4),
+                                        color: stat.accentColor.withValues(
+                                          alpha: 0.4,
+                                        ),
                                         width: 1,
                                       ),
                                     ),
@@ -1170,7 +1238,9 @@ class ModernEmployeeAppBar extends StatelessWidget
                                         letterSpacing: 0.1,
                                         shadows: [
                                           Shadow(
-                                            color: Colors.black.withValues(alpha: 0.3),
+                                            color: Colors.black.withValues(
+                                              alpha: 0.3,
+                                            ),
                                             offset: const Offset(0.5, 0.5),
                                             blurRadius: 1,
                                           ),
@@ -1213,21 +1283,21 @@ class ModernEmployeeAppBar extends StatelessWidget
 
 /// Data model for individual statistics displayed in the app bar
 ///
-/// Used to create stat cards that show key metrics like active chats,
+/// Used to create stat cards that show key metrics like active tickets,
 /// performance scores, completion rates, etc.
 ///
 /// Example usage:
 /// ```dart
 /// StatItem(
-///   label: 'Active Chats',
+///   label: 'Active Tickets',
 ///   value: '12',
 ///   subtitle: '+3 today',
-///   icon: Icons.chat,
+///   icon: Icons.assignment,
 ///   accentColor: AppColors.primary,
 /// )
 /// ```
 class StatItem {
-  /// The descriptive label for this statistic (e.g., "Active Chats")
+  /// The descriptive label for this statistic (e.g., "Active Tickets")
   final String label;
 
   /// The main value to display prominently (e.g., "12", "94%")

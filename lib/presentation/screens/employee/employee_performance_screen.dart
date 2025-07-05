@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../core/core.dart';
 import '../../widgets/widgets.dart';
+import '../../cubit/employee_performance/employee_performance_cubit.dart';
 
 class EmployeePerformanceScreen extends StatefulWidget {
   const EmployeePerformanceScreen({super.key});
@@ -24,6 +26,8 @@ class _EmployeePerformanceScreenState extends State<EmployeePerformanceScreen>
   void initState() {
     super.initState();
     _initializeAnimations();
+    // Load performance data when the screen initializes
+    context.read<EmployeePerformanceCubit>().loadPerformance();
   }
 
   void _initializeAnimations() {
@@ -65,49 +69,114 @@ class _EmployeePerformanceScreenState extends State<EmployeePerformanceScreen>
       backgroundColor: AppColors.background,
       body: FadeTransition(
         opacity: _fadeAnimation,
-        child: CustomScrollView(
-          slivers: [
-            // Hero Performance Header
-            SliverToBoxAdapter(
-              child: _buildPerformanceHero(theme, customSpacing),
-            ),
+        child: BlocBuilder<EmployeePerformanceCubit, EmployeePerformanceState>(
+          builder: (context, state) {
+            if (state is EmployeePerformanceLoading) {
+              return const Center(child: CircularProgressIndicator());
+            }
 
-            // Performance Overview Cards
-            SliverToBoxAdapter(
-              child: _buildPerformanceOverview(theme, customSpacing),
-            ),
+            if (state is EmployeePerformanceError) {
+              return Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(Icons.error_outline, size: 64, color: AppColors.error),
+                    SizedBox(height: customSpacing.md),
+                    Text(
+                      'Error loading performance data',
+                      style: theme.textTheme.headlineMedium?.copyWith(
+                        color: AppColors.textPrimary,
+                      ),
+                    ),
+                    SizedBox(height: customSpacing.sm),
+                    Text(
+                      state.message,
+                      style: theme.textTheme.bodyMedium?.copyWith(
+                        color: AppColors.textSecondary,
+                      ),
+                    ),
+                    SizedBox(height: customSpacing.lg),
+                    ElevatedButton(
+                      onPressed: () {
+                        context
+                            .read<EmployeePerformanceCubit>()
+                            .refreshPerformance();
+                      },
+                      child: const Text('Retry'),
+                    ),
+                  ],
+                ),
+              );
+            }
 
-            // Advanced Metrics Dashboard
-            SliverToBoxAdapter(
-              child: _buildAdvancedMetrics(theme, customSpacing),
-            ),
+            final data = state is EmployeePerformanceSuccess
+                ? state.data
+                : null;
 
-            // Performance Chart
-            SliverToBoxAdapter(
-              child: _buildInteractiveChart(theme, customSpacing),
-            ),
+            return RefreshIndicator(
+              onRefresh: () async {
+                await context
+                    .read<EmployeePerformanceCubit>()
+                    .refreshPerformance();
+              },
+              child: CustomScrollView(
+                slivers: [
+                  // Hero Performance Header
+                  SliverToBoxAdapter(
+                    child: _buildPerformanceHero(theme, customSpacing, data),
+                  ),
 
-            // Goals & Achievements
-            SliverToBoxAdapter(child: _buildGoalsSection(theme, customSpacing)),
+                  // Performance Overview Cards
+                  SliverToBoxAdapter(
+                    child: _buildPerformanceOverview(
+                      theme,
+                      customSpacing,
+                      data,
+                    ),
+                  ),
 
-            // Performance Insights
-            SliverToBoxAdapter(
-              child: _buildPerformanceInsights(theme, customSpacing),
-            ),
+                  // Advanced Metrics Dashboard
+                  SliverToBoxAdapter(
+                    child: _buildAdvancedMetrics(theme, customSpacing),
+                  ),
 
-            // Rankings & Comparisons
-            SliverToBoxAdapter(
-              child: _buildRankingsSection(theme, customSpacing),
-            ),
+                  // Performance Chart
+                  SliverToBoxAdapter(
+                    child: _buildInteractiveChart(theme, customSpacing),
+                  ),
 
-            SliverToBoxAdapter(child: SizedBox(height: customSpacing.xxl * 2)),
-          ],
+                  // Goals & Achievements
+                  SliverToBoxAdapter(
+                    child: _buildGoalsSection(theme, customSpacing),
+                  ),
+
+                  // Performance Insights
+                  SliverToBoxAdapter(
+                    child: _buildPerformanceInsights(theme, customSpacing),
+                  ),
+
+                  // Rankings & Comparisons
+                  SliverToBoxAdapter(
+                    child: _buildRankingsSection(theme, customSpacing),
+                  ),
+
+                  SliverToBoxAdapter(
+                    child: SizedBox(height: customSpacing.xxl * 2),
+                  ),
+                ],
+              ),
+            );
+          },
         ),
       ),
     );
   }
 
-  Widget _buildPerformanceHero(ThemeData theme, CustomSpacing customSpacing) {
+  Widget _buildPerformanceHero(
+    ThemeData theme,
+    CustomSpacing customSpacing,
+    EmployeePerformanceData? data,
+  ) {
     return Container(
       margin: EdgeInsets.all(customSpacing.md),
       decoration: BoxDecoration(
@@ -367,6 +436,7 @@ class _EmployeePerformanceScreenState extends State<EmployeePerformanceScreen>
   Widget _buildPerformanceOverview(
     ThemeData theme,
     CustomSpacing customSpacing,
+    EmployeePerformanceData? data,
   ) {
     return Container(
       margin: EdgeInsets.all(customSpacing.md),
@@ -413,12 +483,12 @@ class _EmployeePerformanceScreenState extends State<EmployeePerformanceScreen>
                 customSpacing,
               ),
               _buildPerformanceCard(
-                'Response Time',
-                '1.8',
-                'minutes',
-                Icons.timer,
+                'Tickets Resolved',
+                '47',
+                'this week',
+                Icons.check_circle,
                 AppColors.primary,
-                '-15% improvement',
+                '+12% vs last week',
                 customSpacing,
               ),
               _buildPerformanceCard(
@@ -635,7 +705,7 @@ class _EmployeePerformanceScreenState extends State<EmployeePerformanceScreen>
         'title': 'Customer Focus Metrics',
         'items': [
           {'name': 'Satisfaction Score', 'value': '4.9/5.0', 'progress': 0.98},
-          {'name': 'Response Time', 'value': '1.8 min', 'progress': 0.85},
+          {'name': 'Ticket Resolution', 'value': '94%', 'progress': 0.94},
           {
             'name': 'First Contact Resolution',
             'value': '89%',
@@ -923,9 +993,9 @@ class _EmployeePerformanceScreenState extends State<EmployeePerformanceScreen>
                   customSpacing,
                 ),
                 _buildGoalItem(
-                  'Maintain <2min response time',
-                  1.8,
-                  2.0,
+                  'Resolve >20 tickets weekly',
+                  24,
+                  20,
                   AppColors.success,
                   customSpacing,
                 ),
@@ -1073,7 +1143,7 @@ class _EmployeePerformanceScreenState extends State<EmployeePerformanceScreen>
           SizedBox(height: customSpacing.lg),
 
           const Text(
-            'Excellent work this period! You\'re performing 15% above team average. Your customer satisfaction scores are consistently high, and your response times have improved significantly.',
+            'Excellent work this period! You\'re performing 15% above team average. Your customer satisfaction scores are consistently high, and your ticket resolution efficiency has improved significantly.',
             style: TextStyle(
               fontSize: 15,
               color: AppColors.textPrimary,

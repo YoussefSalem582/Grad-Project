@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 
-
 import '../../../core/core.dart';
 
 class TeamPerformanceScreen extends StatefulWidget {
@@ -197,11 +196,11 @@ class _TeamPerformanceScreenState extends State<TeamPerformanceScreen>
             const SizedBox(width: 12),
             Expanded(
               child: _buildTeamStatCard(
-                'Avg. Response Time',
-                '2.3m',
+                'Avg. Resolution Time',
+                '4.2h',
                 Icons.timer,
                 AppColors.success,
-                '-0.4m from yesterday',
+                '-0.8h from yesterday',
                 true,
               ),
             ),
@@ -902,4 +901,3 @@ class _TeamPerformanceScreenState extends State<TeamPerformanceScreen>
     );
   }
 }
-

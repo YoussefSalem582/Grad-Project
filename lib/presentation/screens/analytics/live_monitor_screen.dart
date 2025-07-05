@@ -475,7 +475,7 @@ class _LiveMonitorScreenState extends State<LiveMonitorScreen> {
             'This is taking way too long to resolve...',
             'negative',
             '1 minute ago',
-            'Live Chat',
+            'Support Ticket',
           ),
           const Divider(),
           _buildFeedbackItem(

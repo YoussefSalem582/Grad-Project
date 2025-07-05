@@ -63,10 +63,14 @@ class VideoResultsCard extends StatelessWidget {
               child: Container(
                 padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
-                  color: _getEmotionColor(snapshot.emotion).withOpacity(0.1),
+                  color: _getEmotionColor(
+                    snapshot.emotion,
+                  ).withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(8),
                   border: Border.all(
-                    color: _getEmotionColor(snapshot.emotion).withOpacity(0.3),
+                    color: _getEmotionColor(
+                      snapshot.emotion,
+                    ).withValues(alpha: 0.3),
                   ),
                 ),
                 child: Column(
@@ -99,12 +103,12 @@ class VideoResultsCard extends StatelessWidget {
                 decoration: BoxDecoration(
                   color: _getSentimentColor(
                     snapshot.sentiment,
-                  ).withOpacity(0.1),
+                  ).withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(8),
                   border: Border.all(
                     color: _getSentimentColor(
                       snapshot.sentiment,
-                    ).withOpacity(0.3),
+                    ).withValues(alpha: 0.3),
                   ),
                 ),
                 child: Column(
@@ -139,7 +143,7 @@ class VideoResultsCard extends StatelessWidget {
         Container(
           padding: const EdgeInsets.all(12),
           decoration: BoxDecoration(
-            color: Colors.grey.withOpacity(0.1),
+            color: Colors.grey.withValues(alpha: 0.1),
             borderRadius: BorderRadius.circular(8),
           ),
           child: Column(
@@ -204,7 +208,7 @@ class VideoResultsCard extends StatelessWidget {
                         Container(
                           height: 8,
                           decoration: BoxDecoration(
-                            color: Colors.grey.withOpacity(0.3),
+                            color: Colors.grey.withValues(alpha: 0.3),
                             borderRadius: BorderRadius.circular(4),
                           ),
                         ),
