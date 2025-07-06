@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../core/core.dart';
-import '../../providers/providers.dart';
+import '../../cubit/emotion/emotion_cubit.dart';
 import '../../widgets/widgets.dart';
 
 class DashboardScreen extends StatefulWidget {
@@ -16,7 +16,11 @@ class _DashboardScreenState extends State<DashboardScreen> {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      context.read<EmotionProvider>().refreshAllData();
+      final emotionCubit = context.read<EmotionCubit>();
+      emotionCubit.loadSystemMetrics();
+      emotionCubit.loadAnalytics();
+      emotionCubit.loadCacheStats();
+      emotionCubit.loadModelInfo();
     });
   }
 
@@ -82,8 +86,13 @@ class _DashboardScreenState extends State<DashboardScreen> {
               ),
               const Spacer(),
               IconButton(
-                onPressed: () =>
-                    context.read<EmotionProvider>().refreshAllData(),
+                onPressed: () {
+                  final emotionCubit = context.read<EmotionCubit>();
+                  emotionCubit.loadSystemMetrics();
+                  emotionCubit.loadAnalytics();
+                  emotionCubit.loadCacheStats();
+                  emotionCubit.loadModelInfo();
+                },
                 icon: const Icon(Icons.refresh_rounded, color: Colors.white),
                 tooltip: 'Refresh Dashboard',
               ),

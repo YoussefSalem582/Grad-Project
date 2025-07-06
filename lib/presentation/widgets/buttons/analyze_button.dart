@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
-import '../../providers/providers.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import '../../cubit/emotion/emotion_cubit.dart';
 import '../../../core/core.dart';
 
 class AnalyzeButton extends StatelessWidget {
@@ -10,8 +10,8 @@ class AnalyzeButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Consumer<EmotionProvider>(
-      builder: (context, provider, child) {
+    return BlocBuilder<EmotionCubit, EmotionState>(
+      builder: (context, state) {
         return Container(
           height: 60,
           decoration: BoxDecoration(
@@ -28,16 +28,14 @@ class AnalyzeButton extends StatelessWidget {
           child: Material(
             color: Colors.transparent,
             child: InkWell(
-              onTap: provider.isConnected && !provider.isLoading
-                  ? onPressed
-                  : null,
+              onTap: _isButtonEnabled(state) ? onPressed : null,
               borderRadius: BorderRadius.circular(20),
               child: Container(
                 padding: const EdgeInsets.symmetric(horizontal: 24),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    if (provider.isLoading) ...[
+                    if (_isLoading(state)) ...[
                       const SizedBox(
                         width: 24,
                         height: 24,
@@ -79,5 +77,16 @@ class AnalyzeButton extends StatelessWidget {
         );
       },
     );
+  }
+
+  bool _isButtonEnabled(EmotionState state) {
+    if (state is EmotionConnectionResult) {
+      return state.isConnected && !_isLoading(state);
+    }
+    return !_isLoading(state);
+  }
+
+  bool _isLoading(EmotionState state) {
+    return state is EmotionLoading;
   }
 }

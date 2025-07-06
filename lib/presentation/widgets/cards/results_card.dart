@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
-import '../../providers/providers.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import '../../cubit/emotion/emotion_cubit.dart';
 import '../widgets.dart';
 import '../../../core/core.dart';
 
@@ -9,12 +9,13 @@ class ResultsCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Consumer<EmotionProvider>(
-      builder: (context, provider, child) {
-        final result = provider.emotionResult;
-        if (result == null) {
+    return BlocBuilder<EmotionCubit, EmotionState>(
+      builder: (context, state) {
+        if (state is! EmotionSuccess) {
           return const SizedBox.shrink();
         }
+
+        final result = state.emotionResult;
 
         return Column(
           children: [

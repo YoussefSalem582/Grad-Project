@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../core/core.dart';
-import '../../providers/providers.dart';
+import '../../cubit/emotion/emotion_cubit.dart';
 
 class ModelInfoScreen extends StatefulWidget {
   const ModelInfoScreen({super.key});
@@ -15,7 +15,7 @@ class _ModelInfoScreenState extends State<ModelInfoScreen> {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      context.read<EmotionProvider>().loadModelInfo();
+      context.read<EmotionCubit>().loadModelInfo();
     });
   }
 
@@ -66,7 +66,7 @@ class _ModelInfoScreenState extends State<ModelInfoScreen> {
             ),
           ),
           IconButton(
-            onPressed: () => context.read<EmotionProvider>().loadModelInfo(),
+            onPressed: () => context.read<EmotionCubit>().loadModelInfo(),
             icon: const Icon(Icons.refresh, color: Colors.white, size: 24),
             tooltip: 'Refresh model info',
           ),
@@ -91,11 +91,11 @@ class _ModelInfoScreenState extends State<ModelInfoScreen> {
         ),
         child: SingleChildScrollView(
           padding: const EdgeInsets.fromLTRB(24, 32, 24, 32),
-          child: Consumer<EmotionProvider>(
-            builder: (context, provider, child) {
+          child: BlocBuilder<EmotionCubit, EmotionState>(
+            builder: (context, state) {
               return Column(
                 children: [
-                  _buildModelOverviewCard(provider),
+                  _buildModelOverviewCard(state),
                   const SizedBox(height: 24),
                   _buildCapabilitiesCard(),
                   const SizedBox(height: 24),
@@ -113,39 +113,31 @@ class _ModelInfoScreenState extends State<ModelInfoScreen> {
     );
   }
 
-  Widget _buildModelOverviewCard(EmotionProvider provider) {
+  Widget _buildModelOverviewCard(EmotionState state) {
+    final modelInfo = state is EmotionSuccess ? state.modelInfo : null;
+
     return _buildInfoCard(
       title: 'Model Overview',
       icon: Icons.psychology,
       color: AppColors.primary,
-      child: provider.modelInfo != null
+      child: modelInfo != null
           ? Column(
               children: [
                 _buildInfoRow(
                   'Model Name',
-                  provider.modelInfo!['name'] ?? 'GraphSmile EmotionAI',
+                  modelInfo['name'] ?? 'GraphSmile EmotionAI',
                 ),
-                _buildInfoRow(
-                  'Version',
-                  provider.modelInfo!['version'] ?? '3.0.0',
-                ),
+                _buildInfoRow('Version', modelInfo['version'] ?? '3.0.0'),
                 _buildInfoRow(
                   'Architecture',
-                  provider.modelInfo!['architecture'] ??
-                      'Transformer Neural Network',
+                  modelInfo['architecture'] ?? 'Transformer Neural Network',
                 ),
                 _buildInfoRow(
                   'Last Updated',
-                  provider.modelInfo!['last_updated'] ?? 'December 2024',
+                  modelInfo['last_updated'] ?? 'December 2024',
                 ),
-                _buildInfoRow(
-                  'Model Size',
-                  provider.modelInfo!['size'] ?? '1.2GB',
-                ),
-                _buildInfoRow(
-                  'Parameters',
-                  provider.modelInfo!['parameters'] ?? '850M',
-                ),
+                _buildInfoRow('Model Size', modelInfo['size'] ?? '1.2GB'),
+                _buildInfoRow('Parameters', modelInfo['parameters'] ?? '850M'),
               ],
             )
           : const Center(

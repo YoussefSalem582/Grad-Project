@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
-import '../../providers/providers.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import '../../cubit/emotion/emotion_cubit.dart';
 
 import '../../../core/core.dart';
 
@@ -80,7 +80,7 @@ class _StatisticsScreenState extends State<StatisticsScreen>
             ),
           ),
           IconButton(
-            onPressed: () => context.read<EmotionProvider>().refreshAllData(),
+            onPressed: () => context.read<EmotionCubit>().loadSystemMetrics(),
             icon: const Icon(Icons.refresh, color: Colors.white, size: 24),
             tooltip: 'Refresh data',
           ),
@@ -197,13 +197,13 @@ class _StatisticsScreenState extends State<StatisticsScreen>
   Widget _buildDistributionTab() {
     return SingleChildScrollView(
       padding: const EdgeInsets.fromLTRB(24, 32, 24, 32),
-      child: Consumer<EmotionProvider>(
-        builder: (context, provider, child) {
+      child: BlocBuilder<EmotionCubit, EmotionState>(
+        builder: (context, state) {
           return Column(
             children: [
-              _buildEmotionDistributionCard(provider),
+              _buildEmotionDistributionCard(state),
               const SizedBox(height: 24),
-              _buildSentimentDistributionCard(provider),
+              _buildSentimentDistributionCard(state),
               const SizedBox(height: 24),
               _buildTimeDistributionCard(),
             ],
@@ -216,13 +216,13 @@ class _StatisticsScreenState extends State<StatisticsScreen>
   Widget _buildPerformanceTab() {
     return SingleChildScrollView(
       padding: const EdgeInsets.fromLTRB(24, 32, 24, 32),
-      child: Consumer<EmotionProvider>(
-        builder: (context, provider, child) {
+      child: BlocBuilder<EmotionCubit, EmotionState>(
+        builder: (context, state) {
           return Column(
             children: [
-              _buildSystemPerformanceCard(provider),
+              _buildSystemPerformanceCard(state),
               const SizedBox(height: 24),
-              _buildApiPerformanceCard(provider),
+              _buildApiPerformanceCard(state),
               const SizedBox(height: 24),
               _buildAccuracyMetricsCard(),
             ],
@@ -325,8 +325,8 @@ class _StatisticsScreenState extends State<StatisticsScreen>
     );
   }
 
-  Widget _buildEmotionDistributionCard(EmotionProvider provider) {
-    final analytics = provider.analyticsSummary;
+  Widget _buildEmotionDistributionCard(EmotionState state) {
+    final analytics = state is EmotionSuccess ? state.analyticsSummary : null;
     return _buildStatCard(
       title: 'Emotion Distribution',
       subtitle: 'Breakdown by emotion type',
@@ -355,8 +355,8 @@ class _StatisticsScreenState extends State<StatisticsScreen>
     );
   }
 
-  Widget _buildSentimentDistributionCard(EmotionProvider provider) {
-    final analytics = provider.analyticsSummary;
+  Widget _buildSentimentDistributionCard(EmotionState state) {
+    final analytics = state is EmotionSuccess ? state.analyticsSummary : null;
     return _buildStatCard(
       title: 'Sentiment Analysis',
       subtitle: 'Overall sentiment breakdown',
@@ -402,8 +402,8 @@ class _StatisticsScreenState extends State<StatisticsScreen>
     );
   }
 
-  Widget _buildSystemPerformanceCard(EmotionProvider provider) {
-    final metrics = provider.systemMetrics;
+  Widget _buildSystemPerformanceCard(EmotionState state) {
+    final metrics = state is EmotionSuccess ? state.systemMetrics : null;
     return _buildStatCard(
       title: 'System Performance',
       subtitle: 'Backend system health metrics',
@@ -446,8 +446,8 @@ class _StatisticsScreenState extends State<StatisticsScreen>
     );
   }
 
-  Widget _buildApiPerformanceCard(EmotionProvider provider) {
-    final analytics = provider.analyticsSummary;
+  Widget _buildApiPerformanceCard(EmotionState state) {
+    final analytics = state is EmotionSuccess ? state.analyticsSummary : null;
     return _buildStatCard(
       title: 'API Performance',
       subtitle: 'Request processing statistics',

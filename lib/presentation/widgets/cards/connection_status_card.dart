@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
-import '../../providers/providers.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import '../../cubit/emotion/emotion_cubit.dart';
 import '../../../core/core.dart';
 
 class ConnectionStatusCard extends StatelessWidget {
@@ -8,20 +8,22 @@ class ConnectionStatusCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Consumer<EmotionProvider>(
-      builder: (context, provider, child) {
+    return BlocBuilder<EmotionCubit, EmotionState>(
+      builder: (context, state) {
+        final isConnected = _isConnected(state);
+        final isChecking = _isConnectionChecking(state);
+
         return Container(
           padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(
-            gradient: provider.isConnected
+            gradient: isConnected
                 ? AppColors.successGradient
                 : AppColors.errorGradient,
             borderRadius: BorderRadius.circular(20),
             boxShadow: [
               BoxShadow(
-                color:
-                    (provider.isConnected ? AppColors.success : AppColors.error)
-                        .withValues(alpha: 0.3),
+                color: (isConnected ? AppColors.success : AppColors.error)
+                    .withValues(alpha: 0.3),
                 blurRadius: 12,
                 offset: const Offset(0, 4),
               ),
@@ -30,16 +32,14 @@ class ConnectionStatusCard extends StatelessWidget {
           child: Row(
             children: [
               Icon(
-                provider.isConnected ? Icons.check_circle : Icons.error,
+                isConnected ? Icons.check_circle : Icons.error,
                 color: Colors.white,
                 size: 24,
               ),
               const SizedBox(width: 12),
               Expanded(
                 child: Text(
-                  provider.isConnected
-                      ? AppStrings.connected
-                      : AppStrings.disconnected,
+                  isConnected ? AppStrings.connected : AppStrings.disconnected,
                   style: const TextStyle(
                     color: Colors.white,
                     fontWeight: FontWeight.w600,
@@ -48,10 +48,10 @@ class ConnectionStatusCard extends StatelessWidget {
                 ),
               ),
               TextButton.icon(
-                onPressed: provider.isConnectionChecking
+                onPressed: isChecking
                     ? null
-                    : () => provider.checkConnection(),
-                icon: provider.isConnectionChecking
+                    : () => context.read<EmotionCubit>().checkConnection(),
+                icon: isChecking
                     ? const SizedBox(
                         width: 18,
                         height: 18,
@@ -77,5 +77,16 @@ class ConnectionStatusCard extends StatelessWidget {
         );
       },
     );
+  }
+
+  bool _isConnected(EmotionState state) {
+    if (state is EmotionConnectionResult) {
+      return state.isConnected;
+    }
+    return false;
+  }
+
+  bool _isConnectionChecking(EmotionState state) {
+    return state is EmotionConnectionChecking;
   }
 }

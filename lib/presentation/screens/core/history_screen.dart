@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../core/core.dart';
-import '../../providers/providers.dart';
+import '../../cubit/emotion/emotion_cubit.dart';
 
 class HistoryScreen extends StatefulWidget {
   const HistoryScreen({super.key});
@@ -490,8 +490,8 @@ class _HistoryScreenState extends State<HistoryScreen> {
   }
 
   void _reAnalyze(String text) {
-    final provider = context.read<EmotionProvider>();
-    provider.analyzeEmotion(text);
+    final emotionCubit = context.read<EmotionCubit>();
+    emotionCubit.analyzeText(text);
     Navigator.pop(context); // Go back to main screen
   }
 

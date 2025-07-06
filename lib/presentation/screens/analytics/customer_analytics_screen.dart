@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../core/core.dart';
-import '../../providers/providers.dart';
+import '../../cubit/emotion/emotion_cubit.dart';
 
 import '../../widgets/widgets.dart';
 
@@ -46,7 +46,7 @@ class _CustomerAnalyticsScreenState extends State<CustomerAnalyticsScreen>
             tooltip: 'Export Report',
           ),
           IconButton(
-            onPressed: () => context.read<EmotionProvider>().refreshAllData(),
+            onPressed: () => context.read<EmotionCubit>().loadSystemMetrics(),
             icon: const Icon(Icons.refresh_rounded),
             tooltip: 'Refresh Data',
           ),
@@ -167,10 +167,10 @@ class _CustomerAnalyticsScreenState extends State<CustomerAnalyticsScreen>
         children: [
           _buildCustomerFeedbackInput(),
           const SizedBox(height: 24),
-          Consumer<EmotionProvider>(
-            builder: (context, provider, child) {
-              if (provider.emotionResult != null) {
-                return _buildAnalysisResults(provider);
+          BlocBuilder<EmotionCubit, EmotionState>(
+            builder: (context, state) {
+              if (state is EmotionSuccess) {
+                return _buildAnalysisResults(state);
               }
               return _buildRecentAnalyses();
             },
@@ -227,7 +227,7 @@ class _CustomerAnalyticsScreenState extends State<CustomerAnalyticsScreen>
     );
   }
 
-  Widget _buildAnalysisResults(EmotionProvider provider) {
+  Widget _buildAnalysisResults(EmotionSuccess state) {
     return Container(
       decoration: AppTheme.enterpriseCardDecoration(),
       child: const ResultsCard(),
@@ -698,9 +698,7 @@ class _CustomerAnalyticsScreenState extends State<CustomerAnalyticsScreen>
       return;
     }
 
-    context.read<EmotionProvider>().analyzeEmotion(
-      _feedbackController.text.trim(),
-    );
+    context.read<EmotionCubit>().analyzeText(_feedbackController.text.trim());
   }
 
   void _showSampleFeedback() {

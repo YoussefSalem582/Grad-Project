@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
-import '../../providers/providers.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import '../../cubit/video_analysis/video_analysis_cubit.dart';
 
 class VideoAnalysisForm extends StatefulWidget {
   const VideoAnalysisForm({super.key});
@@ -114,8 +114,8 @@ class _VideoAnalysisFormState extends State<VideoAnalysisForm> {
               ElevatedButton(
                 onPressed: () {
                   if (_formKey.currentState?.validate() ?? false) {
-                    context.read<EmotionProvider>().analyzeVideo(
-                      _urlController.text,
+                    context.read<VideoAnalysisCubit>().analyzeVideo(
+                      videoUrl: _urlController.text,
                       frameInterval: _frameInterval,
                       maxFrames: _maxFrames,
                     );

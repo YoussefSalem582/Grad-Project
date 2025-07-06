@@ -1,9 +1,24 @@
 import 'package:get_it/get_it.dart';
 import 'package:http/http.dart' as http;
 
+// Services
 import '../../data/services/video_analysis_api_service.dart';
+import '../../data/services/emotion_api_service.dart';
+
+// Repositories
 import '../../data/repositories/video_analysis_repository.dart';
+
+// Cubits
 import '../../presentation/cubit/video_analysis/video_analysis_cubit.dart';
+import '../../presentation/cubit/emotion/emotion_cubit.dart';
+import '../../presentation/cubit/user/user_cubit.dart';
+import '../../presentation/cubit/text_analysis/text_analysis_cubit.dart';
+import '../../presentation/cubit/voice_analysis/voice_analysis_cubit.dart';
+import '../../presentation/cubit/employee_dashboard/employee_dashboard_cubit.dart';
+import '../../presentation/cubit/employee_analytics/employee_analytics_cubit.dart';
+import '../../presentation/cubit/employee_tickets/employee_tickets_cubit.dart';
+import '../../presentation/cubit/employee_performance/employee_performance_cubit.dart';
+import '../../presentation/cubit/admin_dashboard/admin_dashboard_cubit.dart';
 
 final GetIt sl = GetIt.instance;
 
@@ -15,12 +30,32 @@ Future<void> init() async {
   sl.registerLazySingleton<VideoAnalysisApiService>(
     () => VideoAnalysisApiService(client: sl()),
   );
+  sl.registerLazySingleton<EmotionApiService>(
+    () => EmotionApiService(client: sl()),
+  );
 
   // Repositories
   sl.registerLazySingleton<VideoAnalysisRepository>(
     () => VideoAnalysisRepository(sl()),
   );
 
-  // Cubits
+  // Analysis Cubits
   sl.registerFactory<VideoAnalysisCubit>(() => VideoAnalysisCubit(sl()));
+  sl.registerFactory<TextAnalysisCubit>(() => TextAnalysisCubit());
+  sl.registerFactory<VoiceAnalysisCubit>(() => VoiceAnalysisCubit());
+
+  // Core Cubits
+  sl.registerFactory<EmotionCubit>(() => EmotionCubit(sl()));
+  sl.registerFactory<UserCubit>(() => UserCubit());
+
+  // Employee Cubits
+  sl.registerFactory<EmployeeDashboardCubit>(() => EmployeeDashboardCubit());
+  sl.registerFactory<EmployeeAnalyticsCubit>(() => EmployeeAnalyticsCubit());
+  sl.registerFactory<EmployeeTicketsCubit>(() => EmployeeTicketsCubit());
+  sl.registerFactory<EmployeePerformanceCubit>(
+    () => EmployeePerformanceCubit(),
+  );
+
+  // Admin Cubits
+  sl.registerFactory<AdminDashboardCubit>(() => AdminDashboardCubit());
 }
