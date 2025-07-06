@@ -1,7 +1,5 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:equatable/equatable.dart';
-import '../../../core/core.dart';
-
 part 'voice_analysis_state.dart';
 
 class VoiceAnalysisCubit extends Cubit<VoiceAnalysisState> {

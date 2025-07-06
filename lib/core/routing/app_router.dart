@@ -24,12 +24,6 @@ class AppRouter {
           settings: settings,
         );
 
-      case roleSelection:
-        return MaterialPageRoute(
-          builder: (_) => const RoleSelectionScreen(),
-          settings: settings,
-        );
-
       case adminDashboard:
         return MaterialPageRoute(
           builder: (_) => const AdminNavigationScreen(),
@@ -39,12 +33,6 @@ class AppRouter {
       case employeeDashboard:
         return MaterialPageRoute(
           builder: (_) => const EmployeeNavigationScreen(),
-          settings: settings,
-        );
-
-      case appStatus:
-        return MaterialPageRoute(
-          builder: (_) => const AppStatusScreen(),
           settings: settings,
         );
 

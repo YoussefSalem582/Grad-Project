@@ -5,6 +5,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'core/constants/app_theme.dart';
 import 'core/routing/app_router.dart';
 import 'core/di/dependency_injection.dart' as di;
+import 'core/config/app_config.dart';
 
 // Presentation - Cubits
 import 'presentation/cubit/video_analysis/video_analysis_cubit.dart';
@@ -17,9 +18,14 @@ import 'presentation/cubit/employee_analytics/employee_analytics_cubit.dart';
 import 'presentation/cubit/employee_tickets/employee_tickets_cubit.dart';
 import 'presentation/cubit/employee_performance/employee_performance_cubit.dart';
 import 'presentation/cubit/admin_dashboard/admin_dashboard_cubit.dart';
+import 'presentation/cubit/connection_cubit.dart';
+import 'presentation/widgets/backend_connection_widget.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  // Load application configuration
+  await AppConfig.loadConfig();
 
   // Initialize dependency injection
   await di.init();
@@ -67,23 +73,28 @@ class EmosenseApp extends StatelessWidget {
         BlocProvider<AdminDashboardCubit>(
           create: (_) => di.sl<AdminDashboardCubit>(),
         ),
+
+        // Connection Management
+        BlocProvider<ConnectionCubit>(create: (_) => ConnectionCubit()),
       ],
-      child: MaterialApp(
-        title: 'Emosense',
-        theme: AppTheme.lightTheme,
-        darkTheme: AppTheme.darkTheme,
-        themeMode: ThemeMode.system,
-        initialRoute: AppRouter.login,
-        onGenerateRoute: AppRouter.generateRoute,
-        debugShowCheckedModeBanner: false,
-        builder: (context, child) {
-          return MediaQuery(
-            data: MediaQuery.of(
-              context,
-            ).copyWith(textScaler: const TextScaler.linear(1.0)),
-            child: child!,
-          );
-        },
+      child: BackendConnectionWidget(
+        child: MaterialApp(
+          title: 'Emosense',
+          theme: AppTheme.lightTheme,
+          darkTheme: AppTheme.darkTheme,
+          themeMode: ThemeMode.system,
+          initialRoute: AppRouter.login,
+          onGenerateRoute: AppRouter.generateRoute,
+          debugShowCheckedModeBanner: false,
+          builder: (context, child) {
+            return MediaQuery(
+              data: MediaQuery.of(
+                context,
+              ).copyWith(textScaler: const TextScaler.linear(1.0)),
+              child: child!,
+            );
+          },
+        ),
       ),
     );
   }

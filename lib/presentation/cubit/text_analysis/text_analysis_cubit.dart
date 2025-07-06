@@ -1,7 +1,5 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:equatable/equatable.dart';
-import '../../../core/core.dart';
-
 part 'text_analysis_state.dart';
 
 class TextAnalysisCubit extends Cubit<TextAnalysisState> {

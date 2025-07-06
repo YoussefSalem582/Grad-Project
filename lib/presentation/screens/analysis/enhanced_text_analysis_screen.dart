@@ -5,8 +5,6 @@ import '../../../core/core.dart';
 import '../../widgets/analysis/analysis.dart';
 import '../../widgets/auth/animated_background_widget.dart';
 import '../../cubit/text_analysis/text_analysis_cubit.dart';
-import '../core/settings_screen.dart';
-import 'batch_processing_screen.dart';
 
 class EnhancedTextAnalysisScreen extends StatelessWidget {
   const EnhancedTextAnalysisScreen({super.key});
@@ -369,10 +367,10 @@ class _EnhancedTextAnalysisScreenViewState
 
   void _navigateToBatchProcessing() {
     HapticFeedback.lightImpact();
-    Navigator.push(
-      context,
-      MaterialPageRoute(builder: (context) => const BatchProcessingScreen()),
-    );
+    // Navigator.push(
+    //   context,
+    //   MaterialPageRoute(builder: (context) => const BatchProcessingScreen()),
+    // );
   }
 
   void _exportResults() {
@@ -397,10 +395,10 @@ class _EnhancedTextAnalysisScreenViewState
 
   void _navigateToSettings() {
     HapticFeedback.lightImpact();
-    Navigator.push(
-      context,
-      MaterialPageRoute(builder: (context) => const SettingsScreen()),
-    );
+    // Navigator.push(
+    //   context,
+    //   //MaterialPageRoute(builder: (context) => const SettingsScreen()),
+    // );
   }
 
   void _showAboutDialog() {
