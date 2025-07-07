@@ -15,6 +15,39 @@ class TextTemplatesWidget extends StatelessWidget {
     this.onCategoryChanged,
   });
 
+  /// Helper method to safely get category name from template
+  String _getCategoryName(TextTemplate template) {
+    try {
+      // Try to access as enum first (core TextTemplate)
+      return template.category.name;
+    } catch (e) {
+      // Fallback for string category (model TextTemplate)
+      return template.category.toString();
+    }
+  }
+
+  /// Helper method to safely get category icon from template
+  IconData _getCategoryIcon(TextTemplate template) {
+    try {
+      // Try to access as enum first (core TextTemplate)
+      return template.category.icon;
+    } catch (e) {
+      // Fallback icon for string category (model TextTemplate)
+      return Icons.text_snippet;
+    }
+  }
+
+  /// Helper method to safely get category color from template
+  Color _getCategoryColor(TextTemplate template) {
+    try {
+      // Try to access as enum first (core TextTemplate)
+      return template.category.color;
+    } catch (e) {
+      // Fallback color for string category (model TextTemplate)
+      return AppColors.primary;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
@@ -23,15 +56,15 @@ class TextTemplatesWidget extends StatelessWidget {
     // Group templates by category
     final groupedTemplates = <String, List<TextTemplate>>{};
     for (final template in templates) {
-      groupedTemplates
-          .putIfAbsent(template.category.name, () => [])
-          .add(template);
+      final categoryName = _getCategoryName(template);
+      groupedTemplates.putIfAbsent(categoryName, () => []).add(template);
     }
 
     final categories = groupedTemplates.keys.toList();
-    final displayTemplates = selectedCategory != null
-        ? groupedTemplates[selectedCategory] ?? []
-        : templates;
+    final displayTemplates =
+        selectedCategory != null
+            ? groupedTemplates[selectedCategory] ?? []
+            : templates;
 
     return Container(
       margin: EdgeInsets.all(customSpacing.md),
@@ -193,19 +226,21 @@ class TextTemplatesWidget extends StatelessWidget {
           color: isSelected ? AppColors.primary : AppColors.background,
           borderRadius: BorderRadius.circular(20),
           border: Border.all(
-            color: isSelected
-                ? AppColors.primary
-                : AppColors.primary.withValues(alpha: 0.2),
+            color:
+                isSelected
+                    ? AppColors.primary
+                    : AppColors.primary.withValues(alpha: 0.2),
           ),
-          boxShadow: isSelected
-              ? [
-                  BoxShadow(
-                    color: AppColors.primary.withValues(alpha: 0.2),
-                    blurRadius: 8,
-                    offset: const Offset(0, 2),
-                  ),
-                ]
-              : null,
+          boxShadow:
+              isSelected
+                  ? [
+                    BoxShadow(
+                      color: AppColors.primary.withValues(alpha: 0.2),
+                      blurRadius: 8,
+                      offset: const Offset(0, 2),
+                    ),
+                  ]
+                  : null,
         ),
         child: Text(
           label,
@@ -264,8 +299,8 @@ class TextTemplatesWidget extends StatelessWidget {
             decoration: BoxDecoration(
               gradient: LinearGradient(
                 colors: [
-                  template.category.color,
-                  template.category.color.withValues(alpha: 0.8),
+                  _getCategoryColor(template),
+                  _getCategoryColor(template).withValues(alpha: 0.8),
                 ],
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
@@ -278,7 +313,7 @@ class TextTemplatesWidget extends StatelessWidget {
                   top: -20,
                   right: -20,
                   child: Icon(
-                    template.category.icon,
+                    _getCategoryIcon(template),
                     size: 80,
                     color: Colors.white.withValues(alpha: 0.1),
                   ),
@@ -304,15 +339,15 @@ class TextTemplatesWidget extends StatelessWidget {
                           mainAxisSize: MainAxisSize.min,
                           children: [
                             Icon(
-                              template.category.icon,
+                              _getCategoryIcon(template),
                               size: 12,
-                              color: template.category.color,
+                              color: _getCategoryColor(template),
                             ),
                             SizedBox(width: spacing.xs),
                             Text(
-                              template.category.name,
+                              _getCategoryName(template),
                               style: theme.textTheme.bodySmall?.copyWith(
-                                color: template.category.color,
+                                color: _getCategoryColor(template),
                                 fontWeight: FontWeight.w600,
                                 fontSize: 10,
                               ),
@@ -356,7 +391,7 @@ class TextTemplatesWidget extends StatelessWidget {
                                 Text(
                                   'Use',
                                   style: theme.textTheme.bodySmall?.copyWith(
-                                    color: template.category.color,
+                                    color: _getCategoryColor(template),
                                     fontWeight: FontWeight.w600,
                                   ),
                                 ),
@@ -364,7 +399,7 @@ class TextTemplatesWidget extends StatelessWidget {
                                 Icon(
                                   Icons.arrow_forward,
                                   size: 12,
-                                  color: template.category.color,
+                                  color: _getCategoryColor(template),
                                 ),
                               ],
                             ),
@@ -387,10 +422,11 @@ class TextTemplatesWidget extends StatelessWidget {
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
-      builder: (context) => _AllTemplatesBottomSheet(
-        templates: templates,
-        onTemplateSelected: onTemplateSelected,
-      ),
+      builder:
+          (context) => _AllTemplatesBottomSheet(
+            templates: templates,
+            onTemplateSelected: onTemplateSelected,
+          ),
     );
   }
 }
@@ -412,6 +448,33 @@ class _AllTemplatesBottomSheet extends StatefulWidget {
 class _AllTemplatesBottomSheetState extends State<_AllTemplatesBottomSheet> {
   String? selectedCategory;
 
+  /// Helper method to safely get category name from template
+  String _getCategoryName(TextTemplate template) {
+    try {
+      return template.category.name;
+    } catch (e) {
+      return template.category.toString();
+    }
+  }
+
+  /// Helper method to safely get category icon from template
+  IconData _getCategoryIcon(TextTemplate template) {
+    try {
+      return template.category.icon;
+    } catch (e) {
+      return Icons.text_snippet;
+    }
+  }
+
+  /// Helper method to safely get category color from template
+  Color _getCategoryColor(TextTemplate template) {
+    try {
+      return template.category.color;
+    } catch (e) {
+      return AppColors.primary;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
@@ -419,15 +482,15 @@ class _AllTemplatesBottomSheetState extends State<_AllTemplatesBottomSheet> {
 
     final groupedTemplates = <String, List<TextTemplate>>{};
     for (final template in widget.templates) {
-      groupedTemplates
-          .putIfAbsent(template.category.name, () => [])
-          .add(template);
+      final categoryName = _getCategoryName(template);
+      groupedTemplates.putIfAbsent(categoryName, () => []).add(template);
     }
 
     final categories = groupedTemplates.keys.toList();
-    final displayTemplates = selectedCategory != null
-        ? groupedTemplates[selectedCategory] ?? []
-        : widget.templates;
+    final displayTemplates =
+        selectedCategory != null
+            ? groupedTemplates[selectedCategory] ?? []
+            : widget.templates;
 
     return Container(
       height: MediaQuery.of(context).size.height * 0.8,
@@ -516,9 +579,8 @@ class _AllTemplatesBottomSheetState extends State<_AllTemplatesBottomSheet> {
     return GestureDetector(
       onTap: () {
         setState(() {
-          selectedCategory = isSelected
-              ? null
-              : (label == 'All' ? null : label);
+          selectedCategory =
+              isSelected ? null : (label == 'All' ? null : label);
         });
       },
       child: Container(
@@ -530,9 +592,10 @@ class _AllTemplatesBottomSheetState extends State<_AllTemplatesBottomSheet> {
           color: isSelected ? AppColors.primary : AppColors.background,
           borderRadius: BorderRadius.circular(20),
           border: Border.all(
-            color: isSelected
-                ? AppColors.primary
-                : AppColors.primary.withValues(alpha: 0.2),
+            color:
+                isSelected
+                    ? AppColors.primary
+                    : AppColors.primary.withValues(alpha: 0.2),
           ),
         ),
         child: Text(
@@ -564,12 +627,12 @@ class _AllTemplatesBottomSheetState extends State<_AllTemplatesBottomSheet> {
           width: 60,
           height: 60,
           decoration: BoxDecoration(
-            color: template.category.color.withValues(alpha: 0.1),
+            color: _getCategoryColor(template).withValues(alpha: 0.1),
             borderRadius: BorderRadius.circular(12),
           ),
           child: Icon(
-            template.category.icon,
-            color: template.category.color,
+            _getCategoryIcon(template),
+            color: _getCategoryColor(template),
             size: 24,
           ),
         ),
@@ -591,13 +654,13 @@ class _AllTemplatesBottomSheetState extends State<_AllTemplatesBottomSheet> {
               vertical: spacing.xs,
             ),
             decoration: BoxDecoration(
-              color: template.category.color.withValues(alpha: 0.1),
+              color: _getCategoryColor(template).withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(8),
             ),
             child: Text(
-              template.category.name,
+              _getCategoryName(template),
               style: theme.textTheme.bodySmall?.copyWith(
-                color: template.category.color,
+                color: _getCategoryColor(template),
                 fontWeight: FontWeight.w600,
               ),
             ),

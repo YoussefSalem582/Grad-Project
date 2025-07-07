@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import '../../../core/core.dart';
 import '../../widgets/analysis/analysis.dart';
-import '../../widgets/auth/animated_background_widget.dart';
+import '../../widgets/common/animated_background_widget.dart';
 
 class EnhancedVideoAnalysisScreen extends StatefulWidget {
   const EnhancedVideoAnalysisScreen({super.key});
@@ -510,25 +510,28 @@ class _EnhancedVideoAnalysisScreenState
   void _showHistoryDetails(AnalysisHistoryItem item) {
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
-        title: Text('Analysis Details'),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text('Title: ${item.title}'),
-            Text('Type: ${item.type}'),
-            Text('Confidence: ${((item.confidence ?? 0.0) * 100).toInt()}%'),
-            Text('Date: ${item.timestamp.toString().split('.')[0]}'),
-          ],
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: Text('Close'),
+      builder:
+          (context) => AlertDialog(
+            title: Text('Analysis Details'),
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text('Title: ${item.title}'),
+                Text('Type: ${item.type}'),
+                Text(
+                  'Confidence: ${((item.confidence ?? 0.0) * 100).toInt()}%',
+                ),
+                Text('Date: ${item.timestamp.toString().split('.')[0]}'),
+              ],
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context),
+                child: Text('Close'),
+              ),
+            ],
           ),
-        ],
-      ),
     );
   }
 }
@@ -836,9 +839,10 @@ class _VideoSettingsBottomSheetState extends State<_VideoSettingsBottomSheet> {
                 vertical: spacing.sm,
               ),
             ),
-            items: options.map((option) {
-              return DropdownMenuItem(value: option, child: Text(option));
-            }).toList(),
+            items:
+                options.map((option) {
+                  return DropdownMenuItem(value: option, child: Text(option));
+                }).toList(),
           ),
         ],
       ),

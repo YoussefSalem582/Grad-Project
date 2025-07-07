@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../../core/core.dart';
-import '../../widgets/auth/animated_background_widget.dart';
+import '../../widgets/common/animated_background_widget.dart';
 
 class AdminProfileScreen extends StatefulWidget {
   const AdminProfileScreen({super.key});
@@ -396,9 +396,10 @@ class _AdminProfileScreenState extends State<AdminProfileScreen>
             Wrap(
               spacing: 8,
               runSpacing: 8,
-              children: (_adminProfile['permissions'] as List<String>)
-                  .map((permission) => _buildPermissionChip(permission))
-                  .toList(),
+              children:
+                  (_adminProfile['permissions'] as List<String>)
+                      .map((permission) => _buildPermissionChip(permission))
+                      .toList(),
             ),
           ],
         ),
@@ -621,129 +622,137 @@ class _AdminProfileScreenState extends State<AdminProfileScreen>
   void _showEditProfileDialog() {
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Edit Profile'),
-        content: const Text('Profile editing form would be implemented here'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Cancel'),
+      builder:
+          (context) => AlertDialog(
+            title: const Text('Edit Profile'),
+            content: const Text(
+              'Profile editing form would be implemented here',
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context),
+                child: const Text('Cancel'),
+              ),
+              ElevatedButton(
+                onPressed: () {
+                  Navigator.pop(context);
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text('Profile updated successfully'),
+                    ),
+                  );
+                },
+                child: const Text('Save Changes'),
+              ),
+            ],
           ),
-          ElevatedButton(
-            onPressed: () {
-              Navigator.pop(context);
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('Profile updated successfully')),
-              );
-            },
-            child: const Text('Save Changes'),
-          ),
-        ],
-      ),
     );
   }
 
   void _showSecuritySettingsDialog() {
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Security Settings'),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            ListTile(
-              leading: const Icon(Icons.lock),
-              title: const Text('Change Password'),
-              trailing: const Icon(Icons.arrow_forward_ios),
-              onTap: () {},
+      builder:
+          (context) => AlertDialog(
+            title: const Text('Security Settings'),
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                ListTile(
+                  leading: const Icon(Icons.lock),
+                  title: const Text('Change Password'),
+                  trailing: const Icon(Icons.arrow_forward_ios),
+                  onTap: () {},
+                ),
+                ListTile(
+                  leading: const Icon(Icons.fingerprint),
+                  title: const Text('Two-Factor Authentication'),
+                  trailing: Switch(value: true, onChanged: (value) {}),
+                ),
+                ListTile(
+                  leading: const Icon(Icons.history),
+                  title: const Text('Login History'),
+                  trailing: const Icon(Icons.arrow_forward_ios),
+                  onTap: () {},
+                ),
+              ],
             ),
-            ListTile(
-              leading: const Icon(Icons.fingerprint),
-              title: const Text('Two-Factor Authentication'),
-              trailing: Switch(value: true, onChanged: (value) {}),
-            ),
-            ListTile(
-              leading: const Icon(Icons.history),
-              title: const Text('Login History'),
-              trailing: const Icon(Icons.arrow_forward_ios),
-              onTap: () {},
-            ),
-          ],
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Close'),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context),
+                child: const Text('Close'),
+              ),
+            ],
           ),
-        ],
-      ),
     );
   }
 
   void _showNotificationSettingsDialog() {
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Notification Settings'),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            ListTile(
-              leading: const Icon(Icons.email),
-              title: const Text('Email Notifications'),
-              trailing: Switch(value: true, onChanged: (value) {}),
+      builder:
+          (context) => AlertDialog(
+            title: const Text('Notification Settings'),
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                ListTile(
+                  leading: const Icon(Icons.email),
+                  title: const Text('Email Notifications'),
+                  trailing: Switch(value: true, onChanged: (value) {}),
+                ),
+                ListTile(
+                  leading: const Icon(Icons.phone),
+                  title: const Text('SMS Notifications'),
+                  trailing: Switch(value: false, onChanged: (value) {}),
+                ),
+                ListTile(
+                  leading: const Icon(Icons.security),
+                  title: const Text('Security Alerts'),
+                  trailing: Switch(value: true, onChanged: (value) {}),
+                ),
+              ],
             ),
-            ListTile(
-              leading: const Icon(Icons.phone),
-              title: const Text('SMS Notifications'),
-              trailing: Switch(value: false, onChanged: (value) {}),
-            ),
-            ListTile(
-              leading: const Icon(Icons.security),
-              title: const Text('Security Alerts'),
-              trailing: Switch(value: true, onChanged: (value) {}),
-            ),
-          ],
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Close'),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context),
+                child: const Text('Close'),
+              ),
+            ],
           ),
-        ],
-      ),
     );
   }
 
   void _showLogoutDialog() {
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Sign Out'),
-        content: const Text('Are you sure you want to sign out?'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Cancel'),
+      builder:
+          (context) => AlertDialog(
+            title: const Text('Sign Out'),
+            content: const Text('Are you sure you want to sign out?'),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context),
+                child: const Text('Cancel'),
+              ),
+              ElevatedButton(
+                onPressed: () {
+                  Navigator.pop(context);
+                  // Handle logout logic here
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('Signed out successfully')),
+                  );
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color(0xFFFF6B6B),
+                ),
+                child: const Text(
+                  'Sign Out',
+                  style: TextStyle(color: Colors.white),
+                ),
+              ),
+            ],
           ),
-          ElevatedButton(
-            onPressed: () {
-              Navigator.pop(context);
-              // Handle logout logic here
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('Signed out successfully')),
-              );
-            },
-            style: ElevatedButton.styleFrom(
-              backgroundColor: const Color(0xFFFF6B6B),
-            ),
-            child: const Text(
-              'Sign Out',
-              style: TextStyle(color: Colors.white),
-            ),
-          ),
-        ],
-      ),
     );
   }
 }

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../../core/core.dart';
-import '../../widgets/auth/animated_background_widget.dart';
+import '../../widgets/common/animated_background_widget.dart';
 import '../../widgets/employee_screen_widgets/profile/profile.dart';
 
 class EmployeeProfileScreen extends StatefulWidget {
@@ -81,12 +81,12 @@ class _EmployeeProfileScreenState extends State<EmployeeProfileScreen>
                   notificationsEnabled: _notificationsEnabled,
                   emailAlerts: _emailAlerts,
                   selectedLanguage: _selectedLanguage,
-                  onNotificationsChanged: (value) =>
-                      setState(() => _notificationsEnabled = value),
-                  onEmailAlertsChanged: (value) =>
-                      setState(() => _emailAlerts = value),
-                  onLanguageChanged: (value) =>
-                      setState(() => _selectedLanguage = value!),
+                  onNotificationsChanged:
+                      (value) => setState(() => _notificationsEnabled = value),
+                  onEmailAlertsChanged:
+                      (value) => setState(() => _emailAlerts = value),
+                  onLanguageChanged:
+                      (value) => setState(() => _selectedLanguage = value!),
                 ),
                 const SizedBox(height: 20),
                 ProfileQuickActionsWidget(
@@ -108,119 +108,124 @@ class _EmployeeProfileScreenState extends State<EmployeeProfileScreen>
   void _showEditProfileDialog() {
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Edit Profile'),
-        content: const Text(
-          'Profile editing functionality will be implemented here.',
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Cancel'),
+      builder:
+          (context) => AlertDialog(
+            title: const Text('Edit Profile'),
+            content: const Text(
+              'Profile editing functionality will be implemented here.',
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context),
+                child: const Text('Cancel'),
+              ),
+              ElevatedButton(
+                onPressed: () => Navigator.pop(context),
+                child: const Text('Save'),
+              ),
+            ],
           ),
-          ElevatedButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Save'),
-          ),
-        ],
-      ),
     );
   }
 
   void _showChangePasswordDialog() {
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Change Password'),
-        content: const Text(
-          'Password change functionality will be implemented here.',
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Cancel'),
+      builder:
+          (context) => AlertDialog(
+            title: const Text('Change Password'),
+            content: const Text(
+              'Password change functionality will be implemented here.',
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context),
+                child: const Text('Cancel'),
+              ),
+              ElevatedButton(
+                onPressed: () => Navigator.pop(context),
+                child: const Text('Change'),
+              ),
+            ],
           ),
-          ElevatedButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Change'),
-          ),
-        ],
-      ),
     );
   }
 
   void _showTimeOffRequest() {
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Request Time Off'),
-        content: const Text(
-          'Time off request functionality will be implemented here.',
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Cancel'),
+      builder:
+          (context) => AlertDialog(
+            title: const Text('Request Time Off'),
+            content: const Text(
+              'Time off request functionality will be implemented here.',
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context),
+                child: const Text('Cancel'),
+              ),
+              ElevatedButton(
+                onPressed: () => Navigator.pop(context),
+                child: const Text('Submit'),
+              ),
+            ],
           ),
-          ElevatedButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Submit'),
-          ),
-        ],
-      ),
     );
   }
 
   void _showHelpSupport() {
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Help & Support'),
-        content: const Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text('Need help? Contact us:'),
-            SizedBox(height: 8),
-            Text('Email: support@graphsmile.com'),
-            Text('Phone: +1 (555) 123-4567'),
-            Text('Hours: 9 AM - 6 PM EST'),
-          ],
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Close'),
+      builder:
+          (context) => AlertDialog(
+            title: const Text('Help & Support'),
+            content: const Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text('Need help? Contact us:'),
+                SizedBox(height: 8),
+                Text('Email: support@graphsmile.com'),
+                Text('Phone: +1 (555) 123-4567'),
+                Text('Hours: 9 AM - 6 PM EST'),
+              ],
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context),
+                child: const Text('Close'),
+              ),
+            ],
           ),
-        ],
-      ),
     );
   }
 
   void _showSignOutDialog() {
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Sign Out'),
-        content: const Text('Are you sure you want to sign out?'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Cancel'),
+      builder:
+          (context) => AlertDialog(
+            title: const Text('Sign Out'),
+            content: const Text('Are you sure you want to sign out?'),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context),
+                child: const Text('Cancel'),
+              ),
+              ElevatedButton(
+                onPressed: () {
+                  Navigator.pop(context);
+                  Navigator.pushReplacementNamed(context, '/');
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: AppColors.error,
+                  foregroundColor: Colors.white,
+                ),
+                child: const Text('Sign Out'),
+              ),
+            ],
           ),
-          ElevatedButton(
-            onPressed: () {
-              Navigator.pop(context);
-              Navigator.pushReplacementNamed(context, '/');
-            },
-            style: ElevatedButton.styleFrom(
-              backgroundColor: AppColors.error,
-              foregroundColor: Colors.white,
-            ),
-            child: const Text('Sign Out'),
-          ),
-        ],
-      ),
     );
   }
 }

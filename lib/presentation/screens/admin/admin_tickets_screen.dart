@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../../core/core.dart';
-import '../../widgets/auth/animated_background_widget.dart';
+import '../../widgets/common/animated_background_widget.dart';
 
 class AdminTicketsScreen extends StatefulWidget {
   const AdminTicketsScreen({super.key});
@@ -349,11 +349,12 @@ class _AdminTicketsScreenState extends State<AdminTicketsScreen>
                 style: TextStyle(
                   fontSize: 11,
                   fontWeight: FontWeight.w600,
-                  color: metric['change'].startsWith('+')
-                      ? AppColors.success
-                      : metric['change'].startsWith('-')
-                      ? AppColors.error
-                      : AppColors.primary,
+                  color:
+                      metric['change'].startsWith('+')
+                          ? AppColors.success
+                          : metric['change'].startsWith('-')
+                          ? AppColors.error
+                          : AppColors.primary,
                 ),
               ),
             ],
@@ -454,8 +455,8 @@ class _AdminTicketsScreenState extends State<AdminTicketsScreen>
                 ),
                 child: PopupMenuButton<String>(
                   initialValue: _selectedPriority,
-                  onSelected: (value) =>
-                      setState(() => _selectedPriority = value),
+                  onSelected:
+                      (value) => setState(() => _selectedPriority = value),
                   child: Container(
                     padding: EdgeInsets.all(customSpacing.sm),
                     child: Row(
@@ -478,19 +479,23 @@ class _AdminTicketsScreenState extends State<AdminTicketsScreen>
                       ],
                     ),
                   ),
-                  itemBuilder: (context) => [
-                    const PopupMenuItem(
-                      value: 'all',
-                      child: Text('All Priorities'),
-                    ),
-                    const PopupMenuItem(
-                      value: 'critical',
-                      child: Text('Critical'),
-                    ),
-                    const PopupMenuItem(value: 'high', child: Text('High')),
-                    const PopupMenuItem(value: 'medium', child: Text('Medium')),
-                    const PopupMenuItem(value: 'low', child: Text('Low')),
-                  ],
+                  itemBuilder:
+                      (context) => [
+                        const PopupMenuItem(
+                          value: 'all',
+                          child: Text('All Priorities'),
+                        ),
+                        const PopupMenuItem(
+                          value: 'critical',
+                          child: Text('Critical'),
+                        ),
+                        const PopupMenuItem(value: 'high', child: Text('High')),
+                        const PopupMenuItem(
+                          value: 'medium',
+                          child: Text('Medium'),
+                        ),
+                        const PopupMenuItem(value: 'low', child: Text('Low')),
+                      ],
                 ),
               ),
             ],
@@ -527,32 +532,36 @@ class _AdminTicketsScreenState extends State<AdminTicketsScreen>
   }
 
   Widget _buildTicketsList(CustomSpacing customSpacing) {
-    final filteredTickets = _tickets.where((ticket) {
-      final matchesSearch =
-          ticket['title'].toLowerCase().contains(_searchQuery.toLowerCase()) ||
-          ticket['id'].toLowerCase().contains(_searchQuery.toLowerCase()) ||
-          ticket['customerName'].toLowerCase().contains(
-            _searchQuery.toLowerCase(),
-          );
+    final filteredTickets =
+        _tickets.where((ticket) {
+          final matchesSearch =
+              ticket['title'].toLowerCase().contains(
+                _searchQuery.toLowerCase(),
+              ) ||
+              ticket['id'].toLowerCase().contains(_searchQuery.toLowerCase()) ||
+              ticket['customerName'].toLowerCase().contains(
+                _searchQuery.toLowerCase(),
+              );
 
-      final matchesFilter =
-          _selectedFilter == 'all' ||
-          ticket['status'].toLowerCase().replaceAll(' ', '_') ==
-              _selectedFilter;
+          final matchesFilter =
+              _selectedFilter == 'all' ||
+              ticket['status'].toLowerCase().replaceAll(' ', '_') ==
+                  _selectedFilter;
 
-      final matchesPriority =
-          _selectedPriority == 'all' ||
-          ticket['priority'].toLowerCase() == _selectedPriority;
+          final matchesPriority =
+              _selectedPriority == 'all' ||
+              ticket['priority'].toLowerCase() == _selectedPriority;
 
-      return matchesSearch && matchesFilter && matchesPriority;
-    }).toList();
+          return matchesSearch && matchesFilter && matchesPriority;
+        }).toList();
 
     return Padding(
       padding: EdgeInsets.symmetric(horizontal: customSpacing.lg),
       child: Column(
-        children: filteredTickets
-            .map((ticket) => _buildTicketCard(ticket, customSpacing))
-            .toList(),
+        children:
+            filteredTickets
+                .map((ticket) => _buildTicketCard(ticket, customSpacing))
+                .toList(),
       ),
     );
   }
@@ -626,24 +635,25 @@ class _AdminTicketsScreenState extends State<AdminTicketsScreen>
                 const Spacer(),
                 PopupMenuButton<String>(
                   onSelected: (action) => _handleTicketAction(action, ticket),
-                  itemBuilder: (context) => [
-                    const PopupMenuItem(
-                      value: 'assign',
-                      child: Text('Reassign'),
-                    ),
-                    const PopupMenuItem(
-                      value: 'priority',
-                      child: Text('Change Priority'),
-                    ),
-                    const PopupMenuItem(
-                      value: 'status',
-                      child: Text('Update Status'),
-                    ),
-                    const PopupMenuItem(
-                      value: 'view',
-                      child: Text('View Details'),
-                    ),
-                  ],
+                  itemBuilder:
+                      (context) => [
+                        const PopupMenuItem(
+                          value: 'assign',
+                          child: Text('Reassign'),
+                        ),
+                        const PopupMenuItem(
+                          value: 'priority',
+                          child: Text('Change Priority'),
+                        ),
+                        const PopupMenuItem(
+                          value: 'status',
+                          child: Text('Update Status'),
+                        ),
+                        const PopupMenuItem(
+                          value: 'view',
+                          child: Text('View Details'),
+                        ),
+                      ],
                   child: Icon(Icons.more_vert, color: AppColors.textSecondary),
                 ),
               ],
@@ -859,155 +869,169 @@ class _AdminTicketsScreenState extends State<AdminTicketsScreen>
   void _showReassignDialog(Map<String, dynamic> ticket) {
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
-        title: Text('Reassign Ticket ${ticket['id']}'),
-        content: const Text('Reassignment dialog would be implemented here'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Cancel'),
+      builder:
+          (context) => AlertDialog(
+            title: Text('Reassign Ticket ${ticket['id']}'),
+            content: const Text(
+              'Reassignment dialog would be implemented here',
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context),
+                child: const Text('Cancel'),
+              ),
+              ElevatedButton(
+                onPressed: () {
+                  Navigator.pop(context);
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text('Ticket ${ticket['id']} reassigned'),
+                    ),
+                  );
+                },
+                child: const Text('Reassign'),
+              ),
+            ],
           ),
-          ElevatedButton(
-            onPressed: () {
-              Navigator.pop(context);
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(content: Text('Ticket ${ticket['id']} reassigned')),
-              );
-            },
-            child: const Text('Reassign'),
-          ),
-        ],
-      ),
     );
   }
 
   void _showPriorityDialog(Map<String, dynamic> ticket) {
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
-        title: Text('Change Priority - ${ticket['id']}'),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            ListTile(
-              title: const Text('Critical'),
-              leading: Radio(
-                value: 'Critical',
-                groupValue: ticket['priority'],
-                onChanged: (value) {},
-              ),
+      builder:
+          (context) => AlertDialog(
+            title: Text('Change Priority - ${ticket['id']}'),
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                ListTile(
+                  title: const Text('Critical'),
+                  leading: Radio(
+                    value: 'Critical',
+                    groupValue: ticket['priority'],
+                    onChanged: (value) {},
+                  ),
+                ),
+                ListTile(
+                  title: const Text('High'),
+                  leading: Radio(
+                    value: 'High',
+                    groupValue: ticket['priority'],
+                    onChanged: (value) {},
+                  ),
+                ),
+                ListTile(
+                  title: const Text('Medium'),
+                  leading: Radio(
+                    value: 'Medium',
+                    groupValue: ticket['priority'],
+                    onChanged: (value) {},
+                  ),
+                ),
+                ListTile(
+                  title: const Text('Low'),
+                  leading: Radio(
+                    value: 'Low',
+                    groupValue: ticket['priority'],
+                    onChanged: (value) {},
+                  ),
+                ),
+              ],
             ),
-            ListTile(
-              title: const Text('High'),
-              leading: Radio(
-                value: 'High',
-                groupValue: ticket['priority'],
-                onChanged: (value) {},
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context),
+                child: const Text('Cancel'),
               ),
-            ),
-            ListTile(
-              title: const Text('Medium'),
-              leading: Radio(
-                value: 'Medium',
-                groupValue: ticket['priority'],
-                onChanged: (value) {},
+              ElevatedButton(
+                onPressed: () {
+                  Navigator.pop(context);
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text('Priority updated for ${ticket['id']}'),
+                    ),
+                  );
+                },
+                child: const Text('Update'),
               ),
-            ),
-            ListTile(
-              title: const Text('Low'),
-              leading: Radio(
-                value: 'Low',
-                groupValue: ticket['priority'],
-                onChanged: (value) {},
-              ),
-            ),
-          ],
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Cancel'),
+            ],
           ),
-          ElevatedButton(
-            onPressed: () {
-              Navigator.pop(context);
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(content: Text('Priority updated for ${ticket['id']}')),
-              );
-            },
-            child: const Text('Update'),
-          ),
-        ],
-      ),
     );
   }
 
   void _showStatusDialog(Map<String, dynamic> ticket) {
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
-        title: Text('Update Status - ${ticket['id']}'),
-        content: const Text('Status update dialog would be implemented here'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Cancel'),
+      builder:
+          (context) => AlertDialog(
+            title: Text('Update Status - ${ticket['id']}'),
+            content: const Text(
+              'Status update dialog would be implemented here',
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context),
+                child: const Text('Cancel'),
+              ),
+              ElevatedButton(
+                onPressed: () {
+                  Navigator.pop(context);
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text('Status updated for ${ticket['id']}'),
+                    ),
+                  );
+                },
+                child: const Text('Update'),
+              ),
+            ],
           ),
-          ElevatedButton(
-            onPressed: () {
-              Navigator.pop(context);
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(content: Text('Status updated for ${ticket['id']}')),
-              );
-            },
-            child: const Text('Update'),
-          ),
-        ],
-      ),
     );
   }
 
   void _showTicketDetails(Map<String, dynamic> ticket) {
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
-        title: Text('Ticket Details - ${ticket['id']}'),
-        content: SizedBox(
-          width: double.maxFinite,
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                'Title: ${ticket['title']}',
-                style: const TextStyle(fontWeight: FontWeight.bold),
+      builder:
+          (context) => AlertDialog(
+            title: Text('Ticket Details - ${ticket['id']}'),
+            content: SizedBox(
+              width: double.maxFinite,
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Title: ${ticket['title']}',
+                    style: const TextStyle(fontWeight: FontWeight.bold),
+                  ),
+                  const SizedBox(height: 8),
+                  Text('Description: ${ticket['description']}'),
+                  const SizedBox(height: 8),
+                  Text('Customer: ${ticket['customerName']}'),
+                  const SizedBox(height: 8),
+                  Text('Assigned to: ${ticket['assignedTo']}'),
+                  const SizedBox(height: 8),
+                  Text('Department: ${ticket['department']}'),
+                  const SizedBox(height: 8),
+                  Text('Priority: ${ticket['priority']}'),
+                  const SizedBox(height: 8),
+                  Text('Status: ${ticket['status']}'),
+                  const SizedBox(height: 8),
+                  Text('Category: ${ticket['category']}'),
+                  const SizedBox(height: 8),
+                  Text('Estimated Time: ${ticket['estimatedTime']}'),
+                ],
               ),
-              const SizedBox(height: 8),
-              Text('Description: ${ticket['description']}'),
-              const SizedBox(height: 8),
-              Text('Customer: ${ticket['customerName']}'),
-              const SizedBox(height: 8),
-              Text('Assigned to: ${ticket['assignedTo']}'),
-              const SizedBox(height: 8),
-              Text('Department: ${ticket['department']}'),
-              const SizedBox(height: 8),
-              Text('Priority: ${ticket['priority']}'),
-              const SizedBox(height: 8),
-              Text('Status: ${ticket['status']}'),
-              const SizedBox(height: 8),
-              Text('Category: ${ticket['category']}'),
-              const SizedBox(height: 8),
-              Text('Estimated Time: ${ticket['estimatedTime']}'),
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context),
+                child: const Text('Close'),
+              ),
             ],
           ),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Close'),
-          ),
-        ],
-      ),
     );
   }
 }

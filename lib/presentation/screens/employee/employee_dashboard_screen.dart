@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../core/core.dart';
 import '../../cubit/employee_dashboard/employee_dashboard_cubit.dart';
-import '../../widgets/auth/animated_background_widget.dart';
+import '../../widgets/common/animated_background_widget.dart';
 import '../../widgets/employee_screen_widgets/dashboard/welcome_header_widget.dart';
 import '../../widgets/employee_screen_widgets/dashboard/quick_stats_grid_widget.dart';
 import '../../widgets/employee_screen_widgets/dashboard/analysis_tools_grid_widget.dart';
@@ -123,9 +123,8 @@ class _EmployeeDashboardScreenState extends State<EmployeeDashboardScreen>
                   );
                 }
 
-                final data = state is EmployeeDashboardSuccess
-                    ? state.data
-                    : null;
+                final data =
+                    state is EmployeeDashboardSuccess ? state.data : null;
 
                 return RefreshIndicator(
                   onRefresh: () async {

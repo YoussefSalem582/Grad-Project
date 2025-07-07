@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../../core/core.dart';
-import '../../widgets/auth/animated_background_widget.dart';
+import '../../widgets/common/animated_background_widget.dart';
 
 class AdminUserManagementScreen extends StatefulWidget {
   const AdminUserManagementScreen({super.key});
@@ -293,18 +293,22 @@ class _AdminUserManagementScreenState extends State<AdminUserManagementScreen>
                   ],
                 ),
               ),
-              itemBuilder: (context) => [
-                const PopupMenuItem(value: 'all', child: Text('All Users')),
-                const PopupMenuItem(
-                  value: 'active',
-                  child: Text('Active Only'),
-                ),
-                const PopupMenuItem(
-                  value: 'inactive',
-                  child: Text('Inactive Only'),
-                ),
-                const PopupMenuItem(value: 'admin', child: Text('Admins Only')),
-              ],
+              itemBuilder:
+                  (context) => [
+                    const PopupMenuItem(value: 'all', child: Text('All Users')),
+                    const PopupMenuItem(
+                      value: 'active',
+                      child: Text('Active Only'),
+                    ),
+                    const PopupMenuItem(
+                      value: 'inactive',
+                      child: Text('Inactive Only'),
+                    ),
+                    const PopupMenuItem(
+                      value: 'admin',
+                      child: Text('Admins Only'),
+                    ),
+                  ],
             ),
           ),
         ],
@@ -313,19 +317,20 @@ class _AdminUserManagementScreenState extends State<AdminUserManagementScreen>
   }
 
   Widget _buildUserList(CustomSpacing customSpacing) {
-    final filteredUsers = _users.where((user) {
-      final matchesSearch =
-          user['name'].toLowerCase().contains(_searchQuery.toLowerCase()) ||
-          user['email'].toLowerCase().contains(_searchQuery.toLowerCase());
+    final filteredUsers =
+        _users.where((user) {
+          final matchesSearch =
+              user['name'].toLowerCase().contains(_searchQuery.toLowerCase()) ||
+              user['email'].toLowerCase().contains(_searchQuery.toLowerCase());
 
-      final matchesFilter =
-          _selectedFilter == 'all' ||
-          (_selectedFilter == 'active' && user['status'] == 'Active') ||
-          (_selectedFilter == 'inactive' && user['status'] == 'Inactive') ||
-          (_selectedFilter == 'admin' && user['role'] == 'Admin');
+          final matchesFilter =
+              _selectedFilter == 'all' ||
+              (_selectedFilter == 'active' && user['status'] == 'Active') ||
+              (_selectedFilter == 'inactive' && user['status'] == 'Inactive') ||
+              (_selectedFilter == 'admin' && user['role'] == 'Admin');
 
-      return matchesSearch && matchesFilter;
-    }).toList();
+          return matchesSearch && matchesFilter;
+        }).toList();
 
     return ListView.builder(
       padding: EdgeInsets.symmetric(horizontal: customSpacing.lg),
@@ -436,12 +441,22 @@ class _AdminUserManagementScreenState extends State<AdminUserManagementScreen>
         ),
         trailing: PopupMenuButton<String>(
           onSelected: (action) => _handleUserAction(action, user),
-          itemBuilder: (context) => [
-            const PopupMenuItem(value: 'edit', child: Text('Edit User')),
-            const PopupMenuItem(value: 'reset', child: Text('Reset Password')),
-            const PopupMenuItem(value: 'toggle', child: Text('Toggle Status')),
-            const PopupMenuItem(value: 'delete', child: Text('Delete User')),
-          ],
+          itemBuilder:
+              (context) => [
+                const PopupMenuItem(value: 'edit', child: Text('Edit User')),
+                const PopupMenuItem(
+                  value: 'reset',
+                  child: Text('Reset Password'),
+                ),
+                const PopupMenuItem(
+                  value: 'toggle',
+                  child: Text('Toggle Status'),
+                ),
+                const PopupMenuItem(
+                  value: 'delete',
+                  child: Text('Delete User'),
+                ),
+              ],
           child: Icon(Icons.more_vert, color: AppColors.textSecondary),
         ),
       ),
@@ -492,67 +507,72 @@ class _AdminUserManagementScreenState extends State<AdminUserManagementScreen>
   void _showAddUserDialog() {
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Add New User'),
-        content: const Text('Add user dialog would be implemented here'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Cancel'),
+      builder:
+          (context) => AlertDialog(
+            title: const Text('Add New User'),
+            content: const Text('Add user dialog would be implemented here'),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context),
+                child: const Text('Cancel'),
+              ),
+              ElevatedButton(
+                onPressed: () => Navigator.pop(context),
+                child: const Text('Add User'),
+              ),
+            ],
           ),
-          ElevatedButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Add User'),
-          ),
-        ],
-      ),
     );
   }
 
   void _showEditUserDialog(Map<String, dynamic> user) {
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
-        title: Text('Edit ${user['name']}'),
-        content: const Text('Edit user dialog would be implemented here'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Cancel'),
+      builder:
+          (context) => AlertDialog(
+            title: Text('Edit ${user['name']}'),
+            content: const Text('Edit user dialog would be implemented here'),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context),
+                child: const Text('Cancel'),
+              ),
+              ElevatedButton(
+                onPressed: () => Navigator.pop(context),
+                child: const Text('Save Changes'),
+              ),
+            ],
           ),
-          ElevatedButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Save Changes'),
-          ),
-        ],
-      ),
     );
   }
 
   void _showResetPasswordDialog(Map<String, dynamic> user) {
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
-        title: Text('Reset Password for ${user['name']}'),
-        content: const Text(
-          'Are you sure you want to reset this user\'s password?',
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Cancel'),
+      builder:
+          (context) => AlertDialog(
+            title: Text('Reset Password for ${user['name']}'),
+            content: const Text(
+              'Are you sure you want to reset this user\'s password?',
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context),
+                child: const Text('Cancel'),
+              ),
+              ElevatedButton(
+                onPressed: () {
+                  Navigator.pop(context);
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text('Password reset for ${user['name']}'),
+                    ),
+                  );
+                },
+                child: const Text('Reset Password'),
+              ),
+            ],
           ),
-          ElevatedButton(
-            onPressed: () {
-              Navigator.pop(context);
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(content: Text('Password reset for ${user['name']}')),
-              );
-            },
-            child: const Text('Reset Password'),
-          ),
-        ],
-      ),
     );
   }
 
@@ -570,31 +590,37 @@ class _AdminUserManagementScreenState extends State<AdminUserManagementScreen>
   void _showDeleteUserDialog(Map<String, dynamic> user) {
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
-        title: Text('Delete ${user['name']}'),
-        content: const Text(
-          'Are you sure you want to delete this user? This action cannot be undone.',
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Cancel'),
+      builder:
+          (context) => AlertDialog(
+            title: Text('Delete ${user['name']}'),
+            content: const Text(
+              'Are you sure you want to delete this user? This action cannot be undone.',
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context),
+                child: const Text('Cancel'),
+              ),
+              ElevatedButton(
+                onPressed: () {
+                  setState(() {
+                    _users.removeWhere((u) => u['id'] == user['id']);
+                  });
+                  Navigator.pop(context);
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text('${user['name']} deleted')),
+                  );
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: AppColors.error,
+                ),
+                child: const Text(
+                  'Delete',
+                  style: TextStyle(color: Colors.white),
+                ),
+              ),
+            ],
           ),
-          ElevatedButton(
-            onPressed: () {
-              setState(() {
-                _users.removeWhere((u) => u['id'] == user['id']);
-              });
-              Navigator.pop(context);
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(content: Text('${user['name']} deleted')),
-              );
-            },
-            style: ElevatedButton.styleFrom(backgroundColor: AppColors.error),
-            child: const Text('Delete', style: TextStyle(color: Colors.white)),
-          ),
-        ],
-      ),
     );
   }
 }

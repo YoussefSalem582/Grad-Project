@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../../core/core.dart';
-import '../../widgets/auth/animated_background_widget.dart';
+import '../../widgets/common/animated_background_widget.dart';
 
 class AdminSystemConfigScreen extends StatefulWidget {
   const AdminSystemConfigScreen({super.key});
@@ -302,9 +302,10 @@ class _AdminSystemConfigScreenState extends State<AdminSystemConfigScreen>
             ],
           ),
           child: Column(
-            children: _systemSettings.entries.map((entry) {
-              return _buildSettingTile(entry.key, entry.value);
-            }).toList(),
+            children:
+                _systemSettings.entries.map((entry) {
+                  return _buildSettingTile(entry.key, entry.value);
+                }).toList(),
           ),
         ),
       ],
@@ -590,120 +591,131 @@ class _AdminSystemConfigScreenState extends State<AdminSystemConfigScreen>
   void _performBackup() {
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Backup System'),
-        content: const Text(
-          'Are you sure you want to perform a system backup now?',
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Cancel'),
+      builder:
+          (context) => AlertDialog(
+            title: const Text('Backup System'),
+            content: const Text(
+              'Are you sure you want to perform a system backup now?',
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context),
+                child: const Text('Cancel'),
+              ),
+              ElevatedButton(
+                onPressed: () {
+                  Navigator.pop(context);
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('System backup initiated')),
+                  );
+                },
+                child: const Text('Start Backup'),
+              ),
+            ],
           ),
-          ElevatedButton(
-            onPressed: () {
-              Navigator.pop(context);
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('System backup initiated')),
-              );
-            },
-            child: const Text('Start Backup'),
-          ),
-        ],
-      ),
     );
   }
 
   void _viewLogs() {
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('System Logs'),
-        content: SizedBox(
-          width: double.maxFinite,
-          height: 300,
-          child: Container(
-            padding: const EdgeInsets.all(8),
-            color: Colors.black87,
-            child: SingleChildScrollView(
-              child: Text(
-                '[2024-01-15 10:30:15] INFO: System started\n'
-                '[2024-01-15 10:30:16] INFO: Database connected\n'
-                '[2024-01-15 10:30:17] INFO: User authentication service started\n'
-                '[2024-01-15 10:30:18] INFO: Analysis engine initialized\n'
-                '[2024-01-15 10:35:22] INFO: User login: john.smith@company.com\n'
-                '[2024-01-15 10:45:33] INFO: Analysis completed: TEXT_001\n'
-                '[2024-01-15 11:15:44] WARN: High memory usage detected\n'
-                '[2024-01-15 11:16:00] INFO: Memory cleanup completed\n',
-                style: TextStyle(
-                  fontFamily: 'monospace',
-                  fontSize: 12,
-                  color: Colors.green,
+      builder:
+          (context) => AlertDialog(
+            title: const Text('System Logs'),
+            content: SizedBox(
+              width: double.maxFinite,
+              height: 300,
+              child: Container(
+                padding: const EdgeInsets.all(8),
+                color: Colors.black87,
+                child: SingleChildScrollView(
+                  child: Text(
+                    '[2024-01-15 10:30:15] INFO: System started\n'
+                    '[2024-01-15 10:30:16] INFO: Database connected\n'
+                    '[2024-01-15 10:30:17] INFO: User authentication service started\n'
+                    '[2024-01-15 10:30:18] INFO: Analysis engine initialized\n'
+                    '[2024-01-15 10:35:22] INFO: User login: john.smith@company.com\n'
+                    '[2024-01-15 10:45:33] INFO: Analysis completed: TEXT_001\n'
+                    '[2024-01-15 11:15:44] WARN: High memory usage detected\n'
+                    '[2024-01-15 11:16:00] INFO: Memory cleanup completed\n',
+                    style: TextStyle(
+                      fontFamily: 'monospace',
+                      fontSize: 12,
+                      color: Colors.green,
+                    ),
+                  ),
                 ),
               ),
             ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context),
+                child: const Text('Close'),
+              ),
+            ],
           ),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Close'),
-          ),
-        ],
-      ),
     );
   }
 
   void _clearCache() {
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Clear Cache'),
-        content: const Text('This will clear all cached data. Are you sure?'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Cancel'),
+      builder:
+          (context) => AlertDialog(
+            title: const Text('Clear Cache'),
+            content: const Text(
+              'This will clear all cached data. Are you sure?',
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context),
+                child: const Text('Cancel'),
+              ),
+              ElevatedButton(
+                onPressed: () {
+                  Navigator.pop(context);
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('Cache cleared successfully')),
+                  );
+                },
+                child: const Text('Clear Cache'),
+              ),
+            ],
           ),
-          ElevatedButton(
-            onPressed: () {
-              Navigator.pop(context);
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('Cache cleared successfully')),
-              );
-            },
-            child: const Text('Clear Cache'),
-          ),
-        ],
-      ),
     );
   }
 
   void _restartSystem() {
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Restart System'),
-        content: const Text(
-          'This will restart the entire system. All users will be disconnected. Continue?',
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Cancel'),
+      builder:
+          (context) => AlertDialog(
+            title: const Text('Restart System'),
+            content: const Text(
+              'This will restart the entire system. All users will be disconnected. Continue?',
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context),
+                child: const Text('Cancel'),
+              ),
+              ElevatedButton(
+                onPressed: () {
+                  Navigator.pop(context);
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('System restart initiated')),
+                  );
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: AppColors.error,
+                ),
+                child: const Text(
+                  'Restart',
+                  style: TextStyle(color: Colors.white),
+                ),
+              ),
+            ],
           ),
-          ElevatedButton(
-            onPressed: () {
-              Navigator.pop(context);
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('System restart initiated')),
-              );
-            },
-            style: ElevatedButton.styleFrom(backgroundColor: AppColors.error),
-            child: const Text('Restart', style: TextStyle(color: Colors.white)),
-          ),
-        ],
-      ),
     );
   }
 }

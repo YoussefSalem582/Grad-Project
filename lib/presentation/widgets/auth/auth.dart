@@ -1,7 +1,7 @@
 // Auth Widgets Export File
 // This file provides a single entry point for importing all auth-related widgets
 
-export 'animated_background_widget.dart';
+export '../common/animated_background_widget.dart';
 export 'logo_widget.dart';
 export 'welcome_text_widget.dart';
 export 'role_selection_widget.dart';

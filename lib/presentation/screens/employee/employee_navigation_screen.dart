@@ -29,12 +29,18 @@ class _EmployeeNavigationScreenState extends State<EmployeeNavigationScreen>
   late Animation<double> _pulseAnimation;
   late Animation<double> _shimmerAnimation;
 
-  final List<Widget> _screens = [
+  /// Get the list of screens with proper navigation callbacks
+  List<Widget> get _screens => [
     BlocProvider(
       create: (context) => EmployeeDashboardCubit(),
       child: const EmployeeDashboardScreen(),
     ),
-    const EmployeeAnalysisToolsScreen(),
+    // Analysis tools screen with callback for navigation
+    EmployeeAnalysisToolsScreen(
+      onAnalysisToolSelected: (index) {
+        setState(() => _selectedIndex = index);
+      },
+    ),
     const EmployeeCustomerInteractionsScreen(),
     const EmployeeProfileScreen(),
     const EnhancedTextAnalysisScreen(),
@@ -545,44 +551,49 @@ class _EmployeeNavigationScreenState extends State<EmployeeNavigationScreen>
           ],
         ),
       ),
-      itemBuilder: (context) => [
-        const PopupMenuItem(
-          value: 'profile',
-          child: Row(
-            children: [
-              Icon(Icons.account_circle),
-              SizedBox(width: 8),
-              Text('My Profile'),
-            ],
-          ),
-        ),
-        const PopupMenuItem(
-          value: 'help',
-          child: Row(
-            children: [
-              Icon(Icons.help_outline),
-              SizedBox(width: 8),
-              Text('Help & Support'),
-            ],
-          ),
-        ),
-        const PopupMenuItem(
-          value: 'settings',
-          child: Row(
-            children: [
-              Icon(Icons.settings),
-              SizedBox(width: 8),
-              Text('Settings'),
-            ],
-          ),
-        ),
-        const PopupMenuItem(
-          value: 'logout',
-          child: Row(
-            children: [Icon(Icons.logout), SizedBox(width: 8), Text('Logout')],
-          ),
-        ),
-      ],
+      itemBuilder:
+          (context) => [
+            const PopupMenuItem(
+              value: 'profile',
+              child: Row(
+                children: [
+                  Icon(Icons.account_circle),
+                  SizedBox(width: 8),
+                  Text('My Profile'),
+                ],
+              ),
+            ),
+            const PopupMenuItem(
+              value: 'help',
+              child: Row(
+                children: [
+                  Icon(Icons.help_outline),
+                  SizedBox(width: 8),
+                  Text('Help & Support'),
+                ],
+              ),
+            ),
+            const PopupMenuItem(
+              value: 'settings',
+              child: Row(
+                children: [
+                  Icon(Icons.settings),
+                  SizedBox(width: 8),
+                  Text('Settings'),
+                ],
+              ),
+            ),
+            const PopupMenuItem(
+              value: 'logout',
+              child: Row(
+                children: [
+                  Icon(Icons.logout),
+                  SizedBox(width: 8),
+                  Text('Logout'),
+                ],
+              ),
+            ),
+          ],
     );
   }
 
@@ -632,123 +643,135 @@ class _EmployeeNavigationScreenState extends State<EmployeeNavigationScreen>
     // Show enhanced notifications dialog with better UX
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        title: Row(
-          children: [
-            Container(
-              padding: const EdgeInsets.all(8),
-              decoration: BoxDecoration(
-                color: AppColors.primary.withValues(alpha: 0.1),
-                borderRadius: BorderRadius.circular(8),
-              ),
-              child: Icon(Icons.notifications_active, color: AppColors.primary),
+      builder:
+          (context) => AlertDialog(
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(16),
             ),
-            const SizedBox(width: 12),
-            const Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    'Notifications',
-                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
+            title: Row(
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(8),
+                  decoration: BoxDecoration(
+                    color: AppColors.primary.withValues(alpha: 0.1),
+                    borderRadius: BorderRadius.circular(8),
                   ),
-                  Text(
-                    '3 new updates',
-                    style: TextStyle(fontSize: 12, color: Colors.grey),
+                  child: Icon(
+                    Icons.notifications_active,
+                    color: AppColors.primary,
+                  ),
+                ),
+                const SizedBox(width: 12),
+                const Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Notifications',
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                      Text(
+                        '3 new updates',
+                        style: TextStyle(fontSize: 12, color: Colors.grey),
+                      ),
+                    ],
+                  ),
+                ),
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 8,
+                    vertical: 4,
+                  ),
+                  decoration: BoxDecoration(
+                    color: AppColors.error,
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: const Text(
+                    '3',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 12,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            content: SizedBox(
+              width: double.maxFinite,
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  _buildNotificationItem(
+                    'New customer message received',
+                    'Customer #1245 needs urgent assistance',
+                    '2 minutes ago',
+                    Icons.message_outlined,
+                    AppColors.primary,
+                    isUnread: true,
+                  ),
+                  const Divider(height: 1),
+                  _buildNotificationItem(
+                    'Analysis complete',
+                    'Video analysis for customer session completed',
+                    '5 minutes ago',
+                    Icons.check_circle_outline,
+                    AppColors.success,
+                    isUnread: true,
+                  ),
+                  const Divider(height: 1),
+                  _buildNotificationItem(
+                    'Task deadline approaching',
+                    'Customer follow-up due in 2 hours',
+                    '10 minutes ago',
+                    Icons.schedule_outlined,
+                    AppColors.warning,
+                    isUnread: true,
+                  ),
+                  const Divider(height: 1),
+                  _buildNotificationItem(
+                    'Weekly summary',
+                    'Your weekly activity summary is ready',
+                    '1 hour ago',
+                    Icons.assessment_outlined,
+                    AppColors.info,
+                    isUnread: false,
                   ),
                 ],
               ),
             ),
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-              decoration: BoxDecoration(
-                color: AppColors.error,
-                borderRadius: BorderRadius.circular(12),
+            actions: [
+              TextButton.icon(
+                onPressed: () {
+                  // Mark all as read logic
+                  Navigator.pop(context);
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text('All notifications marked as read'),
+                      duration: Duration(seconds: 2),
+                    ),
+                  );
+                },
+                icon: const Icon(Icons.done_all),
+                label: const Text('Mark All Read'),
               ),
-              child: const Text(
-                '3',
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 12,
-                  fontWeight: FontWeight.bold,
+              ElevatedButton.icon(
+                onPressed: () => Navigator.pop(context),
+                icon: const Icon(Icons.close),
+                label: const Text('Close'),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: AppColors.primary,
+                  foregroundColor: Colors.white,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(8),
+                  ),
                 ),
-              ),
-            ),
-          ],
-        ),
-        content: SizedBox(
-          width: double.maxFinite,
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              _buildNotificationItem(
-                'New customer message received',
-                'Customer #1245 needs urgent assistance',
-                '2 minutes ago',
-                Icons.message_outlined,
-                AppColors.primary,
-                isUnread: true,
-              ),
-              const Divider(height: 1),
-              _buildNotificationItem(
-                'Analysis complete',
-                'Video analysis for customer session completed',
-                '5 minutes ago',
-                Icons.check_circle_outline,
-                AppColors.success,
-                isUnread: true,
-              ),
-              const Divider(height: 1),
-              _buildNotificationItem(
-                'Task deadline approaching',
-                'Customer follow-up due in 2 hours',
-                '10 minutes ago',
-                Icons.schedule_outlined,
-                AppColors.warning,
-                isUnread: true,
-              ),
-              const Divider(height: 1),
-              _buildNotificationItem(
-                'Weekly summary',
-                'Your weekly activity summary is ready',
-                '1 hour ago',
-                Icons.assessment_outlined,
-                AppColors.info,
-                isUnread: false,
               ),
             ],
           ),
-        ),
-        actions: [
-          TextButton.icon(
-            onPressed: () {
-              // Mark all as read logic
-              Navigator.pop(context);
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(
-                  content: Text('All notifications marked as read'),
-                  duration: Duration(seconds: 2),
-                ),
-              );
-            },
-            icon: const Icon(Icons.done_all),
-            label: const Text('Mark All Read'),
-          ),
-          ElevatedButton.icon(
-            onPressed: () => Navigator.pop(context),
-            icon: const Icon(Icons.close),
-            label: const Text('Close'),
-            style: ElevatedButton.styleFrom(
-              backgroundColor: AppColors.primary,
-              foregroundColor: Colors.white,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(8),
-              ),
-            ),
-          ),
-        ],
-      ),
     );
   }
 
@@ -756,57 +779,58 @@ class _EmployeeNavigationScreenState extends State<EmployeeNavigationScreen>
     // Show help dialog
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
-        title: Row(
-          children: [
-            Icon(Icons.help_outline, color: AppColors.primary),
-            SizedBox(width: 8),
-            Text('Help & Support'),
-          ],
-        ),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            _buildHelpItem(
-              'Getting Started',
-              'Learn the basics of using the app',
+      builder:
+          (context) => AlertDialog(
+            title: Row(
+              children: [
+                Icon(Icons.help_outline, color: AppColors.primary),
+                SizedBox(width: 8),
+                Text('Help & Support'),
+              ],
             ),
-            _buildHelpItem(
-              'Analysis Tools',
-              'Understanding AI-powered insights',
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                _buildHelpItem(
+                  'Getting Started',
+                  'Learn the basics of using the app',
+                ),
+                _buildHelpItem(
+                  'Analysis Tools',
+                  'Understanding AI-powered insights',
+                ),
+                _buildHelpItem(
+                  'Customer Management',
+                  'Managing customer interactions',
+                ),
+                _buildHelpItem(
+                  'Settings & Profile',
+                  'Manage your account and preferences',
+                ),
+                SizedBox(height: 16),
+                Text(
+                  'Need more help?',
+                  style: TextStyle(fontWeight: FontWeight.bold),
+                ),
+                SizedBox(height: 8),
+                Text(
+                  'Contact support: support@graphsmile.com\nPhone: +1 (555) 123-4567',
+                  style: TextStyle(color: AppColors.textSecondary),
+                ),
+              ],
             ),
-            _buildHelpItem(
-              'Customer Management',
-              'Managing customer interactions',
-            ),
-            _buildHelpItem(
-              'Settings & Profile',
-              'Manage your account and preferences',
-            ),
-            SizedBox(height: 16),
-            Text(
-              'Need more help?',
-              style: TextStyle(fontWeight: FontWeight.bold),
-            ),
-            SizedBox(height: 8),
-            Text(
-              'Contact support: support@graphsmile.com\nPhone: +1 (555) 123-4567',
-              style: TextStyle(color: AppColors.textSecondary),
-            ),
-          ],
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: Text('Contact Support'),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context),
+                child: Text('Contact Support'),
+              ),
+              ElevatedButton(
+                onPressed: () => Navigator.pop(context),
+                child: Text('Close'),
+              ),
+            ],
           ),
-          ElevatedButton(
-            onPressed: () => Navigator.pop(context),
-            child: Text('Close'),
-          ),
-        ],
-      ),
     );
   }
 
@@ -843,9 +867,8 @@ class _EmployeeNavigationScreenState extends State<EmployeeNavigationScreen>
                       child: Text(
                         title,
                         style: TextStyle(
-                          fontWeight: isUnread
-                              ? FontWeight.w600
-                              : FontWeight.w500,
+                          fontWeight:
+                              isUnread ? FontWeight.w600 : FontWeight.w500,
                           fontSize: 14,
                         ),
                       ),
