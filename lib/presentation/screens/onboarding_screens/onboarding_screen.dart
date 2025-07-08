@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import '../../../core/routing/app_router.dart';
-import '../../widgets/onboarding/onboarding.dart';
+import 'widgets/onboarding.dart';
 import '../../widgets/common/animated_background_widget.dart';
 import '../../services/onboarding_preferences.dart';
 import '../../models/onboarding_models.dart';
@@ -97,15 +97,15 @@ class _OnboardingScreenState extends State<OnboardingScreen>
     _backgroundAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
       CurvedAnimation(parent: _backgroundController, curve: Curves.linear),
     );
-
-    // Start background animation loop
-    _backgroundController.repeat();
   }
 
   void _startEntryAnimation() {
     Future.delayed(const Duration(milliseconds: 300), () {
       _animationController.forward();
     });
+
+    // Start background animation
+    _backgroundController.repeat();
   }
 
   void _nextPage() {

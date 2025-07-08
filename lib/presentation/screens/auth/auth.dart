@@ -1,4 +1,2 @@
-// Authentication screens
-export 'login_screen.dart';
-export 'signup_screen.dart';
-export 'splash_screen.dart';
+// Authentication screens - now managed by individual screen folders
+// Legacy screens that have been moved to modular structure

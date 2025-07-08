@@ -1,9 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../presentation/screens/screens.dart';
 import '../../screens/test_backend_screen.dart';
-import '../../presentation/screens/auth/splash_screen.dart';
-import '../../presentation/screens/auth/onboarding_screen.dart';
-import '../../presentation/screens/auth/auth_choice_screen.dart';
 
 /// Centralized routing configuration
 class AppRouter {

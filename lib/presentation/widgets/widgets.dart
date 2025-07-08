@@ -8,8 +8,6 @@ export 'forms/forms.dart';
 export 'common/loading_widgets.dart';
 export 'app_bars/modern_employee_app_bar.dart';
 export 'auth/auth.dart';
-export 'employee_screen_widgets/employee/employee_widgets.dart';
 export 'dialogs/dialogs.dart';
 export 'sections/sections.dart';
-export 'employee_screen_widgets/dashboard/dashboard.dart';
 export 'navigation/navigation.dart';

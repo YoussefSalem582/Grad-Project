@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../../core/core.dart';
-import '../../employee_screen_widgets/employee/employee_widgets.dart';
+import '../../../screens/employee/employee_dashboard_screen/widgets/employee_analytics_card.dart';
 import '../../../cubit/employee_analytics/employee_analytics_cubit.dart';
 
 class MetricsGrid extends StatelessWidget {
@@ -26,19 +26,20 @@ class MetricsGrid extends StatelessWidget {
             crossAxisSpacing: customSpacing.md,
             mainAxisSpacing: customSpacing.md,
             childAspectRatio: 1.3,
-            children: state.data.metrics
-                .map(
-                  (metric) => EmployeeAnalyticsCard(
-                    title: metric['title'],
-                    value: metric['value'],
-                    unit: metric['unit'],
-                    icon: _getIconForMetric(metric['title']),
-                    color: _getColorForMetric(metric['title']),
-                    trend: metric['trend'],
-                    isPositiveTrend: metric['isPositiveTrend'],
-                  ),
-                )
-                .toList(),
+            children:
+                state.data.metrics
+                    .map(
+                      (metric) => EmployeeAnalyticsCard(
+                        title: metric['title'],
+                        value: metric['value'],
+                        unit: metric['unit'],
+                        icon: _getIconForMetric(metric['title']),
+                        color: _getColorForMetric(metric['title']),
+                        trend: metric['trend'],
+                        isPositiveTrend: metric['isPositiveTrend'],
+                      ),
+                    )
+                    .toList(),
           );
         }
 

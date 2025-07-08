@@ -15,12 +15,26 @@ class EmployeeBottomNavBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     // Map current screen to bottom nav index
-    // For analysis screens (4+), show Tools tab as selected
     int currentIndex;
-    if (selectedIndex >= 4) {
-      currentIndex = 1; // Show "Tool" as selected for analysis screens
-    } else {
-      currentIndex = selectedIndex;
+    switch (selectedIndex) {
+      case 0: // Dashboard
+        currentIndex = 0;
+        break;
+      case 1: // Analysis Tools / Tool
+      case 5: // Analysis Tools Screen
+      case 6: // Video Analysis
+      case 7: // Text Analysis
+      case 8: // Voice Analysis
+        currentIndex = 1;
+        break;
+      case 4: // Tickets
+        currentIndex = 2;
+        break;
+      case 3: // Profile
+        currentIndex = 3;
+        break;
+      default:
+        currentIndex = 0;
     }
 
     return Container(
@@ -116,7 +130,26 @@ class EmployeeBottomNavBar extends StatelessWidget {
   ) {
     return GestureDetector(
       onTap: () {
-        onItemTapped(index);
+        // Map bottom nav index to actual screen index
+        int targetScreenIndex;
+        switch (index) {
+          case 0: // Home
+            targetScreenIndex = 0;
+            break;
+          case 1: // Tool (Analysis Tools)
+            targetScreenIndex = 5;
+            break;
+          case 2: // Tickets
+            targetScreenIndex = 4;
+            break;
+          case 3: // Profile
+            targetScreenIndex = 3;
+            break;
+          default:
+            targetScreenIndex = 0;
+        }
+
+        onItemTapped(targetScreenIndex);
         // Add haptic feedback for better UX
         HapticFeedback.lightImpact();
       },
@@ -126,33 +159,39 @@ class EmployeeBottomNavBar extends StatelessWidget {
         padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 6),
         margin: const EdgeInsets.symmetric(horizontal: 1),
         decoration: BoxDecoration(
-          gradient: isSelected
-              ? LinearGradient(
-                  colors: [
-                    Colors.white.withValues(alpha: 0.4),
-                    const Color(0xFF667EEA).withValues(alpha: 0.2),
-                    Colors.white.withValues(alpha: 0.3),
-                  ],
-                )
-              : null,
+          gradient:
+              isSelected
+                  ? LinearGradient(
+                    colors: [
+                      Colors.white.withValues(alpha: 0.4),
+                      const Color(0xFF667EEA).withValues(alpha: 0.2),
+                      Colors.white.withValues(alpha: 0.3),
+                    ],
+                  )
+                  : null,
           borderRadius: BorderRadius.circular(16),
-          border: isSelected
-              ? Border.all(color: Colors.white.withValues(alpha: 0.5), width: 1)
-              : null,
-          boxShadow: isSelected
-              ? [
-                  BoxShadow(
-                    color: const Color(0xFF667EEA).withValues(alpha: 0.3),
-                    blurRadius: 10,
-                    offset: const Offset(0, 2),
-                  ),
-                  BoxShadow(
-                    color: AppColors.primary.withValues(alpha: 0.2),
-                    blurRadius: 6,
-                    offset: const Offset(0, 1),
-                  ),
-                ]
-              : null,
+          border:
+              isSelected
+                  ? Border.all(
+                    color: Colors.white.withValues(alpha: 0.5),
+                    width: 1,
+                  )
+                  : null,
+          boxShadow:
+              isSelected
+                  ? [
+                    BoxShadow(
+                      color: const Color(0xFF667EEA).withValues(alpha: 0.3),
+                      blurRadius: 10,
+                      offset: const Offset(0, 2),
+                    ),
+                    BoxShadow(
+                      color: AppColors.primary.withValues(alpha: 0.2),
+                      blurRadius: 6,
+                      offset: const Offset(0, 1),
+                    ),
+                  ]
+                  : null,
         ),
         child: Column(
           mainAxisSize: MainAxisSize.min,

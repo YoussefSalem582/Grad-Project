@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../../core/core.dart';
-import '../../employee_screen_widgets/employee/employee_widgets.dart';
+import '../../../screens/employee/common/widgets/widgets.dart';
 import '../../../cubit/employee_analytics/employee_analytics_cubit.dart';
 
 class AnalyticsHeader extends StatelessWidget {
@@ -16,9 +16,10 @@ class AnalyticsHeader extends StatelessWidget {
         Expanded(child: EmployeeSectionHeader(title: 'Interaction Analytics')),
         BlocBuilder<EmployeeAnalyticsCubit, EmployeeAnalyticsState>(
           builder: (context, state) {
-            final selectedTimeRange = state is EmployeeAnalyticsSuccess
-                ? state.data.timeRange
-                : 'This Week';
+            final selectedTimeRange =
+                state is EmployeeAnalyticsSuccess
+                    ? state.data.timeRange
+                    : 'This Week';
 
             return Container(
               padding: EdgeInsets.symmetric(
@@ -44,12 +45,15 @@ class AnalyticsHeader extends StatelessWidget {
                     fontWeight: FontWeight.w600,
                     fontSize: 14,
                   ),
-                  items: ['Today', 'This Week', 'This Month', 'Last 3 Months']
-                      .map(
-                        (range) =>
-                            DropdownMenuItem(value: range, child: Text(range)),
-                      )
-                      .toList(),
+                  items:
+                      ['Today', 'This Week', 'This Month', 'Last 3 Months']
+                          .map(
+                            (range) => DropdownMenuItem(
+                              value: range,
+                              child: Text(range),
+                            ),
+                          )
+                          .toList(),
                   onChanged: (value) {
                     if (value != null) {
                       context.read<EmployeeAnalyticsCubit>().changeTimeRange(

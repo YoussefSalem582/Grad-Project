@@ -1,9 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../presentation/screens/screens.dart';
 import '../../screens/test_backend_screen.dart';
-import '../../presentation/screens/auth/splash_screen.dart';
-import '../../presentation/screens/onboarding_screens/onboarding_screen.dart';
-import '../../presentation/screens/auth/auth_choice_screen.dart';
 
 /// Centralized routing configuration
 class AppRouter {
@@ -17,6 +14,14 @@ class AppRouter {
   static const String employeeDashboard = '/employee';
   static const String appStatus = '/status';
   static const String testBackend = '/test-backend';
+  static const String loading = '/loading';
+  static const String error = '/error';
+  static const String emptyState = '/empty-state';
+
+  // Analysis tool routes
+  static const String textAnalysis = '/text-analysis';
+  static const String voiceAnalysis = '/voice-analysis';
+  static const String videoAnalysis = '/video-analysis';
 
   static Route<dynamic> generateRoute(RouteSettings settings) {
     switch (settings.name) {
@@ -68,6 +73,64 @@ class AppRouter {
           settings: settings,
         );
 
+      case loading:
+        final args = settings.arguments as Map<String, dynamic>?;
+        return MaterialPageRoute(
+          builder:
+              (_) => LoadingScreen(
+                message: args?['message'] ?? 'Loading...',
+                showProgress: args?['showProgress'] ?? false,
+                progress: args?['progress'],
+              ),
+          settings: settings,
+        );
+
+      case error:
+        final args = settings.arguments as Map<String, dynamic>?;
+        return MaterialPageRoute(
+          builder:
+              (_) => ErrorScreen(
+                title: args?['title'] ?? 'Error',
+                message: args?['message'] ?? 'Something went wrong',
+                icon: args?['icon'],
+                actionLabel: args?['actionLabel'],
+                onAction: args?['onAction'],
+              ),
+          settings: settings,
+        );
+
+      case emptyState:
+        final args = settings.arguments as Map<String, dynamic>?;
+        return MaterialPageRoute(
+          builder:
+              (_) => EmptyStateScreen(
+                title: args?['title'] ?? 'No Data',
+                message: args?['message'] ?? 'No data available',
+                icon: args?['icon'],
+                actionLabel: args?['actionLabel'],
+                onAction: args?['onAction'],
+              ),
+          settings: settings,
+        );
+
+      case textAnalysis:
+        return MaterialPageRoute(
+          builder: (_) => const EnhancedTextAnalysisScreen(),
+          settings: settings,
+        );
+
+      case voiceAnalysis:
+        return MaterialPageRoute(
+          builder: (_) => const EnhancedVoiceAnalysisScreen(),
+          settings: settings,
+        );
+
+      case videoAnalysis:
+        return MaterialPageRoute(
+          builder: (_) => const EmployeeVideoAnalysisScreen(),
+          settings: settings,
+        );
+
       default:
         return MaterialPageRoute(
           builder: (_) => const _NotFoundScreen(),
@@ -105,12 +168,118 @@ class AppRouter {
     Navigator.pushReplacementNamed(context, employeeDashboard);
   }
 
+  static void toTextAnalysis(BuildContext context) {
+    Navigator.pushNamed(context, textAnalysis);
+  }
+
+  static void toVoiceAnalysis(BuildContext context) {
+    Navigator.pushNamed(context, voiceAnalysis);
+  }
+
+  static void toVideoAnalysis(BuildContext context) {
+    Navigator.pushNamed(context, videoAnalysis);
+  }
+
   static void toAppStatus(BuildContext context) {
     Navigator.pushNamed(context, appStatus);
   }
 
   static void toTestBackend(BuildContext context) {
     Navigator.pushNamed(context, testBackend);
+  }
+
+  // Helper methods for common screens
+  static void toLoading(
+    BuildContext context, {
+    String message = 'Loading...',
+    bool showProgress = false,
+    double? progress,
+  }) {
+    Navigator.pushNamed(
+      context,
+      loading,
+      arguments: {
+        'message': message,
+        'showProgress': showProgress,
+        'progress': progress,
+      },
+    );
+  }
+
+  static void showError(
+    BuildContext context, {
+    String title = 'Error',
+    String message = 'Something went wrong',
+    IconData? icon,
+    String? actionLabel,
+    VoidCallback? onAction,
+  }) {
+    Navigator.pushNamed(
+      context,
+      error,
+      arguments: {
+        'title': title,
+        'message': message,
+        'icon': icon,
+        'actionLabel': actionLabel,
+        'onAction': onAction,
+      },
+    );
+  }
+
+  static void showEmptyState(
+    BuildContext context, {
+    String title = 'No Data',
+    String message = 'No data available',
+    IconData? icon,
+    String? actionLabel,
+    VoidCallback? onAction,
+  }) {
+    Navigator.pushNamed(
+      context,
+      emptyState,
+      arguments: {
+        'title': title,
+        'message': message,
+        'icon': icon,
+        'actionLabel': actionLabel,
+        'onAction': onAction,
+      },
+    );
+  }
+
+  // Enhanced navigation utilities
+  static Future<T?> pushAndClearStack<T extends Object?>(
+    BuildContext context,
+    String routeName, {
+    Object? arguments,
+  }) {
+    return Navigator.pushNamedAndRemoveUntil(
+      context,
+      routeName,
+      (route) => false,
+      arguments: arguments,
+    );
+  }
+
+  static Future<T?> pushReplacement<T extends Object?, TO extends Object?>(
+    BuildContext context,
+    String routeName, {
+    Object? arguments,
+  }) {
+    return Navigator.pushReplacementNamed(
+      context,
+      routeName,
+      arguments: arguments,
+    );
+  }
+
+  static void pop<T extends Object?>(BuildContext context, [T? result]) {
+    Navigator.pop(context, result);
+  }
+
+  static void popUntil(BuildContext context, String routeName) {
+    Navigator.popUntil(context, ModalRoute.withName(routeName));
   }
 }
 
