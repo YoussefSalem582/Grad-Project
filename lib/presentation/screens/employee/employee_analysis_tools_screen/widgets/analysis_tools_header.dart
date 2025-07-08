@@ -51,56 +51,29 @@ class AnalysisToolsHeader extends StatelessWidget {
             child: const Icon(Icons.analytics, color: Colors.white, size: 32),
           ),
           SizedBox(width: customSpacing.md),
+          SizedBox(height: customSpacing.sm),
 
-          // Text content
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+          // Status indicator
+          Container(
+            padding: EdgeInsets.symmetric(
+              horizontal: customSpacing.sm,
+              vertical: customSpacing.xs,
+            ),
+            decoration: BoxDecoration(
+              color: AppColors.success.withValues(alpha: 0.1),
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
               children: [
+                Icon(Icons.check_circle, color: AppColors.success, size: 16),
+                SizedBox(width: customSpacing.xs),
                 Text(
-                  'Analysis Tools',
-                  style: theme.textTheme.headlineSmall?.copyWith(
-                    fontWeight: FontWeight.w900,
-                    color: Colors.white,
-                  ),
-                ),
-                SizedBox(height: customSpacing.xs),
-                Text(
-                  'AI-powered customer insights and analytics',
-                  style: theme.textTheme.bodyMedium?.copyWith(
-                    color: Colors.grey,
-                  ),
-                ),
-                SizedBox(height: customSpacing.sm),
-
-                // Status indicator
-                Container(
-                  padding: EdgeInsets.symmetric(
-                    horizontal: customSpacing.sm,
-                    vertical: customSpacing.xs,
-                  ),
-                  decoration: BoxDecoration(
-                    color: AppColors.success.withValues(alpha: 0.1),
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Icon(
-                        Icons.check_circle,
-                        color: AppColors.success,
-                        size: 16,
-                      ),
-                      SizedBox(width: customSpacing.xs),
-                      Text(
-                        '3 tools available',
-                        style: TextStyle(
-                          color: AppColors.success,
-                          fontSize: 12,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                    ],
+                  '3 tools available',
+                  style: TextStyle(
+                    color: AppColors.success,
+                    fontSize: 12,
+                    fontWeight: FontWeight.w600,
                   ),
                 ),
               ],
