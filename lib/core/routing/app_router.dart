@@ -127,7 +127,7 @@ class AppRouter {
 
       case videoAnalysis:
         return MaterialPageRoute(
-          builder: (_) => const EmployeeVideoAnalysisScreen(),
+          builder: (_) => const EnhancedVideoAnalysisScreen(),
           settings: settings,
         );
 

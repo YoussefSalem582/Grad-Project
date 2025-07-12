@@ -60,9 +60,9 @@ class AppConfig {
   // API Configuration
   // ========================================
 
-  /// Backend API base URL (e.g., 'http://localhost:8002' or 'https://api.emosense.com/v1')
+  /// Backend API base URL (e.g., 'http://localhost:8000' or 'https://api.emosense.com/v1')
   static String get baseUrl =>
-      dotenv.env['API_BASE_URL'] ?? 'http://localhost:8002';
+      dotenv.env['API_BASE_URL'] ?? 'http://localhost:8000';
 
   /// API authentication key for backend requests
   static String get apiKey => dotenv.env['API_KEY'] ?? 'default-api-key';

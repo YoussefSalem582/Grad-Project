@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:equatable/equatable.dart';
 import '../../../data/models/video_analysis_response.dart';
@@ -34,6 +35,28 @@ class VideoAnalysisCubit extends Cubit<VideoAnalysisState> {
     } catch (e) {
       // If backend fails, show demo data with asset images
       emit(VideoAnalysisDemo(_createDemoResult(videoUrl)));
+    }
+  }
+
+  /// Analyze video from uploaded file
+  Future<void> analyzeVideoFile({
+    required File videoFile,
+    int frameInterval = 30,
+    int maxFrames = 5,
+  }) async {
+    emit(const VideoAnalysisLoading());
+
+    try {
+      final result = await _repository.analyzeVideoFile(
+        videoFile: videoFile,
+        frameInterval: frameInterval,
+        maxFrames: maxFrames,
+      );
+
+      emit(VideoAnalysisSuccess(result));
+    } catch (e) {
+      // If backend fails, show demo data with file name
+      emit(VideoAnalysisDemo(_createDemoResult(videoFile.path)));
     }
   }
 
@@ -82,7 +105,7 @@ class VideoAnalysisCubit extends Cubit<VideoAnalysisState> {
           sentiment: 'positive',
           confidence: 0.92,
           subtitle:
-              'Customer expresses genuine satisfaction with the product. Shows excitement about features and recommends to others. Overall very positive product review experience.',
+              'Linus tests an all‑Logitech gaming desk and ends up impressed but not blown away: the G715 wireless TKL keyboard feels premium and feature‑rich, yet its high price and ABS keycaps keep it shy of “must‑buy” status, while the ultra‑light G Pro X Superlight mouse paired with the PowerPlay charging mat remains one of his favorite peripherals—flawless in performance, if you can stomach the cost and outdated micro‑USB port.',
           frameImageBase64: '', // Empty since we're using asset
           assetImagePath: 'assets/images/product_review_1.png',
           totalFramesAnalyzed: 8,

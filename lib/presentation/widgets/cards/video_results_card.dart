@@ -139,6 +139,51 @@ class VideoResultsCard extends StatelessWidget {
 
         const SizedBox(height: 16),
 
+        // Frame Image Display
+        if (snapshot.assetImagePath != null) ...[
+          Container(
+            width: double.infinity,
+            height: 200,
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(color: Colors.grey.withValues(alpha: 0.3)),
+            ),
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(12),
+              child: Image.asset(
+                snapshot.assetImagePath!,
+                fit: BoxFit.cover,
+                errorBuilder: (context, error, stackTrace) {
+                  return Container(
+                    decoration: BoxDecoration(
+                      color: Colors.grey.withValues(alpha: 0.1),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: const Center(
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(
+                            Icons.image_not_supported,
+                            size: 48,
+                            color: Colors.grey,
+                          ),
+                          SizedBox(height: 8),
+                          Text(
+                            'Image not available',
+                            style: TextStyle(color: Colors.grey),
+                          ),
+                        ],
+                      ),
+                    ),
+                  );
+                },
+              ),
+            ),
+          ),
+          const SizedBox(height: 16),
+        ],
+
         // Summary Text
         Container(
           padding: const EdgeInsets.all(12),
@@ -184,8 +229,8 @@ class VideoResultsCard extends StatelessWidget {
           ...snapshot.emotionDistribution.entries.map((entry) {
             final emotion = entry.key;
             final count = entry.value;
-            final percentage = (count / snapshot.totalFramesAnalyzed * 100)
-                .round();
+            final percentage =
+                (count / snapshot.totalFramesAnalyzed * 100).round();
 
             return Padding(
               padding: const EdgeInsets.only(bottom: 8.0),

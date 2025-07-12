@@ -1,3 +1,4 @@
+import 'dart:io';
 import '../models/video_analysis_response.dart';
 import '../services/video_analysis_api_service.dart';
 
@@ -20,6 +21,23 @@ class VideoAnalysisRepository {
       );
     } catch (e) {
       throw Exception('Failed to analyze video: ${e.toString()}');
+    }
+  }
+
+  /// Analyze video from uploaded file
+  Future<VideoAnalysisResponse> analyzeVideoFile({
+    required File videoFile,
+    int frameInterval = 30,
+    int maxFrames = 5,
+  }) async {
+    try {
+      return await _apiService.analyzeVideoFile(
+        videoFile: videoFile,
+        frameInterval: frameInterval,
+        maxFrames: maxFrames,
+      );
+    } catch (e) {
+      throw Exception('Failed to analyze video file: ${e.toString()}');
     }
   }
 

@@ -57,6 +57,10 @@ dependencies:
   # Configuration and environment management
   flutter_dotenv: ^5.1.0
   shared_preferences: ^2.2.2
+  
+  # File picking and media handling
+  file_picker: ^10.2.0
+  image_picker: ^1.0.7
 
 dev_dependencies:
   flutter_test:

@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -26,6 +27,7 @@ class _EmployeeVideoAnalysisScreenState
     with TickerProviderStateMixin {
   final TextEditingController _urlController = TextEditingController();
   final FocusNode _urlFocusNode = FocusNode();
+  File? _selectedVideoFile;
 
   late AnimationController _headerController;
   late AnimationController _cardController;
@@ -108,12 +110,14 @@ class _EmployeeVideoAnalysisScreenState
 
               const SizedBox(height: 24),
 
-              // Video URL Input
-              VideoUrlInput(
-                controller: _urlController,
-                focusNode: _urlFocusNode,
+              // Video Input (URL or File)
+              VideoInputWidget(
+                urlController: _urlController,
+                urlFocusNode: _urlFocusNode,
                 animation: _cardAnimation,
                 onChanged: () => setState(() {}),
+                onFileSelected: (file) => setState(() => _selectedVideoFile = file.path.isEmpty ? null : file),
+                selectedFile: _selectedVideoFile,
               ),
 
               const SizedBox(height: 20),
@@ -121,7 +125,7 @@ class _EmployeeVideoAnalysisScreenState
               // Analyze Button
               AnalyzeButton(
                 animation: _cardAnimation,
-                canAnalyze: _urlController.text.isNotEmpty,
+                canAnalyze: _urlController.text.isNotEmpty || _selectedVideoFile != null,
                 onPressed: _analyzeVideo,
               ),
 
@@ -143,10 +147,18 @@ class _EmployeeVideoAnalysisScreenState
 
   /// Analyze video using the cubit
   void _analyzeVideo() {
-    final url = _urlController.text.trim();
-    if (url.isNotEmpty) {
-      context.read<VideoAnalysisCubit>().analyzeVideo(videoUrl: url);
-      HapticFeedback.mediumImpact();
+    if (_selectedVideoFile != null) {
+      // Analyze uploaded video file
+      context.read<VideoAnalysisCubit>().analyzeVideoFile(
+        videoFile: _selectedVideoFile!,
+      );
+    } else {
+      // Analyze video from URL
+      final url = _urlController.text.trim();
+      if (url.isNotEmpty) {
+        context.read<VideoAnalysisCubit>().analyzeVideo(videoUrl: url);
+      }
     }
+    HapticFeedback.mediumImpact();
   }
 }

@@ -15,10 +15,11 @@ import 'presentation/cubit/text_analysis/text_analysis_cubit.dart';
 import 'presentation/cubit/voice_analysis/voice_analysis_cubit.dart';
 import 'presentation/cubit/employee_dashboard/employee_dashboard_cubit.dart';
 import 'presentation/cubit/employee_analytics/employee_analytics_cubit.dart';
-import 'presentation/cubit/employee_tickets/employee_tickets_cubit.dart';
 import 'presentation/cubit/employee_performance/employee_performance_cubit.dart';
 import 'presentation/cubit/admin_dashboard/admin_dashboard_cubit.dart';
 import 'presentation/cubit/connection_cubit.dart';
+
+// Presentation - Widgets
 import 'presentation/widgets/backend_connection_widget.dart';
 
 void main() async {
@@ -61,9 +62,6 @@ class EmosenseApp extends StatelessWidget {
         ),
         BlocProvider<EmployeeAnalyticsCubit>(
           create: (_) => di.sl<EmployeeAnalyticsCubit>(),
-        ),
-        BlocProvider<EmployeeTicketsCubit>(
-          create: (_) => di.sl<EmployeeTicketsCubit>(),
         ),
         BlocProvider<EmployeePerformanceCubit>(
           create: (_) => di.sl<EmployeePerformanceCubit>(),

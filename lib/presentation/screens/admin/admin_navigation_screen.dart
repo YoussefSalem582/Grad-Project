@@ -4,7 +4,9 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../core/core.dart';
 import '../../../core/routing/app_router.dart';
 import '../../../core/utils/screen_state_manager.dart';
+import '../../../core/di/dependency_injection.dart' as di;
 import '../../cubit/admin_dashboard/admin_dashboard_cubit.dart';
+import '../../cubit/tickets/tickets_cubit.dart';
 import '../../widgets/navigation/admin_bottom_nav_bar.dart';
 import 'widgets/admin_app_bar.dart';
 import 'widgets/admin_dialogs.dart';
@@ -94,7 +96,10 @@ class _AdminNavigationScreenState extends State<AdminNavigationScreen>
         screen = const AdminUserManagementScreen();
         break;
       case 2:
-        screen = const AdminTicketsScreen();
+        screen = BlocProvider(
+          create: (context) => di.sl<TicketsCubit>(),
+          child: const AdminTicketsScreen(),
+        );
         break;
       case 3:
         screen = const AdminSystemConfigScreen();

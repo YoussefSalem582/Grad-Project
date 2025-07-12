@@ -246,7 +246,7 @@ class ConnectionManager {
   List<BackendConfig> get predefinedConfigs => [
     BackendConfig(
       name: 'Local Development',
-      baseUrl: 'http://localhost:8002',
+      baseUrl: 'http://localhost:8000',
       apiKey: 'dev-api-key',
       isDefault: true,
     ),
@@ -309,13 +309,14 @@ class ConnectionManager {
       _updateStatus(ConnectionStatus.error);
       return ConnectionResult.failure(
         message: 'Failed to connect: ${e.toString()}',
-        error: e is ApiException
-            ? e
-            : ApiException(
-                message: e.toString(),
-                statusCode: 0,
-                type: ApiExceptionType.unknown,
-              ),
+        error:
+            e is ApiException
+                ? e
+                : ApiException(
+                  message: e.toString(),
+                  statusCode: 0,
+                  type: ApiExceptionType.unknown,
+                ),
       );
     }
   }

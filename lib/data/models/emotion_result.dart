@@ -16,19 +16,52 @@ class EmotionResult extends Equatable {
   });
 
   factory EmotionResult.fromJson(Map<String, dynamic> json) {
-    return EmotionResult(
-      emotion: json['emotion'] as String,
-      sentiment: json['sentiment'] as String,
-      confidence: (json['confidence'] as num).toDouble(),
-      allEmotions: Map<String, double>.from(
-        (json['all_emotions'] as Map<String, dynamic>).map(
-          (key, value) => MapEntry(key, (value as num).toDouble()),
+    // Handle backend response format
+    if (json.containsKey('emotion') && json.containsKey('processing_time')) {
+      // Backend response format
+      final emotion = json['emotion'] as String;
+      final processingTime = (json['processing_time'] as num).toDouble();
+
+      return EmotionResult(
+        emotion: emotion,
+        sentiment: _emotionToSentiment(emotion),
+        confidence: 0.85, // Default confidence since backend doesn't provide it
+        allEmotions: {emotion: 0.85},
+        processingTimeMs: processingTime * 1000, // Convert to ms
+      );
+    } else {
+      // Original format
+      return EmotionResult(
+        emotion: json['emotion'] as String,
+        sentiment: json['sentiment'] as String,
+        confidence: (json['confidence'] as num).toDouble(),
+        allEmotions: Map<String, double>.from(
+          (json['all_emotions'] as Map<String, dynamic>).map(
+            (key, value) => MapEntry(key, (value as num).toDouble()),
+          ),
         ),
-      ),
-      processingTimeMs: json['processing_time_ms'] != null
-          ? (json['processing_time_ms'] as num).toDouble()
-          : null,
-    );
+        processingTimeMs:
+            json['processing_time_ms'] != null
+                ? (json['processing_time_ms'] as num).toDouble()
+                : null,
+      );
+    }
+  }
+
+  static String _emotionToSentiment(String emotion) {
+    switch (emotion.toLowerCase()) {
+      case 'joy':
+      case 'surprise':
+        return 'positive';
+      case 'sadness':
+      case 'anger':
+      case 'fear':
+      case 'disgust':
+        return 'negative';
+      case 'neutral':
+      default:
+        return 'neutral';
+    }
   }
 
   Map<String, dynamic> toJson() {

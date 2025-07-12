@@ -1,11 +1,15 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:equatable/equatable.dart';
+import '../../../data/services/emotion_api_service.dart';
+
 part 'text_analysis_state.dart';
 
 class TextAnalysisCubit extends Cubit<TextAnalysisState> {
-  TextAnalysisCubit() : super(const TextAnalysisInitial());
+  final EmotionApiService _apiService;
 
-  /// Analyze text input
+  TextAnalysisCubit(this._apiService) : super(const TextAnalysisInitial());
+
+  /// Analyze text input using real API
   Future<void> analyzeText({
     required String text,
     required String analysisType,
@@ -23,10 +27,12 @@ class TextAnalysisCubit extends Cubit<TextAnalysisState> {
     emit(const TextAnalysisLoading());
 
     try {
-      // Simulate analysis process
-      await Future.delayed(const Duration(seconds: 2));
-
-      final result = _createAnalysisResult(text, analysisType);
+      final emotionResult = await _apiService.predictEmotion(text);
+      final result = _convertToTextAnalysisResult(
+        emotionResult,
+        text,
+        analysisType,
+      );
       emit(TextAnalysisSuccess(result));
     } catch (e) {
       emit(TextAnalysisError('Analysis failed: ${e.toString()}'));
@@ -46,6 +52,52 @@ class TextAnalysisCubit extends Cubit<TextAnalysisState> {
   /// Clear current analysis
   void clearAnalysis() {
     emit(const TextAnalysisInitial());
+  }
+
+  /// Convert emotion result to text analysis result format
+  TextAnalysisResult _convertToTextAnalysisResult(
+    dynamic emotionResult,
+    String text,
+    String analysisType,
+  ) {
+    return TextAnalysisResult(
+      id: DateTime.now().millisecondsSinceEpoch.toString(),
+      text: text,
+      analysisType: analysisType,
+      confidence: emotionResult.confidence,
+      timestamp: DateTime.now(),
+      summary:
+          'Emotion detected: ${emotionResult.emotion} with ${emotionResult.sentiment} sentiment',
+      details: [
+        'Text Length: ${text.length} characters',
+        'Word Count: ${text.split(' ').length} words',
+        'Dominant Emotion: ${emotionResult.emotion}',
+        'Sentiment: ${emotionResult.sentiment}',
+        'Confidence: ${(emotionResult.confidence * 100).toStringAsFixed(1)}%',
+        if (emotionResult.processingTimeMs != null)
+          'Processing Time: ${emotionResult.processingTimeMs!.toStringAsFixed(1)}ms',
+      ],
+      sentiments: {
+        emotionResult.sentiment: emotionResult.confidence,
+        'neutral': 1.0 - emotionResult.confidence,
+      },
+      keywords: _extractKeywordsFromText(text),
+      metrics: {
+        'emotion': emotionResult.emotion,
+        'sentiment': emotionResult.sentiment,
+        'confidence': emotionResult.confidence,
+        'processing_time': emotionResult.processingTimeMs ?? 0,
+        'text_length': text.length,
+        'word_count': text.split(' ').length,
+        'emotions_breakdown': emotionResult.allEmotions,
+      },
+    );
+  }
+
+  /// Extract keywords from text
+  List<String> _extractKeywordsFromText(String text) {
+    final words = text.toLowerCase().split(RegExp(r'\W+'));
+    return words.where((word) => word.length > 3).take(5).toList();
   }
 
   /// Create analysis result based on type
@@ -198,13 +250,14 @@ class TextAnalysisCubit extends Cubit<TextAnalysisState> {
   }
 
   List<String> _extractKeywords(String text) {
-    final words = text
-        .toLowerCase()
-        .replaceAll(RegExp(r'[^\w\s]'), '')
-        .split(' ')
-        .where((word) => word.length > 3)
-        .toSet()
-        .toList();
+    final words =
+        text
+            .toLowerCase()
+            .replaceAll(RegExp(r'[^\w\s]'), '')
+            .split(' ')
+            .where((word) => word.length > 3)
+            .toSet()
+            .toList();
 
     // Filter out common stop words
     const stopWords = {
@@ -246,28 +299,26 @@ class TextAnalysisCubit extends Cubit<TextAnalysisState> {
   Map<String, dynamic> _generateMetrics(String text) {
     final words = text.split(' ').length;
     final characters = text.length;
-    final sentences = text
-        .split(RegExp(r'[.!?]'))
-        .where((s) => s.trim().isNotEmpty)
-        .length;
+    final sentences =
+        text.split(RegExp(r'[.!?]')).where((s) => s.trim().isNotEmpty).length;
 
     return {
       'wordCount': words,
       'characterCount': characters,
       'sentenceCount': sentences,
-      'averageWordsPerSentence': sentences > 0
-          ? (words / sentences).toStringAsFixed(1)
-          : '0',
+      'averageWordsPerSentence':
+          sentences > 0 ? (words / sentences).toStringAsFixed(1) : '0',
       'readabilityScore': _calculateReadabilityScore(
         words,
         sentences,
         characters,
       ),
-      'complexity': words > 50
-          ? 'Complex'
-          : words > 20
-          ? 'Moderate'
-          : 'Simple',
+      'complexity':
+          words > 50
+              ? 'Complex'
+              : words > 20
+              ? 'Moderate'
+              : 'Simple',
     };
   }
 

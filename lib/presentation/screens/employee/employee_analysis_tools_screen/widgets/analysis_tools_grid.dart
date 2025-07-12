@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../../../../core/core.dart';
+import '../../../analysis/enhanced_video_analysis_screen.dart';
 import 'analysis_tool_card.dart';
 
 /// Grid widget that displays all available analysis tools
@@ -39,9 +40,9 @@ class AnalysisToolsGrid extends StatelessWidget {
             final isTablet = screenWidth > 600;
 
             if (isTablet) {
-              return _buildTabletLayout(customSpacing);
+              return _buildTabletLayout(customSpacing, context);
             } else {
-              return _buildMobileLayout(customSpacing);
+              return _buildMobileLayout(customSpacing, context);
             }
           },
         ),
@@ -50,7 +51,7 @@ class AnalysisToolsGrid extends StatelessWidget {
   }
 
   /// Build tablet layout: 2 cards on top row, 1 centered on bottom
-  Widget _buildTabletLayout(CustomSpacing customSpacing) {
+  Widget _buildTabletLayout(CustomSpacing customSpacing, BuildContext context) {
     return Column(
       children: [
         Row(
@@ -87,7 +88,14 @@ class AnalysisToolsGrid extends StatelessWidget {
                 description: 'Customer videos & interviews',
                 icon: Icons.video_library,
                 color: const Color(0xFF667EEA),
-                onTap: () => onAnalysisToolTap(6), // Index 6 for video analysis
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const EnhancedVideoAnalysisScreen(),
+                    ),
+                  );
+                },
               ),
             ),
             Expanded(flex: 1, child: Container()),
@@ -98,7 +106,7 @@ class AnalysisToolsGrid extends StatelessWidget {
   }
 
   /// Build mobile layout: vertical stack
-  Widget _buildMobileLayout(CustomSpacing customSpacing) {
+  Widget _buildMobileLayout(CustomSpacing customSpacing, BuildContext context) {
     return Column(
       children: [
         AnalysisToolCard(
@@ -122,7 +130,14 @@ class AnalysisToolsGrid extends StatelessWidget {
           description: 'Customer videos & interviews',
           icon: Icons.video_library,
           color: const Color(0xFF667EEA),
-          onTap: () => onAnalysisToolTap(6), // Index 6 for video analysis
+          onTap: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => const EnhancedVideoAnalysisScreen(),
+              ),
+            );
+          },
         ),
       ],
     );

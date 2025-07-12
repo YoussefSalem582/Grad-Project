@@ -1,6 +1,7 @@
 // lib/screens/test_backend_screen.dart
 import 'package:flutter/material.dart';
-import '../core/config/api_config.dart';
+import '../data/services/emotion_api_service.dart';
+import '../core/config/app_config.dart';
 
 class TestBackendScreen extends StatefulWidget {
   const TestBackendScreen({Key? key}) : super(key: key);
@@ -31,7 +32,7 @@ class _TestBackendScreenState extends State<TestBackendScreen> {
     });
 
     try {
-      final isHealthy = await _apiService.checkHealth();
+      final isHealthy = await _apiService.checkConnection();
       setState(() {
         _isHealthy = isHealthy;
         _status = isHealthy ? 'Connected ✅' : 'Connection failed ❌';
@@ -60,13 +61,15 @@ class _TestBackendScreenState extends State<TestBackendScreen> {
     });
 
     try {
-      final result = await _apiService.analyzeText(_textController.text.trim());
+      final result = await _apiService.predictEmotion(
+        _textController.text.trim(),
+      );
       setState(() {
         _lastResult = '''
-Emotion: ${result['emotion']}
-Confidence: ${(result['confidence'] * 100).toStringAsFixed(1)}%
-Model: ${result['model_used']}
-Time: ${(result['processing_time'] * 1000).toStringAsFixed(1)}ms
+Emotion: ${result.emotion}
+Sentiment: ${result.sentiment}
+Confidence: ${(result.confidence * 100).toStringAsFixed(1)}%
+Time: ${result.processingTimeMs?.toStringAsFixed(1) ?? 'N/A'}ms
 ''';
         _isLoading = false;
       });
@@ -111,7 +114,7 @@ Time: ${(result['processing_time'] * 1000).toStringAsFixed(1)}ms
                     ),
                     const SizedBox(height: 8),
                     Text(
-                      'API URL: ${ApiConfig.baseUrl}',
+                      'API URL: ${AppConfig.baseUrl}',
                       style: const TextStyle(fontSize: 12, color: Colors.grey),
                     ),
                     const SizedBox(height: 16),

@@ -1,21 +1,17 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:equatable/equatable.dart';
-
-// Remove the imports that may not exist and create a simple analysis cubit
-// import '../../../domain/entities/analysis_result.dart';
-// import '../../../domain/usecases/analyze_text_usecase.dart';
-// import '../../../domain/usecases/analyze_voice_usecase.dart';
-// import '../../../domain/usecases/analyze_social_usecase.dart';
-// import '../../../domain/usecases/get_analysis_history_usecase.dart';
-// import '../../../core/usecases/usecase.dart';
+import '../../../data/services/emotion_api_service.dart';
+import '../../../data/models/emotion_result.dart';
 
 part 'analysis_state.dart';
 
-/// Cubit for managing general analysis operations (simplified version)
+/// Cubit for managing general analysis operations
 class AnalysisCubit extends Cubit<AnalysisState> {
-  AnalysisCubit() : super(const AnalysisInitial());
+  final EmotionApiService _apiService;
 
-  /// Analyze text content (placeholder implementation)
+  AnalysisCubit(this._apiService) : super(const AnalysisInitial());
+
+  /// Analyze text content using real API
   Future<void> analyzeText(String content) async {
     if (content.trim().isEmpty) {
       emit(const AnalysisError('Text cannot be empty'));
@@ -25,12 +21,9 @@ class AnalysisCubit extends Cubit<AnalysisState> {
     emit(const AnalysisLoading());
 
     try {
-      // Simulate analysis process
-      await Future.delayed(const Duration(seconds: 2));
-
-      // Create a mock result
-      final result = _createMockResult(content, 'text');
-      emit(AnalysisSuccess(result, [result]));
+      final result = await _apiService.predictEmotion(content);
+      final analysisResult = _convertEmotionToAnalysis(result, content, 'text');
+      emit(AnalysisSuccess(analysisResult, [analysisResult]));
     } catch (e) {
       emit(AnalysisError('Analysis failed: ${e.toString()}'));
     }
@@ -41,9 +34,8 @@ class AnalysisCubit extends Cubit<AnalysisState> {
     emit(const AnalysisLoading());
 
     try {
-      // Simulate analysis process
+      // TODO: Implement voice analysis when audio endpoint is available
       await Future.delayed(const Duration(seconds: 3));
-
       final result = _createMockResult(audioPath, 'voice');
       emit(AnalysisSuccess(result, [result]));
     } catch (e) {
@@ -56,9 +48,8 @@ class AnalysisCubit extends Cubit<AnalysisState> {
     emit(const AnalysisLoading());
 
     try {
-      // Simulate analysis process
+      // TODO: Implement social analysis when social endpoint is available
       await Future.delayed(const Duration(seconds: 2));
-
       final result = _createMockResult(socialData, 'social');
       emit(AnalysisSuccess(result, [result]));
     } catch (e) {
@@ -76,6 +67,32 @@ class AnalysisCubit extends Cubit<AnalysisState> {
     if (state is AnalysisError) {
       emit(const AnalysisInitial());
     }
+  }
+
+  /// Convert EmotionResult to analysis result format
+  Map<String, dynamic> _convertEmotionToAnalysis(
+    EmotionResult emotionResult,
+    String content,
+    String type,
+  ) {
+    return {
+      'id': DateTime.now().millisecondsSinceEpoch.toString(),
+      'content': content,
+      'type': type,
+      'emotion': emotionResult.emotion,
+      'sentiment': emotionResult.sentiment,
+      'confidence': emotionResult.confidence,
+      'timestamp': DateTime.now().toIso8601String(),
+      'emotions': emotionResult.allEmotions,
+      'keywords': _extractKeywords(content),
+      'processing_time': emotionResult.processingTimeMs,
+    };
+  }
+
+  /// Extract keywords from content (simple implementation)
+  List<String> _extractKeywords(String content) {
+    final words = content.toLowerCase().split(RegExp(r'\W+'));
+    return words.where((word) => word.length > 3).take(5).toList();
   }
 
   Map<String, dynamic> _createMockResult(String content, String type) {
