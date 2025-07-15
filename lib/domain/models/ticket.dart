@@ -223,25 +223,26 @@ class Ticket extends Equatable {
 
   /// Check if ticket is high priority (high or critical)
   bool get isHighPriority {
-    return priority == TicketPriority.high || priority == TicketPriority.critical;
+    return priority == TicketPriority.high ||
+        priority == TicketPriority.critical;
   }
 
   @override
   List<Object?> get props => [
-        id,
-        title,
-        description,
-        status,
-        priority,
-        source,
-        customerName,
-        assignee,
-        category,
-        createdAt,
-        updatedAt,
-        estimatedTime,
-        referenceUrl,
-      ];
+    id,
+    title,
+    description,
+    status,
+    priority,
+    source,
+    customerName,
+    assignee,
+    category,
+    createdAt,
+    updatedAt,
+    estimatedTime,
+    referenceUrl,
+  ];
 
   /// Parse DateTime from string or return current time
   static DateTime _parseDateTime(dynamic dateTime) {
@@ -352,11 +353,11 @@ class TicketFilter extends Equatable {
 
   @override
   List<Object?> get props => [
-        status,
-        priority,
-        source,
-        searchQuery,
-        category,
-        assigneeId,
-      ];
+    status,
+    priority,
+    source,
+    searchQuery,
+    category,
+    assigneeId,
+  ];
 }

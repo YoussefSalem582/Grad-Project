@@ -1,4 +1,4 @@
-part of 'tickets_cubit.dart';
+part of 'tickets_bloc.dart';
 
 abstract class TicketsState extends Equatable {
   const TicketsState();
@@ -49,12 +49,7 @@ class AdminTicketsData extends Equatable {
   final int openCount;
   final int inProgressCount;
   final int resolvedCount;
-  final int closedCount;
-  final int highPriorityCount;
-  final int mediumPriorityCount;
-  final int lowPriorityCount;
   final int criticalCount;
-  final List<Map<String, dynamic>> recentTickets;
 
   const AdminTicketsData({
     required this.allTickets,
@@ -63,12 +58,7 @@ class AdminTicketsData extends Equatable {
     required this.openCount,
     required this.inProgressCount,
     required this.resolvedCount,
-    required this.closedCount,
-    required this.highPriorityCount,
-    required this.mediumPriorityCount,
-    required this.lowPriorityCount,
     required this.criticalCount,
-    required this.recentTickets,
   });
 
   @override
@@ -79,39 +69,21 @@ class AdminTicketsData extends Equatable {
     openCount,
     inProgressCount,
     resolvedCount,
-    closedCount,
-    highPriorityCount,
-    mediumPriorityCount,
-    lowPriorityCount,
     criticalCount,
-    recentTickets,
   ];
 }
 
 class EmployeeTicketsData extends Equatable {
-  final List<Map<String, dynamic>> assignedTickets;
-  final List<Map<String, dynamic>> recentTickets;
-  final int myTicketsCount;
-  final int pendingCount;
-  final int inProgressCount;
-  final int completedCount;
+  final List<Map<String, dynamic>> tickets;
+  final List<int> filterCounts;
+  final int selectedFilterIndex;
 
   const EmployeeTicketsData({
-    required this.assignedTickets,
-    required this.recentTickets,
-    required this.myTicketsCount,
-    required this.pendingCount,
-    required this.inProgressCount,
-    required this.completedCount,
+    required this.tickets,
+    required this.filterCounts,
+    required this.selectedFilterIndex,
   });
 
   @override
-  List<Object?> get props => [
-    assignedTickets,
-    recentTickets,
-    myTicketsCount,
-    pendingCount,
-    inProgressCount,
-    completedCount,
-  ];
+  List<Object?> get props => [tickets, filterCounts, selectedFilterIndex];
 }

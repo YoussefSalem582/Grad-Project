@@ -160,9 +160,7 @@ class _EmployeeTicketsScreenState extends State<EmployeeTicketsScreen>
 
     return MultiBlocProvider(
       providers: [
-        BlocProvider(
-          create: (context) => di.sl<TicketsCubit>()..loadTickets(),
-        ),
+        BlocProvider(create: (context) => di.sl<TicketsCubit>()..loadTickets()),
       ],
       child: Scaffold(
         backgroundColor: Colors.transparent,

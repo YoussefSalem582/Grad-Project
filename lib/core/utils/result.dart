@@ -84,10 +84,7 @@ sealed class Result<T> extends Equatable {
   }
 
   /// Fold result into single value
-  R fold<R>(
-    R Function(T) onSuccess,
-    R Function(AppError) onError,
-  ) {
+  R fold<R>(R Function(T) onSuccess, R Function(AppError) onError) {
     return switch (this) {
       Success<T>(data: final data) => onSuccess(data),
       Error<T>(error: final error) => onError(error),
@@ -192,9 +189,7 @@ class ResultHelpers {
   }
 
   /// Execute async function and wrap in result
-  static Future<Result<T>> tryAsync<T>(
-    Future<T> Function() operation,
-  ) async {
+  static Future<Result<T>> tryAsync<T>(Future<T> Function() operation) async {
     try {
       final result = await operation();
       return Success(result);

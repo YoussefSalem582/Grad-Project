@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../core/core.dart';
+import '../../../domain/models/ticket.dart';
 import '../../cubit/tickets/tickets_cubit.dart';
 import '../../widgets/common/animated_background_widget.dart';
 import '../../widgets/dialogs/ticket_details_dialog.dart';
@@ -89,7 +90,9 @@ class _AdminTicketsScreenState extends State<AdminTicketsScreen>
                         SizedBox(height: customSpacing.lg),
                         ElevatedButton(
                           onPressed: () {
-                            context.read<TicketsCubit>().loadAllTickets(isAdminView: true);
+                            context.read<TicketsCubit>().loadAllTickets(
+                              isAdminView: true,
+                            );
                           },
                           child: const Text('Retry'),
                         ),
@@ -98,7 +101,9 @@ class _AdminTicketsScreenState extends State<AdminTicketsScreen>
                   );
                 }
 
-                if (state is TicketsSuccess && state.isAdminView && state.adminData != null) {
+                if (state is TicketsSuccess &&
+                    state.isAdminView &&
+                    state.adminData != null) {
                   return _buildTicketsContent(
                     context,
                     state.adminData!,
@@ -324,7 +329,10 @@ class _AdminTicketsScreenState extends State<AdminTicketsScreen>
                         ],
                         onChanged: (value) {
                           if (value != null) {
-                            cubit.updatePriorityFilter(value, isAdminView: true);
+                            cubit.updatePriorityFilter(
+                              value,
+                              isAdminView: true,
+                            );
                           }
                         },
                       ),
@@ -531,7 +539,9 @@ class _AdminTicketsScreenState extends State<AdminTicketsScreen>
                       vertical: spacing.xs,
                     ),
                     decoration: BoxDecoration(
-                      color: getStatusColor(ticket['status']?.toString()).withOpacity(0.1),
+                      color: getStatusColor(
+                        ticket['status']?.toString(),
+                      ).withOpacity(0.1),
                       borderRadius: BorderRadius.circular(8),
                       border: Border.all(
                         color: getStatusColor(
@@ -579,7 +589,7 @@ class _AdminTicketsScreenState extends State<AdminTicketsScreen>
                     onSelected: (value) {
                       final ticketId = ticket['id']?.toString();
                       if (ticketId == null) return;
-                      
+
                       switch (value) {
                         case 'assign':
                           _showAssignDialog(context, ticket, cubit);
@@ -722,7 +732,7 @@ class _AdminTicketsScreenState extends State<AdminTicketsScreen>
                   title: const Text('John Smith'),
                   subtitle: const Text('Senior Support'),
                   onTap: () {
-                    cubit.assignTicket(ticketId, 'John Smith', isAdminView: true);
+                    cubit.assignTicket(ticketId, 'John Smith');
                     Navigator.of(context).pop();
                   },
                 ),
@@ -730,7 +740,7 @@ class _AdminTicketsScreenState extends State<AdminTicketsScreen>
                   title: const Text('Sarah Johnson'),
                   subtitle: const Text('Technical Lead'),
                   onTap: () {
-                    cubit.assignTicket(ticketId, 'Sarah Johnson', isAdminView: true);
+                    cubit.assignTicket(ticketId, 'Sarah Johnson');
                     Navigator.of(context).pop();
                   },
                 ),
@@ -738,7 +748,7 @@ class _AdminTicketsScreenState extends State<AdminTicketsScreen>
                   title: const Text('Lisa Wong'),
                   subtitle: const Text('Customer Success'),
                   onTap: () {
-                    cubit.assignTicket(ticketId, 'Lisa Wong', isAdminView: true);
+                    cubit.assignTicket(ticketId, 'Lisa Wong');
                     Navigator.of(context).pop();
                   },
                 ),
@@ -773,21 +783,21 @@ class _AdminTicketsScreenState extends State<AdminTicketsScreen>
                 ListTile(
                   title: const Text('Open'),
                   onTap: () {
-                    cubit.updateTicketStatus(ticketId, 'Open', isAdminView: true);
+                    cubit.updateTicketStatus(ticketId, TicketStatus.open);
                     Navigator.of(context).pop();
                   },
                 ),
                 ListTile(
                   title: const Text('In Progress'),
                   onTap: () {
-                    cubit.updateTicketStatus(ticketId, 'In Progress', isAdminView: true);
+                    cubit.updateTicketStatus(ticketId, TicketStatus.inProgress);
                     Navigator.of(context).pop();
                   },
                 ),
                 ListTile(
                   title: const Text('Resolved'),
                   onTap: () {
-                    cubit.updateTicketStatus(ticketId, 'Resolved', isAdminView: true);
+                    cubit.updateTicketStatus(ticketId, TicketStatus.resolved);
                     Navigator.of(context).pop();
                   },
                 ),
@@ -822,28 +832,31 @@ class _AdminTicketsScreenState extends State<AdminTicketsScreen>
                 ListTile(
                   title: const Text('Low'),
                   onTap: () {
-                    cubit.updateTicketPriority(ticketId, 'Low', isAdminView: true);
+                    cubit.updateTicketPriority(ticketId, TicketPriority.low);
                     Navigator.of(context).pop();
                   },
                 ),
                 ListTile(
                   title: const Text('Medium'),
                   onTap: () {
-                    cubit.updateTicketPriority(ticketId, 'Medium', isAdminView: true);
+                    cubit.updateTicketPriority(ticketId, TicketPriority.medium);
                     Navigator.of(context).pop();
                   },
                 ),
                 ListTile(
                   title: const Text('High'),
                   onTap: () {
-                    cubit.updateTicketPriority(ticketId, 'High', isAdminView: true);
+                    cubit.updateTicketPriority(ticketId, TicketPriority.high);
                     Navigator.of(context).pop();
                   },
                 ),
                 ListTile(
                   title: const Text('Critical'),
                   onTap: () {
-                    cubit.updateTicketPriority(ticketId, 'Critical', isAdminView: true);
+                    cubit.updateTicketPriority(
+                      ticketId,
+                      TicketPriority.critical,
+                    );
                     Navigator.of(context).pop();
                   },
                 ),

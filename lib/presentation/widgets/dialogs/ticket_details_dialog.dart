@@ -36,12 +36,36 @@ class TicketDetailsDialog extends StatelessWidget {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              _buildDetailRow('Ticket ID', ticket['id']?.toString() ?? 'Unknown'),
-              _buildDetailRow('Customer', ticket['customerName']?.toString() ?? ticket['customer']?.toString() ?? 'Unknown'),
-              _buildDetailRow('Priority', ticket['priority']?.toString() ?? 'Unknown'),
-              _buildDetailRow('Status', ticket['status']?.toString() ?? 'Unknown'),
-              _buildDetailRow('Created', ticket['createdAt']?.toString() ?? ticket['created']?.toString() ?? 'Unknown'),
-              _buildDetailRow('Assignee', ticket['assignedTo']?.toString() ?? ticket['assignee']?.toString() ?? 'Unassigned'),
+              _buildDetailRow(
+                'Ticket ID',
+                ticket['id']?.toString() ?? 'Unknown',
+              ),
+              _buildDetailRow(
+                'Customer',
+                ticket['customerName']?.toString() ??
+                    ticket['customer']?.toString() ??
+                    'Unknown',
+              ),
+              _buildDetailRow(
+                'Priority',
+                ticket['priority']?.toString() ?? 'Unknown',
+              ),
+              _buildDetailRow(
+                'Status',
+                ticket['status']?.toString() ?? 'Unknown',
+              ),
+              _buildDetailRow(
+                'Created',
+                ticket['createdAt']?.toString() ??
+                    ticket['created']?.toString() ??
+                    'Unknown',
+              ),
+              _buildDetailRow(
+                'Assignee',
+                ticket['assignedTo']?.toString() ??
+                    ticket['assignee']?.toString() ??
+                    'Unassigned',
+              ),
               if (ticket['url'] != null)
                 _buildDetailRowWithLink(
                   context,
@@ -98,9 +122,7 @@ class TicketDetailsDialog extends StatelessWidget {
               ),
             ),
           ),
-          Expanded(
-            child: Text(value, style: TextStyle(color: Colors.black)),
-          ),
+          Expanded(child: Text(value, style: TextStyle(color: Colors.black))),
         ],
       ),
     );

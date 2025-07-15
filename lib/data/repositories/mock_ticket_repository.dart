@@ -7,7 +7,8 @@ import '../../domain/repositories/ticket_repository.dart';
 class MockTicketRepository implements TicketRepository {
   // In-memory storage for development
   final List<Ticket> _tickets = [];
-  final StreamController<List<Ticket>> _ticketsController = StreamController.broadcast();
+  final StreamController<List<Ticket>> _ticketsController =
+      StreamController.broadcast();
 
   MockTicketRepository() {
     _initializeMockData();
@@ -26,7 +27,7 @@ class MockTicketRepository implements TicketRepository {
   @override
   Future<List<Ticket>> getTicketsByFilter(TicketFilter filter) async {
     await Future.delayed(const Duration(milliseconds: 200));
-    
+
     final filteredTickets = _tickets.where(filter.matches).toList();
     return filteredTickets;
   }
@@ -34,7 +35,7 @@ class MockTicketRepository implements TicketRepository {
   @override
   Future<Ticket?> getTicketById(String id) async {
     await Future.delayed(const Duration(milliseconds: 100));
-    
+
     try {
       return _tickets.firstWhere((ticket) => ticket.id == id);
     } catch (e) {
@@ -45,7 +46,7 @@ class MockTicketRepository implements TicketRepository {
   @override
   Future<Ticket> createTicket(Ticket ticket) async {
     await Future.delayed(const Duration(milliseconds: 300));
-    
+
     _tickets.add(ticket);
     _notifyTicketsChanged();
     return ticket;
@@ -54,12 +55,12 @@ class MockTicketRepository implements TicketRepository {
   @override
   Future<Ticket> updateTicket(Ticket ticket) async {
     await Future.delayed(const Duration(milliseconds: 250));
-    
+
     final index = _tickets.indexWhere((t) => t.id == ticket.id);
     if (index == -1) {
       throw Exception('Ticket not found');
     }
-    
+
     _tickets[index] = ticket.copyWith(updatedAt: DateTime.now());
     _notifyTicketsChanged();
     return _tickets[index];
@@ -68,7 +69,7 @@ class MockTicketRepository implements TicketRepository {
   @override
   Future<void> deleteTicket(String id) async {
     await Future.delayed(const Duration(milliseconds: 200));
-    
+
     _tickets.removeWhere((ticket) => ticket.id == id);
     _notifyTicketsChanged();
   }
@@ -76,7 +77,7 @@ class MockTicketRepository implements TicketRepository {
   @override
   Future<Ticket> assignTicket(String ticketId, String assigneeId) async {
     await Future.delayed(const Duration(milliseconds: 200));
-    
+
     final ticket = await getTicketById(ticketId);
     if (ticket == null) {
       throw Exception('Ticket not found');
@@ -100,9 +101,12 @@ class MockTicketRepository implements TicketRepository {
   }
 
   @override
-  Future<Ticket> updateTicketStatus(String ticketId, TicketStatus status) async {
+  Future<Ticket> updateTicketStatus(
+    String ticketId,
+    TicketStatus status,
+  ) async {
     await Future.delayed(const Duration(milliseconds: 200));
-    
+
     final ticket = await getTicketById(ticketId);
     if (ticket == null) {
       throw Exception('Ticket not found');
@@ -117,9 +121,12 @@ class MockTicketRepository implements TicketRepository {
   }
 
   @override
-  Future<Ticket> updateTicketPriority(String ticketId, TicketPriority priority) async {
+  Future<Ticket> updateTicketPriority(
+    String ticketId,
+    TicketPriority priority,
+  ) async {
     await Future.delayed(const Duration(milliseconds: 200));
-    
+
     final ticket = await getTicketById(ticketId);
     if (ticket == null) {
       throw Exception('Ticket not found');
@@ -136,7 +143,7 @@ class MockTicketRepository implements TicketRepository {
   @override
   Future<List<Ticket>> getTicketsAssignedTo(String assigneeId) async {
     await Future.delayed(const Duration(milliseconds: 150));
-    
+
     return _tickets
         .where((ticket) => ticket.assignee?.id == assigneeId)
         .toList();
@@ -145,7 +152,7 @@ class MockTicketRepository implements TicketRepository {
   @override
   Future<List<Ticket>> getTicketsCreatedBy(String userId) async {
     await Future.delayed(const Duration(milliseconds: 150));
-    
+
     // In a real app, tickets would have a createdBy field
     return _tickets
         .where((ticket) => ticket.source == TicketSource.employee)
@@ -155,7 +162,7 @@ class MockTicketRepository implements TicketRepository {
   @override
   Future<List<Ticket>> searchTickets(String query) async {
     await Future.delayed(const Duration(milliseconds: 200));
-    
+
     final filter = TicketFilter(searchQuery: query);
     return getTicketsByFilter(filter);
   }
@@ -163,19 +170,20 @@ class MockTicketRepository implements TicketRepository {
   @override
   Future<TicketStatistics> getTicketStatistics() async {
     await Future.delayed(const Duration(milliseconds: 100));
-    
+
     return TicketStatistics.fromTickets(_tickets);
   }
 
   /// Initialize mock data
   void _initializeMockData() {
     final now = DateTime.now();
-    
+
     _tickets.addAll([
       Ticket(
         id: 'EMP-001',
         title: 'Product Quality Issue',
-        description: 'Customer reports defective product received. The customer received a laptop with a cracked screen and is requesting a replacement.',
+        description:
+            'Customer reports defective product received. The customer received a laptop with a cracked screen and is requesting a replacement.',
         status: TicketStatus.open,
         priority: TicketPriority.high,
         source: TicketSource.employee,
@@ -196,7 +204,8 @@ class MockTicketRepository implements TicketRepository {
       Ticket(
         id: 'EMP-002',
         title: 'Shipping Delay Inquiry',
-        description: 'Customer asking about delayed shipment. Order was supposed to arrive yesterday but tracking shows it\'s still in transit.',
+        description:
+            'Customer asking about delayed shipment. Order was supposed to arrive yesterday but tracking shows it\'s still in transit.',
         status: TicketStatus.inProgress,
         priority: TicketPriority.medium,
         source: TicketSource.employee,
@@ -217,7 +226,8 @@ class MockTicketRepository implements TicketRepository {
       Ticket(
         id: 'EMP-003',
         title: 'Account Access Issue',
-        description: 'Customer cannot log into their account after password reset. Getting error message about invalid credentials.',
+        description:
+            'Customer cannot log into their account after password reset. Getting error message about invalid credentials.',
         status: TicketStatus.open,
         priority: TicketPriority.critical,
         source: TicketSource.employee,
@@ -238,7 +248,8 @@ class MockTicketRepository implements TicketRepository {
       Ticket(
         id: 'TK-001',
         title: 'YouTube review spam detection - Tech channel verified',
-        description: 'Multiple fake positive reviews detected on TechReview99 channel for iPhone 15 Pro. Bot comments with similar patterns posted within 2-hour window. Requires manual verification.',
+        description:
+            'Multiple fake positive reviews detected on TechReview99 channel for iPhone 15 Pro. Bot comments with similar patterns posted within 2-hour window. Requires manual verification.',
         status: TicketStatus.open,
         priority: TicketPriority.high,
         source: TicketSource.admin,
@@ -259,7 +270,8 @@ class MockTicketRepository implements TicketRepository {
       Ticket(
         id: 'TK-002',
         title: 'YouTube sentiment analysis failing for product reviews',
-        description: 'AI sentiment classifier incorrectly marking negative gaming laptop reviews as positive. Affecting YouTuber UnboxKing\'s product rating aggregation and sponsor relationships.',
+        description:
+            'AI sentiment classifier incorrectly marking negative gaming laptop reviews as positive. Affecting YouTuber UnboxKing\'s product rating aggregation and sponsor relationships.',
         status: TicketStatus.inProgress,
         priority: TicketPriority.critical,
         source: TicketSource.admin,

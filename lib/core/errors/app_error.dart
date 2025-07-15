@@ -164,7 +164,8 @@ class AuthorizationError extends AppError {
   List<Object?> get props => [...super.props, requiredPermission];
 
   @override
-  String get userMessage => 'You don\'t have permission to perform this action.';
+  String get userMessage =>
+      'You don\'t have permission to perform this action.';
 }
 
 /// Unknown/unexpected errors
@@ -185,12 +186,9 @@ class UnknownError extends AppError {
 
 /// Error factory for creating appropriate error types
 class ErrorFactory {
-  static AppError fromException(
-    dynamic exception, [
-    StackTrace? stackTrace,
-  ]) {
+  static AppError fromException(dynamic exception, [StackTrace? stackTrace]) {
     final timestamp = DateTime.now();
-    
+
     if (exception is AppError) {
       return exception;
     }

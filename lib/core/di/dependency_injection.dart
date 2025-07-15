@@ -24,7 +24,7 @@ import '../../presentation/cubit/employee_dashboard/employee_dashboard_cubit.dar
 import '../../presentation/cubit/employee_analytics/employee_analytics_cubit.dart';
 import '../../presentation/cubit/employee_performance/employee_performance_cubit.dart';
 import '../../presentation/cubit/admin_dashboard/admin_dashboard_cubit.dart';
-import '../../presentation/cubit/tickets/tickets_cubit_improved.dart';
+import '../../presentation/cubit/tickets/tickets_cubit.dart';
 
 final GetIt sl = GetIt.instance;
 
@@ -44,23 +44,15 @@ Future<void> init() async {
   sl.registerLazySingleton<VideoAnalysisRepository>(
     () => VideoAnalysisRepository(sl()),
   );
-  sl.registerLazySingleton<TicketRepository>(
-    () => MockTicketRepository(),
-  );
+  sl.registerLazySingleton<TicketRepository>(() => MockTicketRepository());
 
   // Use Cases
-  sl.registerFactory<LoadTicketsUseCase>(
-    () => LoadTicketsUseCase(sl()),
-  );
-  sl.registerFactory<CreateTicketUseCase>(
-    () => CreateTicketUseCase(sl()),
-  );
+  sl.registerFactory<LoadTicketsUseCase>(() => LoadTicketsUseCase(sl()));
+  sl.registerFactory<CreateTicketUseCase>(() => CreateTicketUseCase(sl()));
   sl.registerFactory<UpdateTicketStatusUseCase>(
     () => UpdateTicketStatusUseCase(sl()),
   );
-  sl.registerFactory<AssignTicketUseCase>(
-    () => AssignTicketUseCase(sl()),
-  );
+  sl.registerFactory<AssignTicketUseCase>(() => AssignTicketUseCase(sl()));
   sl.registerFactory<GetTicketStatisticsUseCase>(
     () => GetTicketStatisticsUseCase(sl()),
   );

@@ -74,7 +74,8 @@ class TicketStatistics {
 
     for (final ticket in tickets) {
       // Count by category
-      categoryCount[ticket.category] = (categoryCount[ticket.category] ?? 0) + 1;
+      categoryCount[ticket.category] =
+          (categoryCount[ticket.category] ?? 0) + 1;
 
       // Count by assignee
       if (ticket.assignee != null) {
@@ -86,11 +87,15 @@ class TicketStatistics {
     return TicketStatistics(
       totalCount: tickets.length,
       openCount: tickets.where((t) => t.status == TicketStatus.open).length,
-      inProgressCount: tickets.where((t) => t.status == TicketStatus.inProgress).length,
-      resolvedCount: tickets.where((t) => t.status == TicketStatus.resolved).length,
+      inProgressCount:
+          tickets.where((t) => t.status == TicketStatus.inProgress).length,
+      resolvedCount:
+          tickets.where((t) => t.status == TicketStatus.resolved).length,
       closedCount: tickets.where((t) => t.status == TicketStatus.closed).length,
-      highPriorityCount: tickets.where((t) => t.priority == TicketPriority.high).length,
-      criticalPriorityCount: tickets.where((t) => t.priority == TicketPriority.critical).length,
+      highPriorityCount:
+          tickets.where((t) => t.priority == TicketPriority.high).length,
+      criticalPriorityCount:
+          tickets.where((t) => t.priority == TicketPriority.critical).length,
       overdueCount: tickets.where((t) => t.isOverdue).length,
       categoryCount: categoryCount,
       assigneeCount: assigneeCount,

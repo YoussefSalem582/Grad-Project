@@ -18,11 +18,15 @@ class LoadTicketsUseCase implements UseCase<List<Ticket>, LoadTicketsParams> {
   Future<Either<Failure, List<Ticket>>> call(LoadTicketsParams params) async {
     try {
       final tickets = await repository.getTicketsByFilter(params.filter);
-      
+
       // Apply additional business logic
       final sortedTickets = _sortTickets(tickets, params.sortBy);
-      final paginatedTickets = _paginateTickets(sortedTickets, params.page, params.pageSize);
-      
+      final paginatedTickets = _paginateTickets(
+        sortedTickets,
+        params.page,
+        params.pageSize,
+      );
+
       return Right(paginatedTickets);
     } catch (e) {
       return Left(TicketFailure(e.toString()));
@@ -36,9 +40,11 @@ class LoadTicketsUseCase implements UseCase<List<Ticket>, LoadTicketsParams> {
       case TicketSortBy.updatedDate:
         return tickets..sort((a, b) => b.updatedAt.compareTo(a.updatedAt));
       case TicketSortBy.priority:
-        return tickets..sort((a, b) => b.priority.index.compareTo(a.priority.index));
+        return tickets
+          ..sort((a, b) => b.priority.index.compareTo(a.priority.index));
       case TicketSortBy.status:
-        return tickets..sort((a, b) => a.status.index.compareTo(b.status.index));
+        return tickets
+          ..sort((a, b) => a.status.index.compareTo(b.status.index));
       case TicketSortBy.title:
         return tickets..sort((a, b) => a.title.compareTo(b.title));
     }
@@ -47,9 +53,9 @@ class LoadTicketsUseCase implements UseCase<List<Ticket>, LoadTicketsParams> {
   List<Ticket> _paginateTickets(List<Ticket> tickets, int page, int pageSize) {
     final startIndex = page * pageSize;
     final endIndex = (startIndex + pageSize).clamp(0, tickets.length);
-    
+
     if (startIndex >= tickets.length) return [];
-    
+
     return tickets.sublist(startIndex, endIndex);
   }
 }
@@ -68,13 +74,7 @@ class LoadTicketsParams {
   });
 }
 
-enum TicketSortBy {
-  createdDate,
-  updatedDate,
-  priority,
-  status,
-  title,
-}
+enum TicketSortBy { createdDate, updatedDate, priority, status, title }
 
 /// Use case for creating a ticket
 class CreateTicketUseCase implements UseCase<Ticket, CreateTicketParams> {
@@ -131,7 +131,8 @@ class CreateTicketParams {
 }
 
 /// Use case for updating ticket status
-class UpdateTicketStatusUseCase implements UseCase<Ticket, UpdateTicketStatusParams> {
+class UpdateTicketStatusUseCase
+    implements UseCase<Ticket, UpdateTicketStatusParams> {
   final TicketRepository repository;
 
   UpdateTicketStatusUseCase(this.repository);
@@ -212,14 +213,12 @@ class AssignTicketParams {
   final String ticketId;
   final String assigneeId;
 
-  const AssignTicketParams({
-    required this.ticketId,
-    required this.assigneeId,
-  });
+  const AssignTicketParams({required this.ticketId, required this.assigneeId});
 }
 
 /// Use case for getting ticket statistics
-class GetTicketStatisticsUseCase implements UseCase<TicketStatistics, NoParams> {
+class GetTicketStatisticsUseCase
+    implements UseCase<TicketStatistics, NoParams> {
   final TicketRepository repository;
 
   GetTicketStatisticsUseCase(this.repository);
