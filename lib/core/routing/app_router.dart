@@ -115,19 +115,19 @@ class AppRouter {
 
       case textAnalysis:
         return MaterialPageRoute(
-          builder: (_) => const EnhancedTextAnalysisScreen(),
+          builder: (_) => const UnifiedTextAnalysisScreen(),
           settings: settings,
         );
 
       case voiceAnalysis:
         return MaterialPageRoute(
-          builder: (_) => const EnhancedVoiceAnalysisScreen(),
+          builder: (_) => const UnifiedVoiceAnalysisScreen(),
           settings: settings,
         );
 
       case videoAnalysis:
         return MaterialPageRoute(
-          builder: (_) => const EnhancedVideoAnalysisScreen(),
+          builder: (_) => const EmployeeVideoAnalysisScreen(),
           settings: settings,
         );
 

@@ -13,7 +13,7 @@ class EmotionApiService {
   static const String _baseUrl = 'http://localhost:8000';
 
   // Mock mode for when backend is not available
-  static const bool _useMockData = false;
+  static const bool _useMockData = true;
 
   // API endpoints
   static const String _healthEndpoint = '/health';
@@ -153,7 +153,7 @@ class EmotionApiService {
   // Predict emotion
   Future<EmotionResult> predictEmotion(String text) async {
     if (_useMockData) {
-      await Future.delayed(const Duration(milliseconds: 500));
+      await Future.delayed(const Duration(seconds: 10));
       return _generateMockEmotion(text);
     }
 

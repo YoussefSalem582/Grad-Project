@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import '../../employee_dashboard_screen/employee_dashboard_screen.dart';
 import '../../employee_profile_screen/employee_profile_screen.dart';
 import '../../employee_tickets_screen/employee_tickets_screen.dart';
-import '../../employee_video_analysis_screen/employee_video_analysis_screen.dart';
+import '../../../analysis/video_analysis_screen/video_analysis_screen.dart';
 import '../../employee_analysis_tools_screen/employee_analysis_tools_screen.dart';
 import '../../../analytics/customer_analytics_screen.dart';
 import '../../../common/placeholder_screen.dart';

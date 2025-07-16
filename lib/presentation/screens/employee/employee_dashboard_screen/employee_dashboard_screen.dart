@@ -171,7 +171,7 @@ class _EmployeeDashboardScreenState extends State<EmployeeDashboardScreen>
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => const EnhancedTextAnalysisScreen(),
+        builder: (context) => const UnifiedTextAnalysisScreen(),
       ),
     );
   }
@@ -180,7 +180,7 @@ class _EmployeeDashboardScreenState extends State<EmployeeDashboardScreen>
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => const EnhancedVoiceAnalysisScreen(),
+        builder: (context) => const UnifiedVoiceAnalysisScreen(),
       ),
     );
   }

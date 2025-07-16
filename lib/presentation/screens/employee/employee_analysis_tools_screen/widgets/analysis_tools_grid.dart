@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../../../../core/core.dart';
-import '../../../analysis/enhanced_video_analysis_screen.dart';
+import '../../../analysis/video_analysis_screen/video_analysis_screen.dart';
 import 'analysis_tool_card.dart';
 
 /// Grid widget that displays all available analysis tools
@@ -92,7 +92,7 @@ class AnalysisToolsGrid extends StatelessWidget {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (context) => const EnhancedVideoAnalysisScreen(),
+                      builder: (context) => const EmployeeVideoAnalysisScreen(),
                     ),
                   );
                 },
@@ -134,7 +134,7 @@ class AnalysisToolsGrid extends StatelessWidget {
             Navigator.push(
               context,
               MaterialPageRoute(
-                builder: (context) => const EnhancedVideoAnalysisScreen(),
+                builder: (context) => const EmployeeVideoAnalysisScreen(),
               ),
             );
           },
