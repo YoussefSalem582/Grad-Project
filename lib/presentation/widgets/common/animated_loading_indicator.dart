@@ -1,40 +1,32 @@
 import 'package:flutter/material.dart';
-import 'dart:math' as math;
+import '../../../core/constants/app_colors.dart';
 
-/// A beautiful animated loading indicator with multiple animation effects
-/// Perfect for analysis screens and long-running operations
-class AnimatedLoadingIndicator extends StatefulWidget {
+/// Animation styles for EMO letters
+enum EmoAnimationStyle { bounce, wave, pulse, rotate, fade }
+
+/// Simple EMO loading indicator with letter animations
+class EmoLoadingIndicator extends StatefulWidget {
   final double size;
-  final Color primaryColor;
-  final Color secondaryColor;
-  final LoadingStyle style;
-  final String? message;
-  final TextStyle? messageStyle;
+  final Color? color;
+  final EmoAnimationStyle animationStyle;
+  final Duration duration;
 
-  const AnimatedLoadingIndicator({
+  const EmoLoadingIndicator({
     super.key,
     this.size = 80.0,
-    this.primaryColor = const Color(0xFF667EEA),
-    this.secondaryColor = const Color(0xFF764BA2),
-    this.style = LoadingStyle.pulsing,
-    this.message,
-    this.messageStyle,
+    this.color,
+    this.animationStyle = EmoAnimationStyle.bounce,
+    this.duration = const Duration(milliseconds: 1200),
   });
 
   @override
-  State<AnimatedLoadingIndicator> createState() =>
-      _AnimatedLoadingIndicatorState();
+  State<EmoLoadingIndicator> createState() => _EmoLoadingIndicatorState();
 }
 
-class _AnimatedLoadingIndicatorState extends State<AnimatedLoadingIndicator>
+class _EmoLoadingIndicatorState extends State<EmoLoadingIndicator>
     with TickerProviderStateMixin {
-  late AnimationController _primaryController;
-  late AnimationController _secondaryController;
-  late AnimationController _rotationController;
-
-  late Animation<double> _primaryAnimation;
-  late Animation<double> _secondaryAnimation;
-  late Animation<double> _rotationAnimation;
+  late List<AnimationController> _controllers;
+  late List<Animation<double>> _animations;
 
   @override
   void initState() {
@@ -43,358 +35,257 @@ class _AnimatedLoadingIndicatorState extends State<AnimatedLoadingIndicator>
   }
 
   void _initializeAnimations() {
-    // Primary animation for main effect
-    _primaryController = AnimationController(
-      duration: const Duration(milliseconds: 2000),
-      vsync: this,
-    )..repeat();
+    _controllers = List.generate(3, (index) {
+      return AnimationController(duration: widget.duration, vsync: this);
+    });
 
-    // Secondary animation for overlay effects
-    _secondaryController = AnimationController(
-      duration: const Duration(milliseconds: 1500),
-      vsync: this,
-    )..repeat();
+    _animations =
+        _controllers.map((controller) {
+          switch (widget.animationStyle) {
+            case EmoAnimationStyle.bounce:
+              return Tween<double>(begin: 0.0, end: -20.0).animate(
+                CurvedAnimation(parent: controller, curve: Curves.elasticOut),
+              );
+            case EmoAnimationStyle.wave:
+              return Tween<double>(begin: 0.0, end: 1.0).animate(
+                CurvedAnimation(parent: controller, curve: Curves.easeInOut),
+              );
+            case EmoAnimationStyle.pulse:
+              return Tween<double>(begin: 1.0, end: 1.3).animate(
+                CurvedAnimation(parent: controller, curve: Curves.easeInOut),
+              );
+            case EmoAnimationStyle.rotate:
+              return Tween<double>(begin: 0.0, end: 1.0).animate(
+                CurvedAnimation(parent: controller, curve: Curves.easeInOut),
+              );
+            case EmoAnimationStyle.fade:
+              return Tween<double>(begin: 0.3, end: 1.0).animate(
+                CurvedAnimation(parent: controller, curve: Curves.easeInOut),
+              );
+          }
+        }).toList();
 
-    // Rotation animation
-    _rotationController = AnimationController(
-      duration: const Duration(milliseconds: 3000),
-      vsync: this,
-    )..repeat();
+    _startAnimations();
+  }
 
-    _primaryAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
-      CurvedAnimation(parent: _primaryController, curve: Curves.easeInOut),
-    );
-
-    _secondaryAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
-      CurvedAnimation(parent: _secondaryController, curve: Curves.elasticInOut),
-    );
-
-    _rotationAnimation = Tween<double>(begin: 0.0, end: 2 * math.pi).animate(
-      CurvedAnimation(parent: _rotationController, curve: Curves.linear),
-    );
+  void _startAnimations() {
+    for (int i = 0; i < _controllers.length; i++) {
+      Future.delayed(Duration(milliseconds: i * 200), () {
+        if (mounted) {
+          _controllers[i].repeat(reverse: true);
+        }
+      });
+    }
   }
 
   @override
   void dispose() {
-    _primaryController.dispose();
-    _secondaryController.dispose();
-    _rotationController.dispose();
+    for (final controller in _controllers) {
+      controller.dispose();
+    }
     super.dispose();
   }
 
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        SizedBox(
-          width: widget.size,
-          height: widget.size,
-          child: _buildLoadingWidget(),
-        ),
-        if (widget.message != null) ...[
-          const SizedBox(height: 16),
-          Text(
-            widget.message!,
-            style:
-                widget.messageStyle ??
-                TextStyle(
-                  color: widget.primaryColor,
-                  fontSize: 14,
-                  fontWeight: FontWeight.w500,
-                ),
-            textAlign: TextAlign.center,
-          ),
-        ],
-      ],
-    );
-  }
+  Widget _buildLetter(String letter, int index) {
+    final animation = _animations[index];
+    final color = widget.color ?? AppColors.primary;
 
-  Widget _buildLoadingWidget() {
-    switch (widget.style) {
-      case LoadingStyle.pulsing:
-        return _buildPulsingIndicator();
-      case LoadingStyle.spinning:
-        return _buildSpinningIndicator();
-      case LoadingStyle.breathing:
-        return _buildBreathingIndicator();
-      case LoadingStyle.wave:
-        return _buildWaveIndicator();
-      case LoadingStyle.orbit:
-        return _buildOrbitIndicator();
-    }
-  }
-
-  Widget _buildPulsingIndicator() {
     return AnimatedBuilder(
-      animation: Listenable.merge([_primaryAnimation, _secondaryAnimation]),
+      animation: animation,
       builder: (context, child) {
-        return Stack(
-          alignment: Alignment.center,
-          children: [
-            // Outer pulsing circle
-            Container(
-              width: widget.size * (0.8 + 0.2 * _primaryAnimation.value),
-              height: widget.size * (0.8 + 0.2 * _primaryAnimation.value),
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                gradient: RadialGradient(
-                  colors: [
-                    widget.primaryColor.withValues(
-                      alpha: 0.3 - 0.2 * _primaryAnimation.value,
-                    ),
-                    widget.secondaryColor.withValues(
-                      alpha: 0.1 - 0.1 * _primaryAnimation.value,
-                    ),
-                  ],
-                ),
-              ),
-            ),
-            // Inner pulsing circle
-            Container(
-              width: widget.size * (0.4 + 0.1 * _secondaryAnimation.value),
-              height: widget.size * (0.4 + 0.1 * _secondaryAnimation.value),
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                gradient: RadialGradient(
-                  colors: [
-                    widget.primaryColor.withValues(alpha: 0.8),
-                    widget.secondaryColor.withValues(alpha: 0.6),
-                  ],
-                ),
-              ),
-            ),
-          ],
-        );
+        switch (widget.animationStyle) {
+          case EmoAnimationStyle.bounce:
+            return Transform.translate(
+              offset: Offset(0, animation.value),
+              child: _buildLetterWidget(letter, color),
+            );
+          case EmoAnimationStyle.wave:
+            return Transform.translate(
+              offset: Offset(0, -15 * animation.value),
+              child: _buildLetterWidget(letter, color),
+            );
+          case EmoAnimationStyle.pulse:
+            return Transform.scale(
+              scale: animation.value,
+              child: _buildLetterWidget(letter, color),
+            );
+          case EmoAnimationStyle.rotate:
+            return Transform.rotate(
+              angle: animation.value * 6.28, // 2π radians
+              child: _buildLetterWidget(letter, color),
+            );
+          case EmoAnimationStyle.fade:
+            return Opacity(
+              opacity: animation.value,
+              child: _buildLetterWidget(letter, color),
+            );
+        }
       },
     );
   }
 
-  Widget _buildSpinningIndicator() {
-    return AnimatedBuilder(
-      animation: _rotationAnimation,
-      builder: (context, child) {
-        return Transform.rotate(
-          angle: _rotationAnimation.value,
-          child: CustomPaint(
-            size: Size(widget.size, widget.size),
-            painter: SpinningPainter(
-              primaryColor: widget.primaryColor,
-              secondaryColor: widget.secondaryColor,
-              progress: _primaryAnimation.value,
-            ),
-          ),
-        );
-      },
-    );
-  }
-
-  Widget _buildBreathingIndicator() {
-    return AnimatedBuilder(
-      animation: _primaryAnimation,
-      builder: (context, child) {
-        final breathingValue =
-            (math.sin(_primaryAnimation.value * 2 * math.pi) + 1) / 2;
-        return Transform.scale(
-          scale: 0.7 + 0.3 * breathingValue,
-          child: Container(
-            width: widget.size,
-            height: widget.size,
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              gradient: RadialGradient(
-                colors: [
-                  widget.primaryColor.withValues(
-                    alpha: 0.8 + 0.2 * breathingValue,
-                  ),
-                  widget.secondaryColor.withValues(
-                    alpha: 0.4 + 0.4 * breathingValue,
-                  ),
-                  Colors.transparent,
-                ],
-                stops: const [0.0, 0.7, 1.0],
-              ),
-            ),
-          ),
-        );
-      },
-    );
-  }
-
-  Widget _buildWaveIndicator() {
-    return AnimatedBuilder(
-      animation: _primaryAnimation,
-      builder: (context, child) {
-        return CustomPaint(
-          size: Size(widget.size, widget.size),
-          painter: WavePainter(
-            primaryColor: widget.primaryColor,
-            secondaryColor: widget.secondaryColor,
-            progress: _primaryAnimation.value,
-          ),
-        );
-      },
-    );
-  }
-
-  Widget _buildOrbitIndicator() {
-    return AnimatedBuilder(
-      animation: Listenable.merge([_rotationAnimation, _secondaryAnimation]),
-      builder: (context, child) {
-        return Stack(
-          alignment: Alignment.center,
-          children: [
-            // Central core
-            Container(
-              width: widget.size * 0.3,
-              height: widget.size * 0.3,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                gradient: RadialGradient(
-                  colors: [widget.primaryColor, widget.secondaryColor],
-                ),
-              ),
-            ),
-            // Orbiting particles
-            for (int i = 0; i < 3; i++)
-              Transform.rotate(
-                angle: _rotationAnimation.value + (i * 2 * math.pi / 3),
-                child: Transform.translate(
-                  offset: Offset(widget.size * 0.3, 0),
-                  child: Container(
-                    width: widget.size * 0.15,
-                    height: widget.size * 0.15,
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      color: widget.primaryColor.withValues(alpha: 0.8),
-                      boxShadow: [
-                        BoxShadow(
-                          color: widget.primaryColor.withValues(alpha: 0.3),
-                          blurRadius: 8,
-                          spreadRadius: 2,
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              ),
-          ],
-        );
-      },
-    );
-  }
-}
-
-/// Custom painter for spinning indicator
-class SpinningPainter extends CustomPainter {
-  final Color primaryColor;
-  final Color secondaryColor;
-  final double progress;
-
-  SpinningPainter({
-    required this.primaryColor,
-    required this.secondaryColor,
-    required this.progress,
-  });
-
-  @override
-  void paint(Canvas canvas, Size size) {
-    final center = Offset(size.width / 2, size.height / 2);
-    final radius = size.width / 2;
-
-    final paint =
-        Paint()
-          ..style = PaintingStyle.stroke
-          ..strokeWidth = 4.0
-          ..strokeCap = StrokeCap.round;
-
-    // Draw gradient arc
-    const sweepAngle = math.pi * 1.5;
-    final startAngle = progress * 2 * math.pi;
-
-    for (int i = 0; i < 20; i++) {
-      final t = i / 19.0;
-      paint.color = Color.lerp(primaryColor, secondaryColor, t)!;
-
-      canvas.drawArc(
-        Rect.fromCircle(center: center, radius: radius - 2),
-        startAngle + (t * sweepAngle),
-        sweepAngle / 20,
-        false,
-        paint,
-      );
-    }
-  }
-
-  @override
-  bool shouldRepaint(covariant CustomPainter oldDelegate) => true;
-}
-
-/// Custom painter for wave indicator
-class WavePainter extends CustomPainter {
-  final Color primaryColor;
-  final Color secondaryColor;
-  final double progress;
-
-  WavePainter({
-    required this.primaryColor,
-    required this.secondaryColor,
-    required this.progress,
-  });
-
-  @override
-  void paint(Canvas canvas, Size size) {
-    final center = Offset(size.width / 2, size.height / 2);
-    final paint = Paint()..style = PaintingStyle.fill;
-
-    for (int i = 0; i < 5; i++) {
-      final waveProgress = (progress + i * 0.2) % 1.0;
-      final radius = size.width * 0.1 * (1 + waveProgress * 3);
-      final opacity = 1.0 - waveProgress;
-
-      paint.color = Color.lerp(
-        primaryColor,
-        secondaryColor,
-        i / 4.0,
-      )!.withValues(alpha: opacity * 0.3);
-
-      canvas.drawCircle(center, radius, paint);
-    }
-  }
-
-  @override
-  bool shouldRepaint(covariant CustomPainter oldDelegate) => true;
-}
-
-/// Loading indicator styles
-enum LoadingStyle { pulsing, spinning, breathing, wave, orbit }
-
-/// Convenience widget for analysis loading
-class AnalysisLoadingIndicator extends StatelessWidget {
-  final String message;
-  final LoadingStyle style;
-
-  const AnalysisLoadingIndicator({
-    super.key,
-    this.message = 'Analyzing...',
-    this.style = LoadingStyle.pulsing,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Center(
-      child: AnimatedLoadingIndicator(
-        size: 120,
-        style: style,
-        message: message,
-        primaryColor: const Color(0xFF667EEA),
-        secondaryColor: const Color(0xFF764BA2),
-        messageStyle: const TextStyle(
-          color: Colors.white,
-          fontSize: 16,
-          fontWeight: FontWeight.w600,
-        ),
+  Widget _buildLetterWidget(String letter, Color color) {
+    return Text(
+      letter,
+      style: TextStyle(
+        fontSize: widget.size * 0.6,
+        fontWeight: FontWeight.bold,
+        color: color,
       ),
     );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      width: widget.size * 2,
+      height: widget.size,
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+        children: [
+          _buildLetter('E', 0),
+          _buildLetter('M', 1),
+          _buildLetter('O', 2),
+        ],
+      ),
+    );
+  }
+}
+
+/// Helper class for easy EMO loading indicator usage
+class EmoLoader {
+  /// Default EMO loader with bounce animation
+  static Widget standard({
+    double size = 80.0,
+    Color? color,
+    Duration duration = const Duration(milliseconds: 1200),
+  }) {
+    return EmoLoadingIndicator(
+      size: size,
+      color: color,
+      animationStyle: EmoAnimationStyle.bounce,
+      duration: duration,
+    );
+  }
+
+  /// EMO loader for analysis screens
+  static Widget analysis({double size = 60.0, Color? color}) {
+    return EmoLoadingIndicator(
+      size: size,
+      color: color ?? Colors.white,
+      animationStyle: EmoAnimationStyle.wave,
+      duration: const Duration(milliseconds: 1000),
+    );
+  }
+
+  /// EMO loader for small spaces
+  static Widget mini({double size = 40.0, Color? color}) {
+    return EmoLoadingIndicator(
+      size: size,
+      color: color ?? AppColors.secondary,
+      animationStyle: EmoAnimationStyle.pulse,
+      duration: const Duration(milliseconds: 800),
+    );
+  }
+
+  /// EMO loader with fade animation
+  static Widget fade({double size = 80.0, Color? color}) {
+    return EmoLoadingIndicator(
+      size: size,
+      color: color ?? AppColors.accent,
+      animationStyle: EmoAnimationStyle.fade,
+      duration: const Duration(milliseconds: 1500),
+    );
+  }
+
+  /// EMO loader with rotation animation
+  static Widget rotate({double size = 80.0, Color? color}) {
+    return EmoLoadingIndicator(
+      size: size,
+      color: color ?? AppColors.primary,
+      animationStyle: EmoAnimationStyle.rotate,
+      duration: const Duration(milliseconds: 2000),
+    );
+  }
+}
+
+// Legacy compatibility classes to maintain backward compatibility
+class EmosenseAnalysisLoadingIndicator extends StatelessWidget {
+  final EmosenseLoadingStyle style;
+  final Color? primaryColor;
+  final Color? secondaryColor;
+  final double size;
+
+  const EmosenseAnalysisLoadingIndicator({
+    super.key,
+    this.style = EmosenseLoadingStyle.brainWave,
+    this.primaryColor,
+    this.secondaryColor,
+    this.size = 80.0,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return EmoLoader.analysis(size: size, color: primaryColor);
+  }
+}
+
+enum EmosenseLoadingStyle {
+  brainWave,
+  neuralNetwork,
+  emotionOrbit,
+  textPulse,
+  voicePulse,
+}
+
+class EmosenseLoadingIndicator extends StatelessWidget {
+  final EmosenseLoadingStyle style;
+  final Color? primaryColor;
+  final Color? secondaryColor;
+  final double size;
+
+  const EmosenseLoadingIndicator({
+    super.key,
+    this.style = EmosenseLoadingStyle.brainWave,
+    this.primaryColor,
+    this.secondaryColor,
+    this.size = 80.0,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return EmoLoader.standard(size: size, color: primaryColor);
+  }
+}
+
+class EmosenseTextAnalysisLoadingIndicator extends StatelessWidget {
+  final Color? primaryColor;
+  final double size;
+
+  const EmosenseTextAnalysisLoadingIndicator({
+    super.key,
+    this.primaryColor,
+    this.size = 80.0,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return EmoLoader.analysis(size: size, color: primaryColor);
+  }
+}
+
+class EmosenseVoiceAnalysisLoadingIndicator extends StatelessWidget {
+  final Color? primaryColor;
+  final double size;
+
+  const EmosenseVoiceAnalysisLoadingIndicator({
+    super.key,
+    this.primaryColor,
+    this.size = 80.0,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return EmoLoader.analysis(size: size, color: primaryColor);
   }
 }

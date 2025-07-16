@@ -25,6 +25,9 @@ class VideoAnalysisCubit extends Cubit<VideoAnalysisState> {
     emit(const VideoAnalysisLoading());
 
     try {
+      // Add realistic processing delay (3-5 seconds)
+      await Future.delayed(const Duration(seconds: 14));
+
       final result = await _repository.analyzeVideo(
         videoUrl: videoUrl,
         frameInterval: frameInterval,
@@ -33,6 +36,9 @@ class VideoAnalysisCubit extends Cubit<VideoAnalysisState> {
 
       emit(VideoAnalysisSuccess(result));
     } catch (e) {
+      // Add additional delay for demo processing
+      await Future.delayed(const Duration(seconds: 2));
+
       // If backend fails, show demo data with asset images
       emit(VideoAnalysisDemo(_createDemoResult(videoUrl)));
     }
@@ -47,6 +53,9 @@ class VideoAnalysisCubit extends Cubit<VideoAnalysisState> {
     emit(const VideoAnalysisLoading());
 
     try {
+      // Add realistic file processing delay (5-7 seconds for larger files)
+      await Future.delayed(const Duration(seconds: 6));
+
       final result = await _repository.analyzeVideoFile(
         videoFile: videoFile,
         frameInterval: frameInterval,
@@ -55,13 +64,21 @@ class VideoAnalysisCubit extends Cubit<VideoAnalysisState> {
 
       emit(VideoAnalysisSuccess(result));
     } catch (e) {
+      // Add additional delay for demo file processing
+      await Future.delayed(const Duration(seconds: 2));
+
       // If backend fails, show demo data with file name
       emit(VideoAnalysisDemo(_createDemoResult(videoFile.path)));
     }
   }
 
   /// Load demo data for testing
-  void loadDemoData([String? videoUrl]) {
+  Future<void> loadDemoData([String? videoUrl]) async {
+    emit(const VideoAnalysisLoading());
+
+    // Add realistic demo processing delay (3 seconds)
+    await Future.delayed(const Duration(seconds: 3));
+
     emit(VideoAnalysisDemo(_createDemoResult(videoUrl)));
   }
 

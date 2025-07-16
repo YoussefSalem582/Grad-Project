@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../../core/di/dependency_injection.dart' as di;
 import '../../../cubit/text_analysis/text_analysis_cubit.dart';
 import '../../../widgets/common/animated_background_widget.dart';
+import '../../../widgets/common/animated_loading_indicator.dart';
 import 'widgets/widgets.dart';
 
 /// Unified Text Analysis Screen - Modularized with Widgets
@@ -193,6 +194,23 @@ class _UnifiedTextAnalysisScreenState extends State<UnifiedTextAnalysisScreen>
                     ? () => _importFromUrl(context)
                     : null,
           ),
+          const SizedBox(height: 24),
+
+          // Show loading indicator when analyzing
+          if (isAnalyzing)
+            Column(
+              children: [
+                EmoLoader.analysis(),
+                const SizedBox(height: 16),
+                Text(
+                  'Analyzing your text...',
+                  style: Theme.of(
+                    context,
+                  ).textTheme.bodyMedium?.copyWith(color: Colors.white),
+                ),
+              ],
+            ),
+
           const SizedBox(height: 24),
 
           // Results Display Widget

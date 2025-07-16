@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../../../core/core.dart';
 import '../../../../cubit/video_analysis/video_analysis_cubit.dart';
+import '../../../../widgets/common/animated_loading_indicator.dart';
 
 /// Analyze button widget with dynamic states and animations
 class AnalyzeButton extends StatelessWidget {
@@ -70,14 +71,7 @@ class AnalyzeButton extends StatelessWidget {
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        const SizedBox(
-          width: 18,
-          height: 18,
-          child: CircularProgressIndicator(
-            valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
-            strokeWidth: 2,
-          ),
-        ),
+        EmoLoader.mini(size: 24, color: Colors.white),
         const SizedBox(width: 12),
         const Text(
           'Analyzing Customer Video...',

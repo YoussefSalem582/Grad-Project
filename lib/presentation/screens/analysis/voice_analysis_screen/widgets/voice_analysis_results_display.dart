@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../../../widgets/common/animated_loading_indicator.dart';
 
 /// Widget for displaying analysis results
 class VoiceAnalysisResultsDisplay extends StatelessWidget {
@@ -96,17 +97,25 @@ class VoiceAnalysisResultsDisplay extends StatelessWidget {
           ),
         ],
       ),
-      child: const Padding(
-        padding: EdgeInsets.all(40),
+      child: Padding(
+        padding: const EdgeInsets.all(40),
         child: Column(
           children: [
-            CircularProgressIndicator(
-              valueColor: AlwaysStoppedAnimation<Color>(Color(0xFF3B82F6)),
-            ),
-            SizedBox(height: 16),
-            Text(
+            EmoLoader.analysis(),
+            const SizedBox(height: 16),
+            const Text(
               'Analyzing voice patterns...',
-              style: TextStyle(fontSize: 16, color: Color(0xFF64748B)),
+              style: TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.w600,
+                color: Color(0xFF1E293B),
+              ),
+            ),
+            const SizedBox(height: 8),
+            const Text(
+              'Processing emotional cues and speech patterns',
+              style: TextStyle(fontSize: 14, color: Color(0xFF64748B)),
+              textAlign: TextAlign.center,
             ),
           ],
         ),

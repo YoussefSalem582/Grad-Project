@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import '../../employee/employee_navigation_screen/employee_navigation_screen.dart';
 import '../../admin/admin_navigation_screen.dart';
 import '../../../widgets/auth/auth.dart';
+import '../../../widgets/common/animated_loading_indicator.dart';
 import 'widgets/login.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -221,13 +222,41 @@ class _LoginScreenState extends State<LoginScreen>
       context: context,
       barrierDismissible: false,
       builder:
-          (context) => const Center(
-            child: CircularProgressIndicator(color: Colors.white),
+          (context) => Center(
+            child: Container(
+              padding: const EdgeInsets.all(40),
+              decoration: BoxDecoration(
+                color: Colors.white.withOpacity(0.95),
+                borderRadius: BorderRadius.circular(20),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.1),
+                    blurRadius: 20,
+                    offset: const Offset(0, 10),
+                  ),
+                ],
+              ),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  EmoLoader.standard(),
+                  const SizedBox(height: 20),
+                  Text(
+                    'Signing in with $provider...',
+                    style: const TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w500,
+                      color: Color(0xFF1E293B),
+                    ),
+                  ),
+                ],
+              ),
+            ),
           ),
     );
 
     // Simulate social login
-    Future.delayed(const Duration(seconds: 2), () {
+    Future.delayed(const Duration(seconds: 8), () {
       if (mounted) {
         Navigator.pop(context); // Close loading dialog
 

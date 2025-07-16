@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../common/animated_loading_indicator.dart';
 
 class AuthButtonWidget extends StatelessWidget {
   final Animation<double> animation;
@@ -57,16 +58,10 @@ class AuthButtonWidget extends StatelessWidget {
                   ),
                   child: Container(
                     alignment: Alignment.center,
-                    child: isLoading
-                        ? const SizedBox(
-                            width: 24,
-                            height: 24,
-                            child: CircularProgressIndicator(
-                              color: Colors.white,
-                              strokeWidth: 2,
-                            ),
-                          )
-                        : _buildButtonContent(),
+                    child:
+                        isLoading
+                            ? EmoLoader.mini(size: 32, color: Colors.white)
+                            : _buildButtonContent(),
                   ),
                 ),
               ),
