@@ -7,7 +7,7 @@ export 'buttons/buttons.dart';
 export 'forms/forms.dart';
 export 'common/loading_widgets.dart';
 export 'common/animated_loading_indicator.dart';
-export 'app_bars/modern_employee_app_bar.dart';
+export 'app_bars/app_bar.dart';
 export 'auth/auth.dart';
 export 'dialogs/dialogs.dart';
 export 'sections/sections.dart';
