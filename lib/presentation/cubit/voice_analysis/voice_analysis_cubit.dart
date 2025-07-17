@@ -38,8 +38,18 @@ class VoiceAnalysisCubit extends Cubit<VoiceAnalysisState> {
   }
 
   /// Load demo data for testing
-  void loadDemoData(String analysisType) {
-    emit(VoiceAnalysisDemo(_createDemoResult(analysisType)));
+  Future<void> loadDemoData(String analysisType) async {
+    emit(const VoiceAnalysisLoading());
+
+    try {
+      // Simulate analysis processing time
+      await Future.delayed(const Duration(seconds: 2));
+
+      final demoResult = _createDemoResult(analysisType);
+      emit(VoiceAnalysisDemo(demoResult));
+    } catch (e) {
+      emit(VoiceAnalysisError('Demo analysis failed: ${e.toString()}'));
+    }
   }
 
   /// Reset to initial state
@@ -85,19 +95,42 @@ class VoiceAnalysisCubit extends Cubit<VoiceAnalysisState> {
 
     return VoiceAnalysisResult(
       id: 'demo_${now.millisecondsSinceEpoch}',
-      filePath: '/audio/demo-sample.mp3',
+      filePath: _getDemoFilePath(analysisType),
       analysisType: analysisType,
-      confidence: 0.89,
+      confidence: _generateConfidence(analysisType),
       timestamp: now,
-      summary: 'Demo analysis completed successfully for $analysisType',
+      summary: _generateSummary(analysisType),
       details: _generateAnalysisDetails(analysisType),
       emotions: _generateEmotionData(analysisType),
-      metrics: _generateMetrics(analysisType),
+      metrics: _generateDemoMetrics(analysisType),
     );
+  }
+
+  String _getDemoFilePath(String analysisType) {
+    switch (analysisType) {
+      case 'Customer Support Analysis':
+        return '/audio/samples/customer_service_call.mp3';
+      case 'Business Communication Analysis':
+        return '/audio/samples/sales_meeting.wav';
+      case 'Interview Performance Analysis':
+        return '/audio/samples/interview_session.mp3';
+      case 'Personal Voice Analysis':
+        return '/audio/samples/voice_message.m4a';
+      default:
+        return '/audio/demo-sample.mp3';
+    }
   }
 
   double _generateConfidence(String analysisType) {
     switch (analysisType) {
+      case 'Customer Support Analysis':
+        return 0.91;
+      case 'Business Communication Analysis':
+        return 0.88;
+      case 'Interview Performance Analysis':
+        return 0.76;
+      case 'Personal Voice Analysis':
+        return 0.94;
       case 'Emotion Analysis':
         return 0.87;
       case 'Communication Style':
@@ -115,6 +148,14 @@ class VoiceAnalysisCubit extends Cubit<VoiceAnalysisState> {
 
   String _generateSummary(String analysisType) {
     switch (analysisType) {
+      case 'Customer Support Analysis':
+        return 'Professional customer service tone with high empathy and patience levels detected';
+      case 'Business Communication Analysis':
+        return 'Confident business presentation style with strong authority and enthusiasm';
+      case 'Interview Performance Analysis':
+        return 'Moderate confidence levels with some nervousness, showing professional communication';
+      case 'Personal Voice Analysis':
+        return 'Very positive and happy personal communication with high emotional engagement';
       case 'Emotion Analysis':
         return 'Positive emotional tone detected with high confidence levels';
       case 'Communication Style':
@@ -132,6 +173,34 @@ class VoiceAnalysisCubit extends Cubit<VoiceAnalysisState> {
 
   List<String> _generateAnalysisDetails(String analysisType) {
     switch (analysisType) {
+      case 'Customer Support Analysis':
+        return [
+          'Professional tone: Excellent (89%)',
+          'Empathy indicators: High (78%)',
+          'Problem-solving approach: Clear',
+          'Customer satisfaction likely: Very High',
+        ];
+      case 'Business Communication Analysis':
+        return [
+          'Authority presence: Strong (85%)',
+          'Persuasiveness: High (82%)',
+          'Clarity of message: Excellent',
+          'Executive presence: Confident',
+        ];
+      case 'Interview Performance Analysis':
+        return [
+          'Confidence level: Moderate (65%)',
+          'Nervousness detected: Some (25%)',
+          'Communication clarity: Good',
+          'Professional demeanor: Strong',
+        ];
+      case 'Personal Voice Analysis':
+        return [
+          'Emotional positivity: Very High (95%)',
+          'Energy level: Enthusiastic',
+          'Authenticity: Genuine',
+          'Overall mood: Happy and engaged',
+        ];
       case 'Emotion Analysis':
         return [
           'Dominant emotion: Confidence (72%)',
@@ -177,6 +246,34 @@ class VoiceAnalysisCubit extends Cubit<VoiceAnalysisState> {
 
   Map<String, double> _generateEmotionData(String analysisType) {
     switch (analysisType) {
+      case 'Customer Support Analysis':
+        return {
+          'Professional': 0.65,
+          'Empathy': 0.22,
+          'Patience': 0.10,
+          'Stress': 0.03,
+        };
+      case 'Business Communication Analysis':
+        return {
+          'Confidence': 0.78,
+          'Enthusiasm': 0.15,
+          'Professional': 0.05,
+          'Authority': 0.02,
+        };
+      case 'Interview Performance Analysis':
+        return {
+          'Confidence': 0.45,
+          'Nervousness': 0.25,
+          'Professionalism': 0.20,
+          'Enthusiasm': 0.10,
+        };
+      case 'Personal Voice Analysis':
+        return {
+          'Happiness': 0.82,
+          'Excitement': 0.12,
+          'Relaxed': 0.05,
+          'Neutral': 0.01,
+        };
       case 'Emotion Analysis':
         return {
           'Confidence': 0.72,
@@ -208,5 +305,63 @@ class VoiceAnalysisCubit extends Cubit<VoiceAnalysisState> {
       'clarityScore': 0.92,
       'engagementLevel': 'High',
     };
+  }
+
+  Map<String, dynamic> _generateDemoMetrics(String analysisType) {
+    switch (analysisType) {
+      case 'Customer Support Analysis':
+        return {
+          'duration': '3:24',
+          'wordsPerMinute': 135,
+          'pauseFrequency': 'Low',
+          'volumeConsistency': 'Very High',
+          'clarityScore': 0.95,
+          'engagementLevel': 'Professional',
+          'empathyScore': 0.88,
+          'problemSolvingApproach': 'Structured',
+        };
+      case 'Business Communication Analysis':
+        return {
+          'duration': '12:15',
+          'wordsPerMinute': 160,
+          'pauseFrequency': 'Very Low',
+          'volumeConsistency': 'High',
+          'clarityScore': 0.93,
+          'engagementLevel': 'Very High',
+          'authorityPresence': 0.91,
+          'persuasiveness': 0.87,
+        };
+      case 'Interview Performance Analysis':
+        return {
+          'duration': '8:47',
+          'wordsPerMinute': 125,
+          'pauseFrequency': 'Moderate',
+          'volumeConsistency': 'Moderate',
+          'clarityScore': 0.85,
+          'engagementLevel': 'Good',
+          'nervousnessIndicators': 0.25,
+          'professionalismScore': 0.82,
+        };
+      case 'Personal Voice Analysis':
+        return {
+          'duration': '1:32',
+          'wordsPerMinute': 170,
+          'pauseFrequency': 'Low',
+          'volumeConsistency': 'High',
+          'clarityScore': 0.90,
+          'engagementLevel': 'Very High',
+          'emotionalExpressiveness': 0.95,
+          'authenticity': 0.93,
+        };
+      default:
+        return {
+          'duration': '4:32',
+          'wordsPerMinute': 145,
+          'pauseFrequency': 'Low',
+          'volumeConsistency': 'High',
+          'clarityScore': 0.92,
+          'engagementLevel': 'High',
+        };
+    }
   }
 }

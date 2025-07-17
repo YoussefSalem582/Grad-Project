@@ -27,7 +27,6 @@ class OnboardingAppHeader extends StatelessWidget {
               ],
             ),
             child: ClipRRect(
-              borderRadius: BorderRadius.circular(40),
               child: Image.asset(
                 'assets/images/app_icon.png',
                 width: 60,

@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import '../../../core/core.dart';
 import '../../../core/routing/app_router.dart';
-import '../../services/onboarding_preferences.dart';
 import 'widgets/splash.dart';
 
 /// Enhanced Splash Screen with modern animations and branding
@@ -69,10 +68,7 @@ class _SplashScreenState extends State<SplashScreen>
 
     // Logo animations with enhanced curves
     _logoScaleAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
-      CurvedAnimation(
-        parent: _logoController,
-        curve: Curves.elasticOut,
-      ),
+      CurvedAnimation(parent: _logoController, curve: Curves.elasticOut),
     );
 
     _logoRotationAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
@@ -110,10 +106,7 @@ class _SplashScreenState extends State<SplashScreen>
 
     // Particle animation with natural movement
     _particleAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
-      CurvedAnimation(
-        parent: _particleController,
-        curve: Curves.easeInOut,
-      ),
+      CurvedAnimation(parent: _particleController, curve: Curves.easeInOut),
     );
   }
 
@@ -139,21 +132,12 @@ class _SplashScreenState extends State<SplashScreen>
 
   Future<void> _navigateToNextScreen() async {
     try {
-      // Check if onboarding is completed
-      final bool isOnboardingCompleted =
-          await OnboardingPreferences.isOnboardingCompleted();
-
+      // Always navigate to onboarding after splash
       if (!mounted) return;
 
-      if (isOnboardingCompleted) {
-        // Navigate to auth choice screen
-        AppRouter.toAuthChoice(context);
-      } else {
-        // Navigate to onboarding screen
-        AppRouter.toOnboarding(context);
-      }
+      AppRouter.toOnboarding(context);
     } catch (e) {
-      // Fallback navigation
+      // Fallback navigation to onboarding
       if (mounted) {
         AppRouter.toOnboarding(context);
       }

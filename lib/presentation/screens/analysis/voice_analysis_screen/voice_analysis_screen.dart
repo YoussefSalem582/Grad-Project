@@ -37,7 +37,8 @@ class _UnifiedVoiceAnalysisScreenState extends State<UnifiedVoiceAnalysisScreen>
   // State variables
   String _selectedAudioSource = 'upload';
   bool _isRecording = false;
-  bool _isAnalyzing = false;
+  bool _hasSampleLoaded = false;
+  String _loadedSampleTitle = '';
 
   @override
   void initState() {
@@ -145,6 +146,9 @@ class _UnifiedVoiceAnalysisScreenState extends State<UnifiedVoiceAnalysisScreen>
 
               // Sample Files Section
               VoiceAnalysisSamplesSection(
+                key: ValueKey(
+                  '$_hasSampleLoaded-$_loadedSampleTitle',
+                ), // Rebuild when sample state changes
                 onSampleSelected: (sampleTitle) {
                   _loadSampleFile(sampleTitle);
                 },
@@ -152,18 +156,63 @@ class _UnifiedVoiceAnalysisScreenState extends State<UnifiedVoiceAnalysisScreen>
               const SizedBox(height: 20),
 
               // Action Buttons
-              VoiceAnalysisActionButtons(
-                isAnalyzing: _isAnalyzing,
-                onAnalyze: _startAnalysis,
-                onClear: _clearContent,
-                hasContent: _hasContent(),
+              BlocBuilder<VoiceAnalysisCubit, VoiceAnalysisState>(
+                builder: (context, state) {
+                  final isAnalyzing = state is VoiceAnalysisLoading;
+                  return Column(
+                    children: [
+                      VoiceAnalysisActionButtons(
+                        isAnalyzing: isAnalyzing,
+                        onAnalyze: _startAnalysis,
+                        onClear: _clearContent,
+                        hasContent: _hasContent(),
+                      ),
+                      const SizedBox(height: 12),
+                      // Quick Demo Button for Testing
+                      Container(
+                        width: double.infinity,
+                        child: OutlinedButton(
+                          onPressed: isAnalyzing ? null : _loadQuickDemo,
+                          style: OutlinedButton.styleFrom(
+                            foregroundColor: const Color(0xFF8B5CF6),
+                            side: const BorderSide(color: Color(0xFF8B5CF6)),
+                            padding: const EdgeInsets.symmetric(vertical: 12),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                          ),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              const Icon(Icons.speed, size: 16),
+                              const SizedBox(width: 8),
+                              Text(
+                                isAnalyzing
+                                    ? 'Loading...'
+                                    : 'Quick Demo Analysis',
+                                style: const TextStyle(fontSize: 14),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ],
+                  );
+                },
               ),
               const SizedBox(height: 20),
 
               // Results Display
-              VoiceAnalysisResultsDisplay(
-                analysisResults: _getAnalysisResults(state),
-                isLoading: _isAnalyzing,
+              BlocBuilder<VoiceAnalysisCubit, VoiceAnalysisState>(
+                builder: (context, state) {
+                  final isLoading = state is VoiceAnalysisLoading;
+                  final analysisResults = _getAnalysisResults(state);
+
+                  return VoiceAnalysisResultsDisplay(
+                    analysisResults: analysisResults,
+                    isLoading: isLoading,
+                  );
+                },
               ),
               const SizedBox(height: 40),
             ]),
@@ -264,44 +313,126 @@ class _UnifiedVoiceAnalysisScreenState extends State<UnifiedVoiceAnalysisScreen>
   }
 
   void _loadSampleFile(String sampleTitle) {
-    // Load sample file logic
+    print('📁 Loading sample: $sampleTitle');
+
+    // Load sample file and immediately trigger analysis
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Text('Loaded sample: $sampleTitle'),
-        backgroundColor: const Color(0xFFF59E0B),
+        content: Text('Analyzing sample: $sampleTitle'),
+        backgroundColor: const Color(0xFF3B82F6),
+        duration: const Duration(seconds: 2),
       ),
+    );
+
+    // Set the audio source to show we have content
+    setState(() {
+      _selectedAudioSource = 'upload';
+      _hasSampleLoaded = true;
+      _loadedSampleTitle = sampleTitle;
+    });
+
+    print(
+      '✅ Sample loaded: $_loadedSampleTitle, hasContent: $_hasSampleLoaded',
+    );
+
+    // Immediately trigger analysis for the sample
+    String analysisType = _getAnalysisTypeForSample(sampleTitle);
+    print('🎯 Auto-analyzing sample with type: $analysisType');
+
+    // Trigger analysis immediately
+    context.read<VoiceAnalysisCubit>().loadDemoData(analysisType);
+  }
+
+  void _loadQuickDemo() {
+    print('🚀 Loading quick demo analysis');
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text('Running quick demo analysis...'),
+        backgroundColor: Color(0xFF8B5CF6),
+        duration: Duration(seconds: 2),
+      ),
+    );
+
+    // Load demo data directly without sample selection
+    context.read<VoiceAnalysisCubit>().loadDemoData(
+      'Customer Support Analysis',
     );
   }
 
   void _startAnalysis() {
-    setState(() {
-      _isAnalyzing = true;
-    });
-
-    // Simulate analysis delay
-    Future.delayed(const Duration(seconds: 3), () {
-      if (mounted) {
-        setState(() {
-          _isAnalyzing = false;
-        });
-
-        // Trigger analysis with mock results
-        context.read<VoiceAnalysisCubit>().analyzeAudio(
-          filePath: '/audio/mock_audio_data.mp3',
-          analysisType: 'Emotion Analysis',
-        );
-      }
-    });
+    if (!_hasContent()) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Please select or provide audio content to analyze'),
+          backgroundColor: Color(0xFFEF4444),
+        ),
+      );
+      return;
+    }
 
     HapticFeedback.lightImpact();
+
+    // Check if we have a sample that's already analyzed
+    final currentState = context.read<VoiceAnalysisCubit>().state;
+    if (_hasSampleLoaded &&
+        _loadedSampleTitle.isNotEmpty &&
+        currentState is VoiceAnalysisDemo) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('$_loadedSampleTitle analysis is already complete!'),
+          backgroundColor: const Color(0xFF10B981),
+          duration: const Duration(seconds: 2),
+        ),
+      );
+      return;
+    }
+
+    // Determine the analysis type based on whether a sample is loaded
+    String analysisType;
+    if (_hasSampleLoaded && _loadedSampleTitle.isNotEmpty) {
+      analysisType = _getAnalysisTypeForSample(_loadedSampleTitle);
+
+      // Debug: Show what we're about to analyze
+      print('🎯 Re-analyzing sample: $_loadedSampleTitle');
+      print('📊 Analysis type: $analysisType');
+
+      // For samples, use loadDemoData to get sample-specific results
+      context.read<VoiceAnalysisCubit>().loadDemoData(analysisType);
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Re-analyzing $_loadedSampleTitle...'),
+          backgroundColor: const Color(0xFF3B82F6),
+          duration: const Duration(seconds: 3),
+        ),
+      );
+    } else {
+      // Regular analysis for uploaded files, recordings, or calls
+      String filePath = _getFilePathForAnalysis();
+      analysisType = _getAnalysisType();
+
+      print('🎯 Starting regular analysis: $analysisType');
+      print('📁 File path: $filePath');
+
+      // Trigger analysis through the cubit
+      context.read<VoiceAnalysisCubit>().analyzeAudio(
+        filePath: filePath,
+        analysisType: analysisType,
+      );
+    }
   }
 
   void _clearContent() {
     setState(() {
       _callIdController.clear();
       _isRecording = false;
-      _isAnalyzing = false;
+      _hasSampleLoaded = false;
+      _loadedSampleTitle = '';
     });
+
+    // Clear the analysis state in the cubit
+    context.read<VoiceAnalysisCubit>().clearAnalysis();
 
     HapticFeedback.selectionClick();
 
@@ -318,30 +449,121 @@ class _UnifiedVoiceAnalysisScreenState extends State<UnifiedVoiceAnalysisScreen>
     return _callIdController.text.isNotEmpty ||
         _selectedAudioSource == 'upload' ||
         _selectedAudioSource == 'record' ||
-        _isRecording;
+        _isRecording ||
+        _hasSampleLoaded;
+  }
+
+  String _getFilePathForAnalysis() {
+    switch (_selectedAudioSource) {
+      case 'upload':
+        return '/audio/uploaded_file.mp3'; // In real app, this would be the actual uploaded file path
+      case 'record':
+        return '/audio/recorded_audio.wav'; // In real app, this would be the recorded file path
+      case 'call':
+        final callId = _callIdController.text.trim();
+        return '/audio/call_recording_$callId.mp3'; // In real app, fetch from call ID
+      default:
+        return '/audio/default_sample.mp3';
+    }
+  }
+
+  String _getAnalysisType() {
+    switch (_selectedAudioSource) {
+      case 'upload':
+        return 'File Analysis';
+      case 'record':
+        return 'Real-time Recording Analysis';
+      case 'call':
+        return 'Call Recording Analysis';
+      default:
+        return 'Emotion Analysis';
+    }
+  }
+
+  String _getAnalysisTypeForSample(String sampleTitle) {
+    switch (sampleTitle) {
+      case 'Customer Service Call':
+        return 'Customer Support Analysis';
+      case 'Sales Meeting':
+        return 'Business Communication Analysis';
+      case 'Interview Session':
+        return 'Interview Performance Analysis';
+      case 'Voice Message':
+        return 'Personal Voice Analysis';
+      default:
+        return 'Sample Audio Analysis';
+    }
   }
 
   Map<String, dynamic>? _getAnalysisResults(VoiceAnalysisState state) {
+    print('🔍 Current analysis state: ${state.runtimeType}');
+
     if (state is VoiceAnalysisSuccess) {
+      final result = state.result;
+      print('✅ Success result: ${result.analysisType}');
       return {
-        'overall_score': 0.85,
-        'dominant_emotion': 'Happy',
-        'emotions': {
-          'happy': 0.75,
-          'confident': 0.65,
-          'calm': 0.45,
-          'excited': 0.35,
-        },
-        'metrics': {
-          'clarity': '92%',
-          'pace': 'Normal',
-          'volume': 'Appropriate',
-          'tone': 'Professional',
-        },
+        'overall_score': result.confidence,
+        'dominant_emotion': _extractDominantEmotion(result.emotions),
+        'emotions': result.emotions,
+        'metrics': result.metrics,
         'transcription':
-            'Hello, thank you for calling our customer support. How can I assist you today? I understand your concern and I will be happy to help resolve this issue for you.',
+            result.details.isNotEmpty
+                ? result.details.join(' ')
+                : 'No transcription available',
+        'summary': result.summary,
+        'analysis_type': result.analysisType,
+        'timestamp': result.timestamp.toString(),
       };
+    } else if (state is VoiceAnalysisDemo) {
+      final result = state.demoResult;
+      print('🎭 Demo result: ${result.analysisType}');
+      print('📊 Emotions: ${result.emotions}');
+      return {
+        'overall_score': result.confidence,
+        'dominant_emotion': _extractDominantEmotion(result.emotions),
+        'emotions': result.emotions,
+        'metrics': result.metrics,
+        'transcription':
+            result.details.isNotEmpty
+                ? result.details.join(' ')
+                : 'Demo transcription: This is a sample analysis of ${result.analysisType.toLowerCase()}',
+        'summary': result.summary,
+        'analysis_type': result.analysisType,
+        'timestamp': result.timestamp.toString(),
+      };
+    } else if (state is VoiceAnalysisError) {
+      print('❌ Error state: ${state.message}');
+      // Show error in UI
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Analysis Error: ${state.message}'),
+            backgroundColor: const Color(0xFFEF4444),
+          ),
+        );
+      });
+    } else if (state is VoiceAnalysisLoading) {
+      print('⏳ Loading state detected');
+    } else {
+      print('🔄 Initial state');
     }
     return null;
+  }
+
+  String _extractDominantEmotion(Map<String, double> emotions) {
+    if (emotions.isEmpty) return 'Neutral';
+
+    String dominantEmotion = emotions.keys.first;
+    double highestValue = emotions.values.first;
+
+    emotions.forEach((emotion, value) {
+      if (value > highestValue) {
+        highestValue = value;
+        dominantEmotion = emotion;
+      }
+    });
+
+    return dominantEmotion.substring(0, 1).toUpperCase() +
+        dominantEmotion.substring(1).toLowerCase();
   }
 }

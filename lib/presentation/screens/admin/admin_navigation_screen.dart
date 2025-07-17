@@ -13,7 +13,7 @@ import 'widgets/admin_dialogs.dart';
 import 'admin_dashboard_screen.dart';
 import 'admin_user_management_screen.dart';
 import 'admin_system_config_screen.dart';
-import 'admin_tickets_screen.dart';
+import 'admin_tickets_screen/admin_tickets_screen.dart';
 import 'admin_profile_screen.dart';
 
 /// Enhanced Admin Navigation Screen with modular components

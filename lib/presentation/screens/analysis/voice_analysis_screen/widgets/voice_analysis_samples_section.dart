@@ -1,13 +1,28 @@
 import 'package:flutter/material.dart';
 
 /// Widget for sample files section
-class VoiceAnalysisSamplesSection extends StatelessWidget {
+class VoiceAnalysisSamplesSection extends StatefulWidget {
   final ValueChanged<String> onSampleSelected;
 
   const VoiceAnalysisSamplesSection({
     super.key,
     required this.onSampleSelected,
   });
+
+  @override
+  State<VoiceAnalysisSamplesSection> createState() =>
+      _VoiceAnalysisSamplesSectionState();
+}
+
+class _VoiceAnalysisSamplesSectionState
+    extends State<VoiceAnalysisSamplesSection> {
+  String? _selectedSample;
+
+  void resetSelection() {
+    setState(() {
+      _selectedSample = null;
+    });
+  }
 
   static const List<Map<String, dynamic>> sampleFiles = [
     {
@@ -109,13 +124,28 @@ class VoiceAnalysisSamplesSection extends StatelessWidget {
               itemBuilder: (context, index) {
                 final sample = sampleFiles[index];
                 return GestureDetector(
-                  onTap: () => onSampleSelected(sample['title'] as String),
-                  child: Container(
+                  onTap: () {
+                    setState(() {
+                      _selectedSample = sample['title'] as String;
+                    });
+                    widget.onSampleSelected(sample['title'] as String);
+                  },
+                  child: AnimatedContainer(
+                    duration: const Duration(milliseconds: 200),
                     padding: const EdgeInsets.all(16),
                     decoration: BoxDecoration(
-                      color: const Color(0xFFF8FAFC),
+                      color:
+                          _selectedSample == sample['title']
+                              ? (sample['color'] as Color).withOpacity(0.1)
+                              : const Color(0xFFF8FAFC),
                       borderRadius: BorderRadius.circular(12),
-                      border: Border.all(color: const Color(0xFFE2E8F0)),
+                      border: Border.all(
+                        color:
+                            _selectedSample == sample['title']
+                                ? sample['color'] as Color
+                                : const Color(0xFFE2E8F0),
+                        width: _selectedSample == sample['title'] ? 2 : 1,
+                      ),
                     ),
                     child: Row(
                       children: [
@@ -195,11 +225,17 @@ class VoiceAnalysisSamplesSection extends StatelessWidget {
                             ],
                           ),
                         ),
-                        const Icon(
-                          Icons.play_circle_outline,
-                          color: Color(0xFF64748B),
-                          size: 20,
-                        ),
+                        _selectedSample == sample['title']
+                            ? const Icon(
+                              Icons.check_circle,
+                              color: Color(0xFF10B981),
+                              size: 20,
+                            )
+                            : const Icon(
+                              Icons.play_circle_outline,
+                              color: Color(0xFF64748B),
+                              size: 20,
+                            ),
                       ],
                     ),
                   ),
