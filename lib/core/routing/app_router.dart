@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import '../../presentation/screens/screens.dart';
-import '../../screens/test_backend_screen.dart';
 
 /// Centralized routing configuration
 class AppRouter {
@@ -64,12 +63,6 @@ class AppRouter {
       case employeeDashboard:
         return MaterialPageRoute(
           builder: (_) => const EmployeeNavigationScreen(),
-          settings: settings,
-        );
-
-      case testBackend:
-        return MaterialPageRoute(
-          builder: (_) => const TestBackendScreen(),
           settings: settings,
         );
 

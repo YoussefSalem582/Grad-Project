@@ -32,20 +32,26 @@ class EmployeeAppBar extends StatelessWidget implements PreferredSizeWidget {
       automaticallyImplyLeading: false,
       title: Row(
         children: [
-          // App Logo/Icon
+          // App Logo/Icon - Using actual app icon asset
           Container(
             margin: const EdgeInsets.only(left: 16),
             padding: const EdgeInsets.all(8),
-            decoration: BoxDecoration(
-              gradient: const LinearGradient(
-                colors: [Color(0xFF667EEA), Color(0xFF764BA2)],
+
+            child: ClipRRect(
+              child: Image.asset(
+                'assets/images/app_icon.png',
+                width: 40,
+                height: 40,
+                fit: BoxFit.contain,
+                errorBuilder: (context, error, stackTrace) {
+                  // Fallback to original icon if asset fails to load
+                  return const Icon(
+                    Icons.psychology_rounded,
+                    color: Colors.white,
+                    size: 24,
+                  );
+                },
               ),
-              borderRadius: BorderRadius.circular(12),
-            ),
-            child: const Icon(
-              Icons.psychology_rounded,
-              color: Colors.white,
-              size: 24,
             ),
           ),
           const SizedBox(width: 12),

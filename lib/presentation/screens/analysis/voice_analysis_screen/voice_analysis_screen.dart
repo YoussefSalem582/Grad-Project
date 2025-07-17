@@ -4,6 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../../core/di/dependency_injection.dart' as di;
 import '../../../cubit/voice_analysis/voice_analysis_cubit.dart';
 import '../../../widgets/common/animated_background_widget.dart';
+import '../../../widgets/app_bars/analysis_app_bar.dart';
 import 'widgets/widgets.dart';
 
 /// Unified Voice Analysis Screen - Refactored with Modular Widgets
@@ -81,7 +82,12 @@ class _UnifiedVoiceAnalysisScreenState extends State<UnifiedVoiceAnalysisScreen>
       create: (context) => di.sl<VoiceAnalysisCubit>(),
       child: Scaffold(
         extendBodyBehindAppBar: true,
-        appBar: _buildAppBar(context),
+        appBar: const AnalysisAppBar(
+          title: 'Voice Analysis Hub',
+          subtitle: 'Audio Emotion Analysis',
+          hasUnreadNotifications: true,
+          notificationCount: 1,
+        ),
         body: SafeArea(
           child: Stack(
             children: [
@@ -110,25 +116,6 @@ class _UnifiedVoiceAnalysisScreenState extends State<UnifiedVoiceAnalysisScreen>
               ),
             ],
           ),
-        ),
-      ),
-    );
-  }
-
-  PreferredSizeWidget _buildAppBar(BuildContext context) {
-    return AppBar(
-      backgroundColor: Colors.transparent,
-      elevation: 0,
-      leading: IconButton(
-        icon: const Icon(Icons.arrow_back_ios, color: Colors.white),
-        onPressed: () => Navigator.of(context).pop(),
-      ),
-      title: const Text(
-        'Voice Analysis Hub',
-        style: TextStyle(
-          color: Colors.white,
-          fontSize: 20,
-          fontWeight: FontWeight.w600,
         ),
       ),
     );

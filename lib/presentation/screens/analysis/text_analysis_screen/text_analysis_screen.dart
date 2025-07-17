@@ -4,6 +4,7 @@ import '../../../../core/di/dependency_injection.dart' as di;
 import '../../../cubit/text_analysis/text_analysis_cubit.dart';
 import '../../../widgets/common/animated_background_widget.dart';
 import '../../../widgets/common/animated_loading_indicator.dart';
+import '../../../widgets/app_bars/analysis_app_bar.dart';
 import 'widgets/widgets.dart';
 
 /// Unified Text Analysis Screen - Modularized with Widgets
@@ -81,7 +82,12 @@ class _UnifiedTextAnalysisScreenState extends State<UnifiedTextAnalysisScreen>
       create: (context) => di.sl<TextAnalysisCubit>(),
       child: Scaffold(
         extendBodyBehindAppBar: true,
-        appBar: _buildAppBar(context),
+        appBar: const AnalysisAppBar(
+          title: 'Text Analysis Hub',
+          subtitle: 'Emotion & Sentiment Analysis',
+          hasUnreadNotifications: true,
+          notificationCount: 2,
+        ),
         body: Stack(
           children: [
             // Animated Background
@@ -93,25 +99,6 @@ class _UnifiedTextAnalysisScreenState extends State<UnifiedTextAnalysisScreen>
               },
             ),
           ],
-        ),
-      ),
-    );
-  }
-
-  PreferredSizeWidget _buildAppBar(BuildContext context) {
-    return AppBar(
-      backgroundColor: Colors.transparent,
-      elevation: 0,
-      leading: IconButton(
-        icon: const Icon(Icons.arrow_back_ios, color: Colors.white),
-        onPressed: () => Navigator.of(context).pop(),
-      ),
-      title: const Text(
-        'Text Analysis Hub',
-        style: TextStyle(
-          color: Colors.white,
-          fontSize: 20,
-          fontWeight: FontWeight.w600,
         ),
       ),
     );

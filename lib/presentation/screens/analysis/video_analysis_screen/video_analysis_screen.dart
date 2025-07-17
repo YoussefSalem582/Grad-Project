@@ -6,6 +6,7 @@ import '../../../../core/core.dart';
 import '../../../cubit/video_analysis/video_analysis_cubit.dart';
 import '../../../widgets/common/animated_background_widget.dart';
 import '../../../widgets/common/animated_loading_indicator.dart';
+import '../../../widgets/app_bars/analysis_app_bar.dart';
 import 'widgets/widgets.dart';
 
 /// Refactored Employee Video Analysis Screen with modular components
@@ -109,11 +110,10 @@ class _EmployeeVideoAnalysisScreenState
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.background,
-      appBar: AppBar(
-        title: const Text('Video Analysis'),
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-        foregroundColor: AppColors.textPrimary,
+      appBar: const AnalysisAppBar(
+        title: 'Video Analysis',
+        subtitle: 'Visual Emotion Detection',
+        hasUnreadNotifications: false,
       ),
       body: Stack(
         children: [
