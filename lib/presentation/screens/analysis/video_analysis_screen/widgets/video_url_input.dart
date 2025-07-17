@@ -25,10 +25,10 @@ class VideoUrlInput extends StatelessWidget {
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: AppColors.border.withValues(alpha: 0.3)),
+          border: Border.all(color: AppColors.border.withOpacity(0.3)),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withValues(alpha: 0.08),
+              color: Colors.black.withOpacity(0.08),
               blurRadius: 12,
               offset: const Offset(0, 4),
             ),
@@ -42,7 +42,7 @@ class VideoUrlInput extends StatelessWidget {
                 Container(
                   padding: const EdgeInsets.all(8),
                   decoration: BoxDecoration(
-                    color: const Color(0xFF667EEA).withValues(alpha: 0.1),
+                    color: const Color(0xFF667EEA).withOpacity(0.1),
                     borderRadius: BorderRadius.circular(10),
                   ),
                   child: const Icon(
@@ -69,14 +69,14 @@ class VideoUrlInput extends StatelessWidget {
               decoration: BoxDecoration(
                 color:
                     focusNode.hasFocus
-                        ? const Color(0xFF667EEA).withValues(alpha: 0.05)
+                        ? const Color(0xFF667EEA).withOpacity(0.05)
                         : AppColors.surface,
                 borderRadius: BorderRadius.circular(12),
                 border: Border.all(
                   color:
                       focusNode.hasFocus
                           ? const Color(0xFF667EEA)
-                          : AppColors.border.withValues(alpha: 0.5),
+                          : AppColors.border.withOpacity(0.5),
                   width: focusNode.hasFocus ? 2 : 1,
                 ),
               ),
@@ -86,7 +86,7 @@ class VideoUrlInput extends StatelessWidget {
                 decoration: InputDecoration(
                   hintText: 'Enter video URL (YouTube, Vimeo, etc.)',
                   hintStyle: TextStyle(
-                    color: AppColors.textSecondary.withValues(alpha: 0.7),
+                    color: AppColors.textSecondary.withOpacity(0.7),
                     fontSize: 14,
                   ),
                   border: InputBorder.none,

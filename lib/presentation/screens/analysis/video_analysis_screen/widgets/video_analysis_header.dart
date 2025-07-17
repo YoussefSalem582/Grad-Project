@@ -14,7 +14,7 @@ class VideoAnalysisHeader extends StatelessWidget {
         return Transform.translate(
           offset: Offset(0, 20 * (1 - animation.value)),
           child: Opacity(
-            opacity: animation.value,
+            opacity: animation.value.clamp(0.0, 1.0),
             child: Container(
               padding: const EdgeInsets.all(20),
               decoration: BoxDecoration(
@@ -30,7 +30,7 @@ class VideoAnalysisHeader extends StatelessWidget {
                 borderRadius: BorderRadius.circular(16),
                 boxShadow: [
                   BoxShadow(
-                    color: const Color(0xFF667EEA).withValues(alpha: 0.3),
+                    color: const Color(0xFF667EEA).withOpacity(0.3),
                     blurRadius: 15,
                     offset: const Offset(0, 8),
                   ),
@@ -41,7 +41,7 @@ class VideoAnalysisHeader extends StatelessWidget {
                   Container(
                     padding: const EdgeInsets.all(12),
                     decoration: BoxDecoration(
-                      color: Colors.white.withValues(alpha: 0.2),
+                      color: Colors.white.withOpacity(0.2),
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: const Icon(
@@ -69,7 +69,7 @@ class VideoAnalysisHeader extends StatelessWidget {
                           style: TextStyle(
                             fontSize: 13,
                             fontWeight: FontWeight.w500,
-                            color: Colors.white.withValues(alpha: 0.9),
+                            color: Colors.white.withOpacity(0.9),
                           ),
                         ),
                       ],

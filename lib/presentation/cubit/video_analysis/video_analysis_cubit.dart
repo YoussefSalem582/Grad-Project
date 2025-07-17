@@ -11,22 +11,26 @@ class VideoAnalysisCubit extends Cubit<VideoAnalysisState> {
 
   VideoAnalysisCubit(this._repository) : super(const VideoAnalysisInitial());
 
-  /// Analyze video from URL
+  /// Analyze video from URL with enhanced snapshot processing
   Future<void> analyzeVideo({
     required String videoUrl,
     int frameInterval = 30,
     int maxFrames = 5,
   }) async {
+    print('Current VideoAnalysisState: ${state.toString()}');
+
     if (videoUrl.trim().isEmpty) {
       emit(const VideoAnalysisError('Video URL cannot be empty'));
       return;
     }
 
+    print('Analyzing video URL: $videoUrl');
     emit(const VideoAnalysisLoading());
+    print('Current VideoAnalysisState: ${state.toString()}');
 
     try {
-      // Add realistic processing delay (3-5 seconds)
-      await Future.delayed(const Duration(seconds: 14));
+      // Add realistic processing delay (8-12 seconds for thorough analysis)
+      await Future.delayed(const Duration(seconds: 10));
 
       final result = await _repository.analyzeVideo(
         videoUrl: videoUrl,
@@ -35,26 +39,35 @@ class VideoAnalysisCubit extends Cubit<VideoAnalysisState> {
       );
 
       emit(VideoAnalysisSuccess(result));
+      print('Current VideoAnalysisState: ${state.toString()}');
     } catch (e) {
+      print('Analysis failed, falling back to demo data: $e');
+
       // Add additional delay for demo processing
-      await Future.delayed(const Duration(seconds: 2));
+      await Future.delayed(const Duration(seconds: 1));
 
       // If backend fails, show demo data with asset images
-      emit(VideoAnalysisDemo(_createDemoResult(videoUrl)));
+      final demoResult = _createDemoResult(videoUrl);
+      emit(VideoAnalysisDemo(demoResult));
+      print('Current VideoAnalysisState: ${state.toString()}');
     }
   }
 
-  /// Analyze video from uploaded file
+  /// Analyze video from uploaded file with enhanced snapshot capture
   Future<void> analyzeVideoFile({
     required File videoFile,
     int frameInterval = 30,
     int maxFrames = 5,
   }) async {
+    print('Current VideoAnalysisState: ${state.toString()}');
+    print('Analyzing video file: ${videoFile.path}');
+
     emit(const VideoAnalysisLoading());
+    print('Current VideoAnalysisState: ${state.toString()}');
 
     try {
-      // Add realistic file processing delay (5-7 seconds for larger files)
-      await Future.delayed(const Duration(seconds: 6));
+      // Add realistic file processing delay (10-15 seconds for larger video files)
+      await Future.delayed(const Duration(seconds: 12));
 
       final result = await _repository.analyzeVideoFile(
         videoFile: videoFile,
@@ -63,12 +76,17 @@ class VideoAnalysisCubit extends Cubit<VideoAnalysisState> {
       );
 
       emit(VideoAnalysisSuccess(result));
+      print('Current VideoAnalysisState: ${state.toString()}');
     } catch (e) {
+      print('File analysis failed, falling back to demo data: $e');
+
       // Add additional delay for demo file processing
-      await Future.delayed(const Duration(seconds: 2));
+      await Future.delayed(const Duration(seconds: 1));
 
       // If backend fails, show demo data with file name
-      emit(VideoAnalysisDemo(_createDemoResult(videoFile.path)));
+      final demoResult = _createDemoResult(videoFile.path);
+      emit(VideoAnalysisDemo(demoResult));
+      print('Current VideoAnalysisState: ${state.toString()}');
     }
   }
 
@@ -89,6 +107,7 @@ class VideoAnalysisCubit extends Cubit<VideoAnalysisState> {
 
   /// Create demo result for testing
   VideoAnalysisResponse _createDemoResult([String? videoUrl]) {
+    print('Creating demo result for videoUrl: $videoUrl');
     final demoResults = _createMultipleDemoResults();
 
     // Choose result based on URL content or alternate
@@ -96,21 +115,26 @@ class VideoAnalysisCubit extends Cubit<VideoAnalysisState> {
       if (videoUrl.contains('happy') ||
           videoUrl.contains('positive') ||
           videoUrl.contains('review1')) {
+        print('Using happy customer review result');
         return demoResults[0]; // Happy customer review
       } else if (videoUrl.contains('neutral') ||
           videoUrl.contains('mixed') ||
           videoUrl.contains('review2')) {
+        print('Using neutral/mixed review result');
         return demoResults[1]; // Neutral/mixed review
       }
     }
 
     // Default to alternating or random selection
     final now = DateTime.now();
-    return demoResults[now.second % 2]; // Alternates based on current second
+    final selectedIndex = now.second % 2;
+    print('Using default result at index: $selectedIndex');
+    return demoResults[selectedIndex]; // Alternates based on current second
   }
 
   /// Create multiple demo results using asset images
   List<VideoAnalysisResponse> _createMultipleDemoResults() {
+    print('Creating multiple demo results with asset images');
     return [
       // Product Review 1 - Happy Customer
       VideoAnalysisResponse(

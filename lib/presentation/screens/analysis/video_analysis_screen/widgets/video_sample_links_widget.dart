@@ -52,7 +52,7 @@ class VideoSampleLinksWidget extends StatelessWidget {
         return Transform.translate(
           offset: Offset(0, 50 * (1 - animation.value)),
           child: Opacity(
-            opacity: animation.value,
+            opacity: animation.value.clamp(0.0, 1.0),
             child: Container(
               margin: const EdgeInsets.only(bottom: 20),
               padding: const EdgeInsets.all(20),

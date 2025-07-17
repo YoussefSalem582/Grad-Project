@@ -4,7 +4,14 @@ import '../../../../../core/core.dart';
 import '../../../../../data/models/video_analysis_response.dart';
 import '../../../../cubit/video_analysis/video_analysis_cubit.dart';
 
-/// Video analysis results display widget
+/// Enhanced Video Analysis Results with Improved Snapshot Display
+///
+/// Features:
+/// - Optimized image loading with error handling
+/// - Smooth animations with clamped opacity values
+/// - Enhanced snapshot display with proper aspect ratios
+/// - Real-time emotion detection feedback
+/// - Comprehensive error handling and fallbacks
 class VideoAnalysisResults extends StatelessWidget {
   final AnimationController resultsController;
 
@@ -19,9 +26,19 @@ class VideoAnalysisResults extends StatelessWidget {
         } else if (state is VideoAnalysisError) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text(state.message),
+              content: Row(
+                children: [
+                  Icon(Icons.error_outline, color: Colors.white, size: 20),
+                  const SizedBox(width: 8),
+                  Expanded(child: Text(state.message)),
+                ],
+              ),
               backgroundColor: Colors.red,
               behavior: SnackBarBehavior.floating,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(10),
+              ),
+              margin: const EdgeInsets.all(16),
             ),
           );
         }
@@ -47,7 +64,7 @@ class VideoAnalysisResults extends StatelessWidget {
       animation: resultsController,
       builder: (context, child) {
         return Opacity(
-          opacity: resultsController.value,
+          opacity: resultsController.value.clamp(0.0, 1.0),
           child: Transform.translate(
             offset: Offset(0, 20 * (1 - resultsController.value)),
             child: Container(
@@ -55,12 +72,10 @@ class VideoAnalysisResults extends StatelessWidget {
               decoration: BoxDecoration(
                 color: Colors.white,
                 borderRadius: BorderRadius.circular(16),
-                border: Border.all(
-                  color: AppColors.border.withValues(alpha: 0.3),
-                ),
+                border: Border.all(color: AppColors.border.withOpacity(0.3)),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withValues(alpha: 0.08),
+                    color: Colors.black.withOpacity(0.08),
                     blurRadius: 12,
                     offset: const Offset(0, 4),
                   ),
@@ -89,7 +104,7 @@ class VideoAnalysisResults extends StatelessWidget {
         Container(
           padding: const EdgeInsets.all(8),
           decoration: BoxDecoration(
-            color: const Color(0xFF667EEA).withValues(alpha: 0.1),
+            color: const Color(0xFF667EEA).withOpacity(0.1),
             borderRadius: BorderRadius.circular(10),
           ),
           child: const Icon(
@@ -117,8 +132,8 @@ class VideoAnalysisResults extends StatelessWidget {
       decoration: BoxDecoration(
         gradient: LinearGradient(
           colors: [
-            const Color(0xFF667EEA).withValues(alpha: 0.08),
-            const Color(0xFF764BA2).withValues(alpha: 0.08),
+            const Color(0xFF667EEA).withOpacity(0.08),
+            const Color(0xFF764BA2).withOpacity(0.08),
           ],
         ),
         borderRadius: BorderRadius.circular(12),
@@ -191,7 +206,7 @@ class VideoAnalysisResults extends StatelessWidget {
             Container(
               padding: const EdgeInsets.all(6),
               decoration: BoxDecoration(
-                color: emotionColor.withValues(alpha: 0.1),
+                color: emotionColor.withOpacity(0.1),
                 borderRadius: BorderRadius.circular(8),
               ),
               child: Icon(Icons.person_rounded, color: emotionColor, size: 16),
@@ -214,12 +229,12 @@ class VideoAnalysisResults extends StatelessWidget {
           decoration: BoxDecoration(
             gradient: LinearGradient(
               colors: [
-                emotionColor.withValues(alpha: 0.05),
-                sentimentColor.withValues(alpha: 0.05),
+                emotionColor.withOpacity(0.05),
+                sentimentColor.withOpacity(0.05),
               ],
             ),
             borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: emotionColor.withValues(alpha: 0.2)),
+            border: Border.all(color: emotionColor.withOpacity(0.2)),
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -256,7 +271,7 @@ class VideoAnalysisResults extends StatelessWidget {
                     Container(
                       width: 1,
                       height: 30,
-                      color: AppColors.border.withValues(alpha: 0.5),
+                      color: AppColors.border.withOpacity(0.5),
                     ),
                     Expanded(
                       child: Padding(
@@ -289,48 +304,208 @@ class VideoAnalysisResults extends StatelessWidget {
                 ),
               ),
 
-              // Video Frame Image Display
+              // Enhanced Video Frame Image Display with Snapshot Features
               if (snapshot.assetImagePath != null) ...[
                 Container(
                   margin: const EdgeInsets.fromLTRB(14, 0, 14, 14),
-                  height: 200,
                   decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(12),
+                    borderRadius: BorderRadius.circular(16),
                     border: Border.all(
-                      color: AppColors.border.withValues(alpha: 0.3),
+                      color: emotionColor.withOpacity(0.3),
+                      width: 2,
                     ),
+                    boxShadow: [
+                      BoxShadow(
+                        color: emotionColor.withOpacity(0.1),
+                        blurRadius: 8,
+                        offset: const Offset(0, 4),
+                      ),
+                    ],
                   ),
                   child: ClipRRect(
-                    borderRadius: BorderRadius.circular(12),
-                    child: Image.asset(
-                      snapshot.assetImagePath!,
-                      width: double.infinity,
-                      fit: BoxFit.cover,
-                      errorBuilder: (context, error, stackTrace) {
-                        return Container(
-                          decoration: BoxDecoration(
-                            color: Colors.grey.withValues(alpha: 0.1),
-                            borderRadius: BorderRadius.circular(12),
+                    borderRadius: BorderRadius.circular(14),
+                    child: Stack(
+                      children: [
+                        // Main snapshot image
+                        AspectRatio(
+                          aspectRatio: 16 / 9, // Standard video aspect ratio
+                          child: Image.asset(
+                            snapshot.assetImagePath!,
+                            width: double.infinity,
+                            fit: BoxFit.cover,
+                            errorBuilder: (context, error, stackTrace) {
+                              print(
+                                'Error loading asset image: ${snapshot.assetImagePath}',
+                              );
+                              print('Error details: $error');
+                              return _buildImageErrorPlaceholder();
+                            },
                           ),
-                          child: const Center(
-                            child: Column(
+                        ),
+
+                        // Snapshot overlay indicators
+                        Positioned(
+                          top: 12,
+                          left: 12,
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 8,
+                              vertical: 4,
+                            ),
+                            decoration: BoxDecoration(
+                              color: Colors.black.withOpacity(0.7),
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            child: Row(
                               mainAxisSize: MainAxisSize.min,
                               children: [
                                 Icon(
-                                  Icons.video_camera_back_outlined,
-                                  size: 48,
-                                  color: Colors.grey,
+                                  Icons.camera_alt,
+                                  color: Colors.white,
+                                  size: 14,
                                 ),
-                                SizedBox(height: 8),
+                                const SizedBox(width: 4),
                                 Text(
-                                  'Video frame not available',
-                                  style: TextStyle(color: Colors.grey),
+                                  'Snapshot',
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.w600,
+                                  ),
                                 ),
                               ],
                             ),
                           ),
-                        );
-                      },
+                        ),
+
+                        // Emotion indicator overlay
+                        Positioned(
+                          bottom: 12,
+                          right: 12,
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 10,
+                              vertical: 6,
+                            ),
+                            decoration: BoxDecoration(
+                              color: emotionColor.withOpacity(0.9),
+                              borderRadius: BorderRadius.circular(20),
+                              border: Border.all(color: Colors.white, width: 1),
+                            ),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Icon(
+                                  _getEmotionIcon(snapshot.emotion),
+                                  color: Colors.white,
+                                  size: 16,
+                                ),
+                                const SizedBox(width: 6),
+                                Text(
+                                  snapshot.emotion,
+                                  style: const TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 13,
+                                    fontWeight: FontWeight.w700,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+
+                        // Confidence indicator
+                        Positioned(
+                          bottom: 12,
+                          left: 12,
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 8,
+                              vertical: 4,
+                            ),
+                            decoration: BoxDecoration(
+                              color: Colors.black.withOpacity(0.7),
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Icon(
+                                  Icons.verified,
+                                  color: const Color(0xFF10B981),
+                                  size: 14,
+                                ),
+                                const SizedBox(width: 4),
+                                Text(
+                                  '${(snapshot.confidence * 100).toInt()}%',
+                                  style: const TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ] else ...[
+                // Enhanced placeholder for missing snapshots
+                Container(
+                  margin: const EdgeInsets.fromLTRB(14, 0, 14, 14),
+                  height: 200,
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      colors: [
+                        Colors.grey.withOpacity(0.1),
+                        Colors.grey.withOpacity(0.05),
+                      ],
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                    ),
+                    borderRadius: BorderRadius.circular(16),
+                    border: Border.all(
+                      color: AppColors.border.withOpacity(0.3),
+                      style: BorderStyle.solid,
+                    ),
+                  ),
+                  child: Center(
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Container(
+                          padding: const EdgeInsets.all(16),
+                          decoration: BoxDecoration(
+                            color: Colors.grey.withOpacity(0.1),
+                            shape: BoxShape.circle,
+                          ),
+                          child: Icon(
+                            Icons.video_camera_back_outlined,
+                            size: 40,
+                            color: Colors.grey.withOpacity(0.7),
+                          ),
+                        ),
+                        const SizedBox(height: 12),
+                        Text(
+                          'No Video Frame Captured',
+                          style: TextStyle(
+                            color: Colors.grey.withOpacity(0.8),
+                            fontSize: 16,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          'Snapshot processing may be unavailable',
+                          style: TextStyle(
+                            color: Colors.grey.withOpacity(0.6),
+                            fontSize: 14,
+                          ),
+                        ),
+                      ],
                     ),
                   ),
                 ),
@@ -343,9 +518,7 @@ class VideoAnalysisResults extends StatelessWidget {
                 decoration: BoxDecoration(
                   color: Colors.white,
                   borderRadius: BorderRadius.circular(10),
-                  border: Border.all(
-                    color: AppColors.border.withValues(alpha: 0.3),
-                  ),
+                  border: Border.all(color: AppColors.border.withOpacity(0.3)),
                 ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -355,9 +528,7 @@ class VideoAnalysisResults extends StatelessWidget {
                         Container(
                           padding: const EdgeInsets.all(4),
                           decoration: BoxDecoration(
-                            color: const Color(
-                              0xFF667EEA,
-                            ).withValues(alpha: 0.1),
+                            color: const Color(0xFF667EEA).withOpacity(0.1),
                             borderRadius: BorderRadius.circular(6),
                           ),
                           child: const Icon(
@@ -425,6 +596,33 @@ class VideoAnalysisResults extends StatelessWidget {
     }
   }
 
+  IconData _getEmotionIcon(String emotion) {
+    switch (emotion.toLowerCase()) {
+      case 'happy':
+      case 'joy':
+        return Icons.sentiment_very_satisfied;
+      case 'excited':
+      case 'enthusiastic':
+        return Icons.celebration;
+      case 'confident':
+      case 'satisfied':
+        return Icons.sentiment_satisfied;
+      case 'neutral':
+        return Icons.sentiment_neutral;
+      case 'concerned':
+      case 'worried':
+        return Icons.sentiment_dissatisfied;
+      case 'frustrated':
+      case 'angry':
+        return Icons.sentiment_very_dissatisfied;
+      case 'sad':
+      case 'disappointed':
+        return Icons.sentiment_very_dissatisfied;
+      default:
+        return Icons.sentiment_neutral;
+    }
+  }
+
   Color _getSentimentColor(String sentiment) {
     switch (sentiment.toLowerCase()) {
       case 'positive':
@@ -436,5 +634,32 @@ class VideoAnalysisResults extends StatelessWidget {
       default:
         return const Color(0xFF667EEA);
     }
+  }
+
+  /// Build error placeholder for images
+  Widget _buildImageErrorPlaceholder() {
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.grey.withOpacity(0.1),
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: const Center(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(
+              Icons.video_camera_back_outlined,
+              size: 48,
+              color: Colors.grey,
+            ),
+            SizedBox(height: 8),
+            Text(
+              'Video frame not available',
+              style: TextStyle(color: Colors.grey),
+            ),
+          ],
+        ),
+      ),
+    );
   }
 }
