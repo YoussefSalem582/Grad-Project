@@ -189,42 +189,41 @@ lib/
 
 </div>
 
-### 📑 Presentation Slides
+### 📑 Project Gallery
 
-<details>
-<summary><strong>🎯 Click to View Complete Presentation</strong></summary>
+<div align="center">
 
 #### Project Overview & Introduction
-| Slide 30 | Slide 31 | Slide 32 |
-|:---:|:---:|:---:|
-| ![Slide 30](assets/Multi%20Emotion%20Detection%20For%20Mental%20illnesses/30.jpg) | ![Slide 31](assets/Multi%20Emotion%20Detection%20For%20Mental%20illnesses/31.jpg) | ![Slide 32](assets/Multi%20Emotion%20Detection%20For%20Mental%20illnesses/32.jpg) |
+![Project Overview](assets/Multi%20Emotion%20Detection%20For%20Mental%20illnesses/30.jpg)
+![Introduction](assets/Multi%20Emotion%20Detection%20For%20Mental%20illnesses/31.jpg)
+![Problem Statement](assets/Multi%20Emotion%20Detection%20For%20Mental%20illnesses/32.jpg)
 
 #### Technical Architecture & Implementation
-| Slide 33 | Slide 34 | Slide 35 |
-|:---:|:---:|:---:|
-| ![Slide 33](assets/Multi%20Emotion%20Detection%20For%20Mental%20illnesses/33.jpg) | ![Slide 34](assets/Multi%20Emotion%20Detection%20For%20Mental%20illnesses/34.jpg) | ![Slide 35](assets/Multi%20Emotion%20Detection%20For%20Mental%20illnesses/35.jpg) |
+![Architecture](assets/Multi%20Emotion%20Detection%20For%20Mental%20illnesses/33.jpg)
+![Implementation](assets/Multi%20Emotion%20Detection%20For%20Mental%20illnesses/34.jpg)
+![Technical Details](assets/Multi%20Emotion%20Detection%20For%20Mental%20illnesses/35.jpg)
 
 #### System Features & Capabilities
-| Slide 36 | Slide 37 | Slide 38 |
-|:---:|:---:|:---:|
-| ![Slide 36](assets/Multi%20Emotion%20Detection%20For%20Mental%20illnesses/36.jpg) | ![Slide 37](assets/Multi%20Emotion%20Detection%20For%20Mental%20illnesses/37.jpg) | ![Slide 38](assets/Multi%20Emotion%20Detection%20For%20Mental%20illnesses/38.jpg) |
+![System Features](assets/Multi%20Emotion%20Detection%20For%20Mental%20illnesses/36.jpg)
+![Capabilities](assets/Multi%20Emotion%20Detection%20For%20Mental%20illnesses/37.jpg)
+![User Interface](assets/Multi%20Emotion%20Detection%20For%20Mental%20illnesses/38.jpg)
 
 #### Results & Analysis
-| Slide 39 | Slide 40 | Slide 41 |
-|:---:|:---:|:---:|
-| ![Slide 39](assets/Multi%20Emotion%20Detection%20For%20Mental%20illnesses/39.jpg) | ![Slide 40](assets/Multi%20Emotion%20Detection%20For%20Mental%20illnesses/40.jpg) | ![Slide 41](assets/Multi%20Emotion%20Detection%20For%20Mental%20illnesses/41.jpg) |
+![Results](assets/Multi%20Emotion%20Detection%20For%20Mental%20illnesses/39.jpg)
+![Analysis](assets/Multi%20Emotion%20Detection%20For%20Mental%20illnesses/40.jpg)
+![Performance Metrics](assets/Multi%20Emotion%20Detection%20For%20Mental%20illnesses/41.jpg)
 
 #### Implementation Details & Performance
-| Slide 42 | Slide 43 | Slide 44 |
-|:---:|:---:|:---:|
-| ![Slide 42](assets/Multi%20Emotion%20Detection%20For%20Mental%20illnesses/42.jpg) | ![Slide 43](assets/Multi%20Emotion%20Detection%20For%20Mental%20illnesses/43.jpg) | ![Slide 44](assets/Multi%20Emotion%20Detection%20For%20Mental%20illnesses/44.jpg) |
+![Implementation Details](assets/Multi%20Emotion%20Detection%20For%20Mental%20illnesses/42.jpg)
+![Performance](assets/Multi%20Emotion%20Detection%20For%20Mental%20illnesses/43.jpg)
+![Testing Results](assets/Multi%20Emotion%20Detection%20For%20Mental%20illnesses/44.jpg)
 
 #### Conclusions & Future Work
-| Slide 45 | Slide 46 | Slide 47 |
-|:---:|:---:|:---:|
-| ![Slide 45](assets/Multi%20Emotion%20Detection%20For%20Mental%20illnesses/45.jpg) | ![Slide 46](assets/Multi%20Emotion%20Detection%20For%20Mental%20illnesses/46.jpg) | ![Slide 47](assets/Multi%20Emotion%20Detection%20For%20Mental%20illnesses/47.jpg) |
+![Conclusions](assets/Multi%20Emotion%20Detection%20For%20Mental%20illnesses/45.jpg)
+![Future Work](assets/Multi%20Emotion%20Detection%20For%20Mental%20illnesses/46.jpg)
+![Final Thoughts](assets/Multi%20Emotion%20Detection%20For%20Mental%20illnesses/47.jpg)
 
-</details>
+</div>
 
 ### 🎓 **Academic Context**
 This project represents a comprehensive graduate-level research and development effort at **Nile University**, focusing on advanced emotion recognition technologies for practical business applications. The presentation demonstrates the theoretical foundation, technical implementation, and real-world applicability of the EmoSense platform.
