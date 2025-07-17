@@ -5,6 +5,27 @@
 [![License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 [![Platform](https://img.shields.io/badge/Platform-Android%20|%20iOS%20|%20Web-lightgrey.svg)](https://flutter.dev/)
 
+## 🎯 What is EmoSense?
+
+**EmoSense** is an intelligent Flutter mobile application that analyzes human emotions in real-time from video content using advanced AI technology. Perfect for businesses wanting to understand customer sentiment, improve service quality, and enhance user experiences.
+
+### 💡 **Simple Concept**
+Upload a video or paste a YouTube URL → AI analyzes facial expressions and emotions → Get detailed insights with confidence scores and visual snapshots → Use data to improve customer service and business decisions.
+
+### 🎯 **Who It's For**
+- **Customer Service Teams**: Analyze client interactions for training and quality improvement
+- **HR Departments**: Evaluate employee satisfaction and team dynamics  
+- **Content Creators**: Understand audience emotional response to videos
+- **Researchers**: Study human emotional patterns and behaviors
+- **Businesses**: Make data-driven decisions based on customer sentiment
+
+### ⚡ **Key Benefits**
+- **Real-time Analysis**: Get instant emotion detection results in 10-15 seconds
+- **Professional UI**: Beautiful, intuitive interface built with Flutter
+- **Accurate Results**: AI-powered emotion recognition with confidence scoring
+- **Enterprise Ready**: Admin and employee portals with role-based access
+- **Cross-Platform**: Works on Android, iOS, and Web browsers
+
 ##  Enterprise-Grade Emotion Recognition & Analytics Platform
 
 **Emosense** is a cutting-edge Flutter application that revolutionizes customer service and human interaction analysis through advanced emotion recognition and real-time sentiment monitoring. Built with **Clean Architecture** principles, this enterprise-ready solution empowers businesses to understand, analyze, and improve human interactions across multiple channels.
@@ -153,6 +174,67 @@ lib/
 ### 🔧 Development Workflow
 ![Development Process](screenshots/development_workflow.png)
 *Professional development practices and code organization*
+
+---
+
+##  📊 Project Presentation
+
+### 🎓 Academic Presentation - Nile University Grad Project
+
+<div align="center">
+
+![EmoSense Logo](assets/Multi%20Emotion%20Detection%20For%20Mental%20illnesses/29.jpg)
+
+*Multi Emotion Detection System for Customer Feedback - Graduate Project*
+
+</div>
+
+### 📑 Presentation Slides
+
+<details>
+<summary><strong>🎯 Click to View Complete Presentation</strong></summary>
+
+#### Project Overview & Introduction
+| Slide 30 | Slide 31 | Slide 32 |
+|:---:|:---:|:---:|
+| ![Slide 30](assets/Multi%20Emotion%20Detection%20For%20Mental%20illnesses/30.jpg) | ![Slide 31](assets/Multi%20Emotion%20Detection%20For%20Mental%20illnesses/31.jpg) | ![Slide 32](assets/Multi%20Emotion%20Detection%20For%20Mental%20illnesses/32.jpg) |
+
+#### Technical Architecture & Implementation
+| Slide 33 | Slide 34 | Slide 35 |
+|:---:|:---:|:---:|
+| ![Slide 33](assets/Multi%20Emotion%20Detection%20For%20Mental%20illnesses/33.jpg) | ![Slide 34](assets/Multi%20Emotion%20Detection%20For%20Mental%20illnesses/34.jpg) | ![Slide 35](assets/Multi%20Emotion%20Detection%20For%20Mental%20illnesses/35.jpg) |
+
+#### System Features & Capabilities
+| Slide 36 | Slide 37 | Slide 38 |
+|:---:|:---:|:---:|
+| ![Slide 36](assets/Multi%20Emotion%20Detection%20For%20Mental%20illnesses/36.jpg) | ![Slide 37](assets/Multi%20Emotion%20Detection%20For%20Mental%20illnesses/37.jpg) | ![Slide 38](assets/Multi%20Emotion%20Detection%20For%20Mental%20illnesses/38.jpg) |
+
+#### Results & Analysis
+| Slide 39 | Slide 40 | Slide 41 |
+|:---:|:---:|:---:|
+| ![Slide 39](assets/Multi%20Emotion%20Detection%20For%20Mental%20illnesses/39.jpg) | ![Slide 40](assets/Multi%20Emotion%20Detection%20For%20Mental%20illnesses/40.jpg) | ![Slide 41](assets/Multi%20Emotion%20Detection%20For%20Mental%20illnesses/41.jpg) |
+
+#### Implementation Details & Performance
+| Slide 42 | Slide 43 | Slide 44 |
+|:---:|:---:|:---:|
+| ![Slide 42](assets/Multi%20Emotion%20Detection%20For%20Mental%20illnesses/42.jpg) | ![Slide 43](assets/Multi%20Emotion%20Detection%20For%20Mental%20illnesses/43.jpg) | ![Slide 44](assets/Multi%20Emotion%20Detection%20For%20Mental%20illnesses/44.jpg) |
+
+#### Conclusions & Future Work
+| Slide 45 | Slide 46 | Slide 47 |
+|:---:|:---:|:---:|
+| ![Slide 45](assets/Multi%20Emotion%20Detection%20For%20Mental%20illnesses/45.jpg) | ![Slide 46](assets/Multi%20Emotion%20Detection%20For%20Mental%20illnesses/46.jpg) | ![Slide 47](assets/Multi%20Emotion%20Detection%20For%20Mental%20illnesses/47.jpg) |
+
+</details>
+
+### 🎓 **Academic Context**
+This project represents a comprehensive graduate-level research and development effort at **Nile University**, focusing on advanced emotion recognition technologies for practical business applications. The presentation demonstrates the theoretical foundation, technical implementation, and real-world applicability of the EmoSense platform.
+
+### 📈 **Presentation Highlights**
+- **Research Methodology**: Academic approach to emotion detection algorithms
+- **Technical Implementation**: Flutter-based mobile application architecture
+- **Business Applications**: Customer feedback analysis and service improvement
+- **Performance Metrics**: Comprehensive testing and validation results
+- **Future Roadmap**: Scalability and enhancement opportunities
 
 ---
 
